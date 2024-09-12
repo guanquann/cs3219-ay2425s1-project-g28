@@ -11,3 +11,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Lint question service
         run: cd backend/question-service && npm install && npm run lint
+      - name: Lint frontend
+        run: cd frontend && npm install && npm run lint
