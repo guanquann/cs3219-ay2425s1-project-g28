@@ -1,15 +1,46 @@
 name: Lint
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+env:
+  NODE_VERSION: 20
 
 jobs:
-  lint:
-    name: Lint
+  question-service:
     runs-on: ubuntu-latest
+    name: Question service
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Lint question service
-        run: cd backend/question-service && npm install && npm run lint
-      - name: Lint frontend
-        run: cd frontend && npm install && npm run lint
+      - name: Setting node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependences
+        working-directory: ./backend/question-service
+        run: npm install
+      - name: Run eslint
+        working-directory: ./backend/question-service
+        run: npm run lint
+  frontend:
+    runs-on: ubuntu-latest
+    name: Frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setting node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+      - name: Run eslint
+        working-directory: ./frontend
+        run: npm run lint
