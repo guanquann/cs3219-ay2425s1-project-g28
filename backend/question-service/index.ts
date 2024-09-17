@@ -1,9 +1,9 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const path = require("path");
-const swaggerUi = require("swagger-ui-express");
-const yaml = require("yaml");
-const fs = require("fs");
+import express, { Express, Request, Response } from "express";
+import dotenv from "dotenv";
+import path from "path";
+import swaggerUi from "swagger-ui-express";
+import yaml from "yaml";
+import fs from "fs";
 
 const envFilePath = path.join(
   path.resolve(path.dirname(path.dirname(__dirname))),
@@ -15,12 +15,12 @@ const swaggerDocument = yaml.parse(file);
 
 dotenv.config({ path: envFilePath });
 
-const app = express();
+const app: Express = express();
 
 const PORT = process.env.QUESTION_SERVICE_PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.status(200).json({ message: "Hello World from question-service" });
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Hello world from question service" });
 });
 
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
