@@ -1,3 +1,5 @@
+// technically this should be in the backend...
+
 import { initializeApp } from "firebase/app";
 import { getStorage } from "firebase/storage";
 

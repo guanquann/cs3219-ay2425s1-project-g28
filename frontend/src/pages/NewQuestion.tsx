@@ -9,8 +9,8 @@ import { v4 as uuidv4 } from "uuid";
 import { storage } from "../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
-import QuestionMarkdown from "../components/question/QuestionMarkdown";
-import QuestionImageContainer from "../components/question/QuestionImageContainer";
+import QuestionMarkdown from "../components/NewQuestion/QuestionMarkdown";
+import QuestionImageContainer from "../components/NewQuestion/QuestionImageContainer";
 
 // hardcode for now
 const difficultyList: string[] = ["Easy", "Medium", "Hard"];
