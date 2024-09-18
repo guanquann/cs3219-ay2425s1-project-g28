@@ -122,7 +122,7 @@ const NewQuestion = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: "70vw", margin: "auto" }}>
+    <Box maxWidth={"70vw"} margin={"auto"}>
       <IconButton onClick={handleBack}>
         <ArrowBackIcon />
       </IconButton>

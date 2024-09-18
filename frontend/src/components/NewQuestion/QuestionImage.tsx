@@ -33,18 +33,18 @@ const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) =
 
       <Box
         className="moreInfo"
+        top={0}
+        left={0}
+        width="100%"
+        height="100%"
+        position="absolute"
+        borderRadius={3}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         sx={{
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          position: "absolute",
           opacity: 0,
-          borderRadius: 3,
           backgroundColor: "#75757599",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
           transition: "opacity 0.5s ease",
         }}
       >
