@@ -1,13 +1,6 @@
 import { Dispatch } from "react";
 // import { questionClient } from "../utils/api";
 
-type QuestionInfo = {
-  questionId: string;
-  title: string;
-  complexity: string;
-  categories: Array<string>;
-};
-
 type QuestionDetail = {
   questionId: string;
   title: string;
@@ -22,13 +15,19 @@ enum QuestionActionTypes {
 
 type QuestionActions = {
   type: QuestionActionTypes;
-  payload: QuestionDetail;
+  payload: Array<QuestionDetail> | QuestionDetail;
 };
 
 type QuestionsState = {
-  questions: Array<QuestionInfo>;
+  questions: Array<QuestionDetail>;
   selectedQuestion: QuestionDetail | null;
   selectedQuestionError: string | null;
+};
+
+const isQuestionList = (
+  questionsList: Array<QuestionDetail> | QuestionDetail
+): questionsList is Array<QuestionDetail> => {
+  return Array.isArray(questionsList);
 };
 
 export const initialState: QuestionsState = {
@@ -65,12 +64,6 @@ export const getQuestionById = (
       categories: ["Category1", "Category2"],
     },
   });
-};
-
-const isQuestionList = (
-  questionsList: Array<QuestionInfo> | QuestionDetail
-): questionsList is Array<QuestionInfo> => {
-  return Array.isArray(questionsList);
 };
 
 const reducer = (

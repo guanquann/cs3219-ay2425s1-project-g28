@@ -4,12 +4,12 @@ import { FunctionComponent } from "react";
 import AppMargin from "../AppMargin";
 import { useNavigate } from "react-router-dom";
 
-type NavbarItems = { label: string; link: string };
+type NavbarItem = { label: string; link: string };
 
-const Navbar: FunctionComponent = () => {
-  const navbarItems: Array<NavbarItems> = [
-    { label: "Questions", link: "/questions" },
-  ];
+type NavbarProps = { navbarItems?: Array<NavbarItem> };
+
+const Navbar: FunctionComponent<NavbarProps> = (props: NavbarProps) => {
+  const { navbarItems = [{ label: "Questions", link: "/" }] } = props;
   const navigate = useNavigate();
 
   return (
@@ -29,7 +29,7 @@ const Navbar: FunctionComponent = () => {
           <Typography
             component={Box}
             variant="h5"
-            sx={[{ flexGrow: 1 }, { "&:hover": { cursor: "pointer" } }]}
+            sx={[{ flexGrow: 1, "&:hover": { cursor: "pointer" } }]}
             onClick={() => navigate("/")}
           >
             PeerPrep
