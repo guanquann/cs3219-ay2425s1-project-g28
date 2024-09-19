@@ -44,10 +44,10 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
         variant="contained"
         disableElevation={true}
         sx={(theme) => ({
-          borderRadius: 3,
+          borderRadius: 1,
           height: 128,
           width: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.02)",
+          backgroundColor: "#fff",
           color: "#757575",
           border: "1px solid",
           borderColor: theme.palette.grey[400],
@@ -79,10 +79,10 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
             variant="contained"
             disableElevation={true}
             sx={(theme) => ({
-              borderRadius: 3,
+              borderRadius: 1,
               height: 128,
               width: 128,
-              backgroundColor: "rgba(0, 0, 0, 0.02)",
+              backgroundColor: "#fff",
               color: "#757575",
               border: "1px solid",
               borderColor: theme.palette.grey[400],

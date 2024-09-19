@@ -20,14 +20,14 @@ const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) =
         ":hover .moreInfo": {
           opacity: 1,
         },
-        borderRadius: 3,
+        borderRadius: 1,
         overflow: "hidden",
       }}
     >
       <img
         src={url}
         loading="lazy"
-        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 3 }}
+        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 1 }}
         alt="question image"
       />
 
@@ -38,7 +38,7 @@ const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) =
         width="100%"
         height="100%"
         position="absolute"
-        borderRadius={3}
+        borderRadius={1}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -53,12 +53,12 @@ const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) =
             navigator.clipboard.writeText(`![image](${url})`);
             toast.success("Image URL copied to clipboard");
           }}
-          sx={{ color: "white" }}
+          sx={{ color: "#fff" }}
         >
           <ContentCopyIcon />
         </IconButton>
 
-        <IconButton onClick={() => handleClickOpen(url)} sx={{ color: "white" }}>
+        <IconButton onClick={() => handleClickOpen(url)} sx={{ color: "#fff " }}>
           <FullscreenIcon />
         </IconButton>
       </Box>
