@@ -42,15 +42,17 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
       <Button
         component="label"
         variant="contained"
-        sx={{
+        disableElevation={true}
+        sx={(theme) => ({
           borderRadius: 3,
           height: 128,
           width: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.01)",
+          backgroundColor: "rgba(0, 0, 0, 0.02)",
           color: "#757575",
-          border: "1px grey",
+          border: "1px solid",
+          borderColor: theme.palette.grey[400],
           marginTop: 2,
-        }}
+        })}
       >
         <FileUploadIcon />
         Click to upload images. The maximum image size accepted is 5MB.
@@ -75,15 +77,17 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
           <Button
             component="label"
             variant="contained"
-            sx={{
+            disableElevation={true}
+            sx={(theme) => ({
               borderRadius: 3,
               height: 128,
               width: 128,
-              backgroundColor: "rgba(0, 0, 0, 0.01)",
+              backgroundColor: "rgba(0, 0, 0, 0.02)",
               color: "#757575",
-              border: "1px grey",
+              border: "1px solid",
+              borderColor: theme.palette.grey[400],
               textAlign: "center",
-            }}
+            })}
           >
             <FileUploadIcon />
             Upload images
