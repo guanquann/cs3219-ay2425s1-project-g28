@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Autocomplete, Box, Button, IconButton, Stack, TextField } from "@mui/material";
+import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { storage } from "../../firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
+import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
 
@@ -49,7 +50,7 @@ const NewQuestion = () => {
         return;
       }
     }
-    navigate("/question");
+    navigate("/questions");
   };
 
   // File upload adapted from https://firebase.google.com/docs/storage/web/upload-files#web_2
@@ -122,8 +123,8 @@ const NewQuestion = () => {
   };
 
   return (
-    <Box maxWidth={"70vw"} margin={"auto"}>
-      <IconButton onClick={handleBack}>
+    <AppMargin>
+      <IconButton onClick={handleBack} sx={{ marginTop: 2 }}>
         <ArrowBackIcon />
       </IconButton>
 
@@ -166,7 +167,7 @@ const NewQuestion = () => {
 
       <QuestionMarkdown markdownText={markdownText} setMarkdownText={setMarkdownText} />
 
-      <Stack spacing={2} direction="row" paddingTop={2}>
+      <Stack spacing={2} direction="row" paddingTop={2} paddingBottom={8}>
         <Button variant="contained" fullWidth onClick={handleSubmit}>
           Submit Question
         </Button>
@@ -176,7 +177,7 @@ const NewQuestion = () => {
       </Stack>
 
       <ToastContainer position="bottom-right" />
-    </Box>
+    </AppMargin>
   );
 };
 
