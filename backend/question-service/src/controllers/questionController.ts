@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Question from "../models/Question.ts";
+import { checkIsExistingQuestion } from "../utils/utils.ts";
+import { DUPLICATE_QUESTION_RESPONSE_MESSAGE } from "../utils/constants.ts";
 
 export const createQuestion = async (
   req: Request,
@@ -8,14 +10,10 @@ export const createQuestion = async (
   try {
     const { title, description, complexity, category } = req.body;
 
-    const existingQuestion = await Question.findOne({
-      title: new RegExp(`^${title}$`, "i"),
-    });
-
+    const existingQuestion = await checkIsExistingQuestion(title);
     if (existingQuestion) {
       res.status(400).json({
-        message:
-          "Duplicate question: A question with the same title already exists.",
+        message: DUPLICATE_QUESTION_RESPONSE_MESSAGE,
       });
       return;
     }
@@ -44,13 +42,25 @@ export const updateQuestion = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const updatedQuestion = await Question.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    if (!updatedQuestion) {
+    const { title } = req.body;
+
+    const currentQuestion = await Question.findById(id);
+    if (!currentQuestion) {
       res.status(404).json({ message: "Question not found" });
       return;
     }
+
+    const existingQuestion = await checkIsExistingQuestion(title, id);
+    if (existingQuestion) {
+      res.status(400).json({
+        message: DUPLICATE_QUESTION_RESPONSE_MESSAGE,
+      });
+      return;
+    }
+
+    const updatedQuestion = await Question.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
 
     res.status(200).json({
       message: "Question updated successfully",
