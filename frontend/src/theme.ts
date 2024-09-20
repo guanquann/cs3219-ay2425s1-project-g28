@@ -16,6 +16,16 @@ const theme = createTheme({
     h5: { fontWeight: 600 },
     h6: { fontWeight: 600 },
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+          fontWeight: "bold",
+        },
+      },
+    },
+  },
 });
 
 export default theme;

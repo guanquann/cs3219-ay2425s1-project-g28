@@ -10,7 +10,7 @@ const Layout: FunctionComponent = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        minInlineSize: "100vw",
+        // minInlineSize: "100vw",
       }}
     >
       <Navbar />
