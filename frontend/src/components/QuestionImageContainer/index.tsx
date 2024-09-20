@@ -4,7 +4,7 @@ import { Button, ImageList, ImageListItem } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import "react-toastify/dist/ReactToastify.css";
 
-import QuestionImage from "../NewQuestion/QuestionImage";
+import QuestionImage from "../QuestionImage";
 import QuestionImageDialog from "../QuestionImageDialog";
 
 const FileUploadInput = styled("input")({
