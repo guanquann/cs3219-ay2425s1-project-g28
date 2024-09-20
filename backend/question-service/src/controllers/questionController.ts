@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { v4 as uuidv4 } from "uuid";
 import Question from "../models/Question.ts";
 import { checkIsExistingQuestion } from "../utils/utils.ts";
 import {
@@ -8,8 +7,8 @@ import {
   QN_DESC_CHAR_LIMIT,
 } from "../utils/constants.ts";
 
-import { bucket, uploadFileToFirebase } from "../../config/firebase";
 import { upload } from "../../config/multer";
+import { uploadFileToFirebase } from "../utils/utils";
 
 export const createQuestion = async (
   req: Request,
