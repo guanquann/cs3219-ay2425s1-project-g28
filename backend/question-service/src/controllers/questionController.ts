@@ -7,13 +7,28 @@ export const createQuestion = async (
 ): Promise<void> => {
   try {
     const { title, description, complexity, category } = req.body;
+
+    const existingQuestion = await Question.findOne({
+      title: new RegExp(`^${title}$`, "i"),
+    });
+
+    if (existingQuestion) {
+      res.status(400).json({
+        message:
+          "Duplicate question: A question with the same title already exists.",
+      });
+      return;
+    }
+
     const newQuestion = new Question({
       title,
       description,
       complexity,
       category,
     });
+
     await newQuestion.save();
+
     res.status(201).json({
       message: "Question created successfully",
       question: newQuestion,
