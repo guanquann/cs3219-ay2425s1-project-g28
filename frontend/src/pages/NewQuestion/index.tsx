@@ -4,35 +4,22 @@ import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/materia
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { v4 as uuidv4 } from "uuid";
-
-import { storage } from "../../firebase";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
 
 // hardcode for now
-const difficultyList: string[] = ["Easy", "Medium", "Hard"];
+const complexityList: string[] = ["Easy", "Medium", "Hard"];
 const categoryList: string[] = [
-  "Array",
-  "Hashmap",
-  "Stack",
-  "DP",
-  "Bitwise",
-  "DFS",
-  "BFS",
-  "Tree",
-  "Graph",
-  "String",
-  "Math",
-  "Design",
-  "SQL",
-  "Shell",
-  "Concurrency",
-  "System Design",
-  "Others",
+  "Strings",
+  "Algorithms",
+  "Data Structures",
+  "Bit Manipulation",
+  "Recursion",
+  "Databases",
+  "Arrays",
+  "Brainteaser",
 ];
 
 const NewQuestion = () => {
@@ -40,12 +27,12 @@ const NewQuestion = () => {
 
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null);
+  const [selectedComplexity, setselectedComplexity] = useState<string | null>(null);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
 
   const handleBack = () => {
-    if (title || markdownText || selectedDifficulty || selectedCategories.length > 0) {
+    if (title || markdownText || selectedComplexity || selectedCategories.length > 0) {
       if (!confirm("Are you sure you want to leave this page? All process will be lost.")) {
         return;
       }
@@ -53,15 +40,13 @@ const NewQuestion = () => {
     navigate("/questions");
   };
 
-  // File upload adapted from https://firebase.google.com/docs/storage/web/upload-files#web_2
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files) {
       return;
     }
 
-    for (let i = 0; i < event.target.files.length; i++) {
-      const file = event.target.files![i];
-
+    const formData = new FormData();
+    for (const file of event.target.files) {
       if (!file.type.startsWith("image/")) {
         toast.error(`${file.name} is not an image`);
         continue;
@@ -71,57 +56,61 @@ const NewQuestion = () => {
         toast.error(`${file.name} is more than 5MB`);
         continue;
       }
+      formData.append("images[]", file);
+    }
 
-      const blob = new Blob([file], { type: file.type });
+    try {
+      const response = await fetch("http://localhost:3000/api/questions/images", {
+        method: "POST",
+        body: formData,
+      });
 
-      // this parts onwards should be in the backend...
-      const storageRef = ref(storage, uuidv4());
-      const uploadTask = uploadBytesResumable(storageRef, blob);
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-          }
-        },
-        (error) => {
-          console.error(error);
-          toast.error("Upload of images failed");
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setUploadedImagesUrl((prevUrls) => [...prevUrls, downloadURL]);
-          });
-        }
-      );
+      const data = await response.json();
+      for (const imageUrl of data.imageUrls) {
+        setUploadedImagesUrl((prev) => [...prev, imageUrl]);
+      }
+      toast.success("File uploaded successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error uploading file");
     }
   };
 
   const handleSubmit = async () => {
-    try {
-      console.log(title, markdownText, selectedDifficulty, selectedCategories);
+    if (!title || !markdownText || !selectedComplexity || selectedCategories.length === 0) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
-      if (!title || !markdownText || !selectedDifficulty || selectedCategories.length === 0) {
-        toast.error("Please fill in all fields");
+    try {
+      const response = await fetch("http://localhost:3000/api/questions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          description: markdownText,
+          complexity: selectedComplexity,
+          category: selectedCategories,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.status === 400) {
+        toast.error(data.message);
         return;
       }
 
-      // insert API call here
-
       toast.success("Question successfully created");
+      navigate("/questions");
     } catch (error) {
       console.error(error);
-      toast.success("Failed to create question");
+      toast.error("Failed to create question");
     }
   };
 
@@ -143,13 +132,13 @@ const NewQuestion = () => {
       />
 
       <Autocomplete
-        options={difficultyList}
+        options={complexityList}
         size="small"
         sx={{ marginTop: 2 }}
-        onChange={(e, newDifficultySelected) => {
-          setSelectedDifficulty(newDifficultySelected);
+        onChange={(e, newcomplexitySelected) => {
+          setselectedComplexity(newcomplexitySelected);
         }}
-        renderInput={(params) => <TextField {...params} label="Difficulty" />}
+        renderInput={(params) => <TextField {...params} label="Complexity" />}
       />
 
       <Autocomplete

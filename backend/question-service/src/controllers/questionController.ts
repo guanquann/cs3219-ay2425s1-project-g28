@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
 import Question from "../models/Question.ts";
 import { checkIsExistingQuestion } from "../utils/utils.ts";
 import {
@@ -6,6 +7,9 @@ import {
   QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
   QN_DESC_CHAR_LIMIT,
 } from "../utils/constants.ts";
+
+import { bucket, uploadFileToFirebase } from "../../config/firebase";
+import { upload } from "../../config/multer";
 
 export const createQuestion = async (
   req: Request,
@@ -45,6 +49,32 @@ export const createQuestion = async (
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
+};
+
+export const createImageLink = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to upload images", error: err.message });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    try {
+      const files = req.files as Express.Multer.File[];
+      const uploadPromises = files.map((file) => uploadFileToFirebase(file));
+      const imageUrls = await Promise.all(uploadPromises);
+      res.status(200).json({ imageUrls });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error });
+    }
+  });
 };
 
 export const updateQuestion = async (
