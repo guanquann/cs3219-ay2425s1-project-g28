@@ -9,7 +9,7 @@ type NavbarItem = { label: string; link: string };
 type NavbarProps = { navbarItems?: Array<NavbarItem> };
 
 const Navbar: FunctionComponent<NavbarProps> = (props: NavbarProps) => {
-  const { navbarItems = [{ label: "Questions", link: "/" }] } = props;
+  const { navbarItems = [{ label: "Questions", link: "/questions" }] } = props;
   const navigate = useNavigate();
 
   return (
