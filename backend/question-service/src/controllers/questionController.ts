@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 import Question from "../models/Question.ts";
 import { checkIsExistingQuestion } from "../utils/utils.ts";
-import { DUPLICATE_QUESTION_RESPONSE_MESSAGE } from "../utils/constants.ts";
+import {
+  DUPLICATE_QUESTION_RESPONSE_MESSAGE,
+  QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
+  QN_DESC_CHAR_LIMIT,
+} from "../utils/constants.ts";
 
 export const createQuestion = async (
   req: Request,
@@ -14,6 +18,13 @@ export const createQuestion = async (
     if (existingQuestion) {
       res.status(400).json({
         message: DUPLICATE_QUESTION_RESPONSE_MESSAGE,
+      });
+      return;
+    }
+
+    if (description.length > QN_DESC_CHAR_LIMIT) {
+      res.status(400).json({
+        message: QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
       });
       return;
     }
@@ -42,7 +53,7 @@ export const updateQuestion = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const { title } = req.body;
+    const { title, description } = req.body;
 
     const currentQuestion = await Question.findById(id);
     if (!currentQuestion) {
@@ -54,6 +65,13 @@ export const updateQuestion = async (
     if (existingQuestion) {
       res.status(400).json({
         message: DUPLICATE_QUESTION_RESPONSE_MESSAGE,
+      });
+      return;
+    }
+
+    if (description && description.length > QN_DESC_CHAR_LIMIT) {
+      res.status(400).json({
+        message: QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
       });
       return;
     }
