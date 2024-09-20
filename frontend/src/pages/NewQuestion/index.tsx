@@ -72,8 +72,11 @@ const NewQuestion = () => {
         continue;
       }
 
+      const blob = new Blob([file], { type: file.type });
+
+      // this parts onwards should be in the backend...
       const storageRef = ref(storage, uuidv4());
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const uploadTask = uploadBytesResumable(storageRef, blob);
 
       uploadTask.on(
         "state_changed",

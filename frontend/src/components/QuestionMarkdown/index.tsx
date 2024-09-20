@@ -1,5 +1,6 @@
 import MDEditor, { commands } from "@uiw/react-md-editor";
 import { Stack } from "@mui/material";
+import "./index.css";
 
 interface QuestionMarkdownProps {
   markdownText: string;
@@ -10,6 +11,9 @@ const QuestionMarkdown: React.FC<QuestionMarkdownProps> = ({ markdownText, setMa
   return (
     <Stack data-color-mode="light" paddingTop={2}>
       <MDEditor
+        textareaProps={{
+          placeholder: "Description",
+        }}
         value={markdownText}
         onChange={(value) => setMarkdownText(value || "")}
         preview="edit"
