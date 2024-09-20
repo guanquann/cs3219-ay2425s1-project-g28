@@ -5,7 +5,7 @@ import yaml from "yaml";
 import fs from "fs";
 
 import connectDB from "./config/db.ts";
-import questionRoutes from "./routes/questionRoutes.ts";
+import questionRoutes from "./src/routes/questionRoutes.ts";
 
 dotenv.config();
 
