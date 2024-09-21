@@ -6,6 +6,11 @@ export interface IUser extends Document {
   password: string;
   createdAt?: Date;
   isAdmin: boolean;
+
+  profile_picture_url?: string;
+  first_name?: string;
+  last_name?: string;
+  biography?: string;
 }
 
 const UserModelSchema: Schema<IUser> = new mongoose.Schema({
@@ -31,6 +36,23 @@ const UserModelSchema: Schema<IUser> = new mongoose.Schema({
     type: Boolean,
     required: true,
     default: false,
+  },
+  profile_picture_url: {
+    type: String,
+    required: false,
+  },
+  first_name: {
+    type: String,
+    required: false,
+  },
+  last_name: {
+    type: String,
+    required: false,
+  },
+  biography: {
+    type: String,
+    required: false,
+    default: "Hello World!",
   },
 });
 

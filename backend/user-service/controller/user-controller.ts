@@ -12,15 +12,31 @@ import {
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
 } from "../model/repository";
+import { validateEmail, validateUsername, validatePassword } from "../utils/validators";
 import { IUser } from "../model/user-model";
 
 export async function createUser(req: Request, res: Response): Promise<Response> {
   try {
     const { username, email, password } = req.body;
+    const existingUser = await _findUserByUsernameOrEmail(username, email);
+    if (existingUser) {
+      return res.status(409).json({ message: "username or email already exists" });
+    }
+
     if (username && email && password) {
-      const existingUser = await _findUserByUsernameOrEmail(username, email);
-      if (existingUser) {
-        return res.status(409).json({ message: "username or email already exists" });
+      const { isValid: isValidUsername, message: usernameMessage } = validateUsername(username);
+      if (!isValidUsername) {
+        return res.status(400).json({ message: usernameMessage });
+      }
+
+      const { isValid: isValidEmail, message: emailMessage } = validateEmail(email);
+      if (!isValidEmail) {
+        return res.status(400).json({ message: emailMessage });
+      }
+
+      const { isValid: isValidPassword, message: passwordMessage } = validatePassword(password);
+      if (!isValidPassword) {
+        return res.status(400).json({ message: passwordMessage });
       }
 
       const salt = bcrypt.genSaltSync(10);
@@ -71,8 +87,17 @@ export async function getAllUsers(req: Request, res: Response): Promise<Response
 
 export async function updateUser(req: Request, res: Response): Promise<Response> {
   try {
-    const { username, email, password } = req.body;
-    if (username || email || password) {
+    const { username, email, password, profile_picture_url, first_name, last_name, biography } =
+      req.body;
+    if (
+      username ||
+      email ||
+      password ||
+      profile_picture_url ||
+      first_name ||
+      last_name ||
+      biography
+    ) {
       const userId = req.params.id;
       if (!isValidObjectId(userId)) {
         return res.status(404).json({ message: `User ${userId} not found` });
@@ -92,12 +117,21 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
         }
       }
 
-      let hashedPassword: string = "";
+      let hashedPassword: string | undefined;
       if (password) {
         const salt = bcrypt.genSaltSync(10);
         hashedPassword = bcrypt.hashSync(password, salt);
       }
-      const updatedUser = await _updateUserById(userId, username, email, hashedPassword);
+      const updatedUser = await _updateUserById(
+        userId,
+        username,
+        email,
+        hashedPassword,
+        profile_picture_url,
+        first_name,
+        last_name,
+        biography
+      );
       return res.status(200).json({
         message: `Updated data for user ${userId}`,
         data: formatUserResponse(updatedUser as IUser),
@@ -168,5 +202,10 @@ export function formatUserResponse(user: IUser) {
     email: user.email,
     isAdmin: user.isAdmin,
     createdAt: user.createdAt,
+
+    profile_picture_url: user.profile_picture_url,
+    first_name: user.first_name,
+    last_name: user.last_name,
+    biography: user.biography,
   };
 }

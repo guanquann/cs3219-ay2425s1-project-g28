@@ -1,6 +1,7 @@
 import UserModel, { IUser } from "./user-model";
 import "dotenv/config";
 import { connect } from "mongoose";
+import { faker } from "@faker-js/faker";
 
 export async function connectToDB() {
   const mongoDBUri: string | undefined = process.env.DB_CLOUD_URI;
@@ -17,7 +18,13 @@ export async function createUser(
   email: string,
   password: string
 ): Promise<IUser> {
-  return new UserModel({ username, email, password }).save();
+  return new UserModel({
+    username,
+    email,
+    password,
+    first_name: faker.person.firstName(),
+    last_name: faker.person.lastName(),
+  }).save();
 }
 
 export async function findUserByEmail(email: string): Promise<IUser | null> {
@@ -49,7 +56,11 @@ export async function updateUserById(
   userId: string,
   username: string,
   email: string,
-  password: string
+  password: string | undefined,
+  profile_picture_url: string,
+  first_name: string,
+  last_name: string,
+  biography: string
 ): Promise<IUser | null> {
   return UserModel.findByIdAndUpdate(
     userId,
@@ -58,6 +69,10 @@ export async function updateUserById(
         username,
         email,
         password,
+        profile_picture_url,
+        first_name,
+        last_name,
+        biography,
       },
     },
     { new: true } // return the updated user

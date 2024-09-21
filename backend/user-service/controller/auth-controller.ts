@@ -25,7 +25,7 @@ export async function handleLogin(req: AuthenticatedRequest, res: Response): Pro
         },
         process.env.JWT_SECRET as string,
         {
-          expiresIn: "1d",
+          expiresIn: "7d",
         }
       );
       return res
