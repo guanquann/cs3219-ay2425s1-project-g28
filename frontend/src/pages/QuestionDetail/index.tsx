@@ -7,60 +7,105 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useReducer } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Markdown from "markdown-to-jsx";
 import AppMargin from "../../components/AppMargin";
-import reducer, {
-  getQuestionById,
-  initialState,
-} from "../../reducers/questionReducer";
 import { grey } from "@mui/material/colors";
+import classes from "./index.module.css";
+import NotFound from "../../components/NotFound";
 
-const QuestionDetail: FunctionComponent = () => {
+type Question = {
+  title: string;
+  description: string;
+  complexity: string;
+  categories: Array<string>;
+};
+
+const QuestionDetail: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [question, setQuestion] = useState<Question | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const theme = useTheme();
 
   useEffect(() => {
     if (!questionId) {
+      setIsLoading(false);
       return;
     }
-    getQuestionById(questionId, dispatch);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // TODO: fetch question
+    const md =
+      "# Sample header 1\n" +
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<br /><br />" +
+      "**Example ordered list:**\n" +
+      "1. Item 1\n" +
+      "2. `Item 2`\n\n" +
+      "*Example unordered list:*\n" +
+      "- Item 1\n" +
+      "- Item 2";
+    setQuestion({
+      title: "Test Question",
+      description: md,
+      complexity: "Medium",
+      categories: ["Category 1", "Category 2"],
+    });
+    setIsLoading(false);
   }, []);
 
-  if (!state.selectedQuestion) {
-    return;
+  if (!question) {
+    if (isLoading) {
+      return (
+        <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
+          <NotFound
+            title="Question not found..."
+            subtitle="Unfortunately, we can't find what you're looking for 😥"
+          />
+        </AppMargin>
+      );
+    } else {
+      return;
+    }
   }
 
   return (
     <AppMargin>
-      <Box sx={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+      <Box
+        sx={(theme) => ({
+          marginTop: theme.spacing(4),
+          marginBottom: theme.spacing(4),
+        })}
+      >
         <Box
-          sx={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}
+          sx={(theme) => ({
+            marginTop: theme.spacing(4),
+            marginBottom: theme.spacing(4),
+          })}
         >
           <Typography component={"h1"} variant="h3">
-            {state.selectedQuestion.title}
+            {question.title}
           </Typography>
-          <Stack direction={"row"} sx={{ marginTop: theme.spacing(2) }}>
+          <Stack
+            direction={"row"}
+            sx={(theme) => ({ marginTop: theme.spacing(2) })}
+          >
             <Chip
-              key={state.selectedQuestion.complexity}
-              label={state.selectedQuestion.complexity}
+              key={question.complexity}
+              label={question.complexity}
               color="primary"
-              sx={{
+              sx={(theme) => ({
                 marginLeft: theme.spacing(1),
                 marginRight: theme.spacing(1),
-              }}
+              })}
             />
-            {state.selectedQuestion.categories.map((cat) => (
+            {question.categories.map((cat) => (
               <Chip
                 key={cat}
                 label={cat}
-                sx={{
+                sx={(theme) => ({
                   marginLeft: theme.spacing(1),
                   marginRight: theme.spacing(1),
-                }}
+                })}
               />
             ))}
           </Stack>
@@ -119,7 +164,7 @@ const QuestionDetail: FunctionComponent = () => {
             },
           }}
         >
-          {state.selectedQuestion.description}
+          {question.description}
         </Markdown>
       </Box>
     </AppMargin>

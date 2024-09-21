@@ -1,6 +1,5 @@
 import { AppBar, Box, Link, Toolbar, Typography } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import { FunctionComponent } from "react";
 import AppMargin from "../AppMargin";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +7,7 @@ type NavbarItem = { label: string; link: string };
 
 type NavbarProps = { navbarItems?: Array<NavbarItem> };
 
-const Navbar: FunctionComponent<NavbarProps> = (props: NavbarProps) => {
+const Navbar: React.FC<NavbarProps> = (props) => {
   const { navbarItems = [{ label: "Questions", link: "/questions" }] } = props;
   const navigate = useNavigate();
 
