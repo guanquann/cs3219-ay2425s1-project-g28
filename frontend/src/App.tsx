@@ -9,9 +9,11 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="/questions" element={<>question page list</>} />
-          <Route path="/questions/new" element={<NewQuestion />} />
-          <Route path="/questions/:questionId" element={<QuestionDetail />} />
+          <Route path="questions">
+            <Route index element={<>question page list</>} />
+            <Route path="new" element={<NewQuestion />} />
+            <Route path=":questionId" element={<QuestionDetail />} />
+          </Route>
           <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>
