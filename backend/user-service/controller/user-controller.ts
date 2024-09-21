@@ -1,3 +1,4 @@
+import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { isValidObjectId } from "mongoose";
 import {
@@ -10,9 +11,10 @@ import {
   findUserByUsernameOrEmail as _findUserByUsernameOrEmail,
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
-} from "../model/repository.js";
+} from "../model/repository";
+import { IUser } from "../model/user-model";
 
-export async function createUser(req, res) {
+export async function createUser(req: Request, res: Response): Promise<Response> {
   try {
     const { username, email, password } = req.body;
     if (username && email && password) {
@@ -37,7 +39,7 @@ export async function createUser(req, res) {
   }
 }
 
-export async function getUser(req, res) {
+export async function getUser(req: Request, res: Response): Promise<Response> {
   try {
     const userId = req.params.id;
     if (!isValidObjectId(userId)) {
@@ -56,7 +58,7 @@ export async function getUser(req, res) {
   }
 }
 
-export async function getAllUsers(req, res) {
+export async function getAllUsers(req: Request, res: Response): Promise<Response> {
   try {
     const users = await _findAllUsers();
 
@@ -67,7 +69,7 @@ export async function getAllUsers(req, res) {
   }
 }
 
-export async function updateUser(req, res) {
+export async function updateUser(req: Request, res: Response): Promise<Response> {
   try {
     const { username, email, password } = req.body;
     if (username || email || password) {
@@ -90,7 +92,7 @@ export async function updateUser(req, res) {
         }
       }
 
-      let hashedPassword;
+      let hashedPassword: string = "";
       if (password) {
         const salt = bcrypt.genSaltSync(10);
         hashedPassword = bcrypt.hashSync(password, salt);
@@ -98,10 +100,12 @@ export async function updateUser(req, res) {
       const updatedUser = await _updateUserById(userId, username, email, hashedPassword);
       return res.status(200).json({
         message: `Updated data for user ${userId}`,
-        data: formatUserResponse(updatedUser),
+        data: formatUserResponse(updatedUser as IUser),
       });
     } else {
-      return res.status(400).json({ message: "No field to update: username and email and password are all missing!" });
+      return res
+        .status(400)
+        .json({ message: "No field to update: username and email and password are all missing!" });
     }
   } catch (err) {
     console.error(err);
@@ -109,11 +113,12 @@ export async function updateUser(req, res) {
   }
 }
 
-export async function updateUserPrivilege(req, res) {
+export async function updateUserPrivilege(req: Request, res: Response): Promise<Response> {
   try {
     const { isAdmin } = req.body;
 
-    if (isAdmin !== undefined) {  // isAdmin can have boolean value true or false
+    if (isAdmin !== undefined) {
+      // isAdmin can have boolean value true or false
       const userId = req.params.id;
       if (!isValidObjectId(userId)) {
         return res.status(404).json({ message: `User ${userId} not found` });
@@ -126,7 +131,7 @@ export async function updateUserPrivilege(req, res) {
       const updatedUser = await _updateUserPrivilegeById(userId, isAdmin === true);
       return res.status(200).json({
         message: `Updated privilege for user ${userId}`,
-        data: formatUserResponse(updatedUser),
+        data: formatUserResponse(updatedUser as IUser),
       });
     } else {
       return res.status(400).json({ message: "isAdmin is missing!" });
@@ -137,7 +142,7 @@ export async function updateUserPrivilege(req, res) {
   }
 }
 
-export async function deleteUser(req, res) {
+export async function deleteUser(req: Request, res: Response): Promise<Response> {
   try {
     const userId = req.params.id;
     if (!isValidObjectId(userId)) {
@@ -156,7 +161,7 @@ export async function deleteUser(req, res) {
   }
 }
 
-export function formatUserResponse(user) {
+export function formatUserResponse(user: IUser) {
   return {
     id: user.id,
     username: user.username,
