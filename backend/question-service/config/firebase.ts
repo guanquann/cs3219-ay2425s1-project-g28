@@ -1,9 +1,12 @@
 import admin from "firebase-admin";
-import serviceAccount from "../firebase.json";
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
-  storageBucket: "gs://peerprep-c3bd1.appspot.com",
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  } as admin.ServiceAccount),
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 const bucket = admin.storage().bucket();
