@@ -107,6 +107,6 @@ export const deleteQuestion = async (
     await Question.findByIdAndDelete(id);
     res.status(200).json({ message: QN_DELETED });
   } catch (error) {
-    res.send(500).json({ message: SERVER_ERROR, error });
+    res.status(500).json({ message: SERVER_ERROR, error });
   }
 };
