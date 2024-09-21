@@ -7,9 +7,9 @@ export interface IUser extends Document {
   createdAt?: Date;
   isAdmin: boolean;
 
-  profile_picture_url?: string;
-  first_name?: string;
-  last_name?: string;
+  profilePictureUrl?: string;
+  firstName?: string;
+  lastName?: string;
   biography?: string;
 }
 
@@ -37,15 +37,15 @@ const UserModelSchema: Schema<IUser> = new mongoose.Schema({
     required: true,
     default: false,
   },
-  profile_picture_url: {
+  profilePictureUrl: {
     type: String,
     required: false,
   },
-  first_name: {
+  firstName: {
     type: String,
     required: false,
   },
-  last_name: {
+  lastName: {
     type: String,
     required: false,
   },

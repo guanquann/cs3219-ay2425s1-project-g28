@@ -16,14 +16,16 @@ export async function connectToDB() {
 export async function createUser(
   username: string,
   email: string,
-  password: string
+  password: string,
+  isAdmin: boolean = false
 ): Promise<IUser> {
   return new UserModel({
     username,
     email,
     password,
-    first_name: faker.person.firstName(),
-    last_name: faker.person.lastName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    isAdmin,
   }).save();
 }
 
@@ -57,9 +59,9 @@ export async function updateUserById(
   username: string,
   email: string,
   password: string | undefined,
-  profile_picture_url: string,
-  first_name: string,
-  last_name: string,
+  profilePictureUrl: string,
+  firstName: string,
+  lastName: string,
   biography: string
 ): Promise<IUser | null> {
   return UserModel.findByIdAndUpdate(
@@ -69,9 +71,9 @@ export async function updateUserById(
         username,
         email,
         password,
-        profile_picture_url,
-        first_name,
-        last_name,
+        profilePictureUrl,
+        firstName,
+        lastName,
         biography,
       },
     },

@@ -12,7 +12,13 @@ import {
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
 } from "../model/repository";
-import { validateEmail, validateUsername, validatePassword } from "../utils/validators";
+import {
+  validateEmail,
+  validateUsername,
+  validatePassword,
+  validateName,
+  validateBiography,
+} from "../utils/validators";
 import { IUser } from "../model/user-model";
 
 export async function createUser(req: Request, res: Response): Promise<Response> {
@@ -87,31 +93,39 @@ export async function getAllUsers(req: Request, res: Response): Promise<Response
 
 export async function updateUser(req: Request, res: Response): Promise<Response> {
   try {
-    const { username, email, password, profile_picture_url, first_name, last_name, biography } =
+    const { username, email, password, profilePictureUrl, firstName, lastName, biography } =
       req.body;
-    if (
-      username ||
-      email ||
-      password ||
-      profile_picture_url ||
-      first_name ||
-      last_name ||
-      biography
-    ) {
+    if (username || email || password || profilePictureUrl || firstName || lastName || biography) {
       const userId = req.params.id;
+
       if (!isValidObjectId(userId)) {
         return res.status(404).json({ message: `User ${userId} not found` });
       }
+
       const user = await _findUserById(userId);
       if (!user) {
         return res.status(404).json({ message: `User ${userId} not found` });
       }
-      if (username || email) {
-        let existingUser = await _findUserByUsername(username);
+
+      if (username) {
+        const { isValid: isValidUsername, message: usernameMessage } = validateUsername(username);
+        if (!isValidUsername) {
+          return res.status(400).json({ message: usernameMessage });
+        }
+
+        const existingUser = await _findUserByUsername(username);
         if (existingUser && existingUser.id !== userId) {
           return res.status(409).json({ message: "username already exists" });
         }
-        existingUser = await _findUserByEmail(email);
+      }
+
+      if (email) {
+        const { isValid: isValidEmail, message: emailMessage } = validateEmail(email);
+        if (!isValidEmail) {
+          return res.status(400).json({ message: emailMessage });
+        }
+
+        const existingUser = await _findUserByEmail(email);
         if (existingUser && existingUser.id !== userId) {
           return res.status(409).json({ message: "email already exists" });
         }
@@ -119,17 +133,51 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
 
       let hashedPassword: string | undefined;
       if (password) {
+        const { isValid: isValidPassword, message: passwordMessage } = validatePassword(password);
+        if (!isValidPassword) {
+          return res.status(400).json({ message: passwordMessage });
+        }
+
         const salt = bcrypt.genSaltSync(10);
         hashedPassword = bcrypt.hashSync(password, salt);
       }
+
+      if (firstName) {
+        const { isValid: isValidFirstName, message: firstNameMessage } = validateName(
+          firstName,
+          "first name"
+        );
+        if (!isValidFirstName) {
+          return res.status(400).json({ message: firstNameMessage });
+        }
+      }
+
+      if (lastName) {
+        const { isValid: isValidLastName, message: lastNameMessage } = validateName(
+          lastName,
+          "last name"
+        );
+        if (!isValidLastName) {
+          return res.status(400).json({ message: lastNameMessage });
+        }
+      }
+
+      if (biography) {
+        const { isValid: isValidBiography, message: biographyMessage } =
+          validateBiography(biography);
+        if (!isValidBiography) {
+          return res.status(400).json({ message: biographyMessage });
+        }
+      }
+
       const updatedUser = await _updateUserById(
         userId,
         username,
         email,
         hashedPassword,
-        profile_picture_url,
-        first_name,
-        last_name,
+        profilePictureUrl,
+        firstName,
+        lastName,
         biography
       );
       return res.status(200).json({
@@ -137,9 +185,10 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
         data: formatUserResponse(updatedUser as IUser),
       });
     } else {
-      return res
-        .status(400)
-        .json({ message: "No field to update: username and email and password are all missing!" });
+      return res.status(400).json({
+        message:
+          "No field to update. Update one of the following fields: username, email, password, profilePictureUrl, firstName, lastName, biography",
+      });
     }
   } catch (err) {
     console.error(err);
@@ -203,9 +252,9 @@ export function formatUserResponse(user: IUser) {
     isAdmin: user.isAdmin,
     createdAt: user.createdAt,
 
-    profile_picture_url: user.profile_picture_url,
-    first_name: user.first_name,
-    last_name: user.last_name,
+    profilePictureUrl: user.profilePictureUrl,
+    firstName: user.firstName,
+    lastName: user.lastName,
     biography: user.biography,
   };
 }

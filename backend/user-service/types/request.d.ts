@@ -6,9 +6,9 @@ export interface AuthenticatedRequest extends Request {
     username: string;
     email: string;
     isAdmin: boolean;
-    profile_picture_url?: string;
-    first_name?: string;
-    last_name?: string;
+    profilePictureUrl?: string;
+    firstName?: string;
+    lastName?: string;
     biography?: string;
   };
 }
