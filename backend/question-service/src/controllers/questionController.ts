@@ -67,9 +67,12 @@ export const createImageLink = async (
 
     try {
       const files = req.files as Express.Multer.File[];
+
       const uploadPromises = files.map((file) => uploadFileToFirebase(file));
       const imageUrls = await Promise.all(uploadPromises);
-      res.status(200).json({ imageUrls });
+      res
+        .status(200)
+        .json({ message: "Images uploaded successfully", imageUrls });
     } catch (error) {
       res.status(500).json({ message: "Server error", error });
     }
@@ -114,6 +117,7 @@ export const updateQuestion = async (
       question: updatedQuestion,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error", error });
   }
 };
