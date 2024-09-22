@@ -7,54 +7,35 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import Markdown from "markdown-to-jsx";
 import AppMargin from "../../components/AppMargin";
 import { grey } from "@mui/material/colors";
 import classes from "./index.module.css";
 import NotFound from "../../components/NotFound";
-
-type Question = {
-  title: string;
-  description: string;
-  complexity: string;
-  categories: Array<string>;
-};
+import reducer, {
+  getQuestionById,
+  initialState,
+  setSelectedQuestionError,
+} from "../../reducers/questionReducer";
 
 const QuestionDetail: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [state, dispatch] = useReducer(reducer, initialState);
   const theme = useTheme();
 
   useEffect(() => {
     if (!questionId) {
-      setIsLoading(false);
+      setSelectedQuestionError("Unable to fetch question.", dispatch);
       return;
     }
 
-    // TODO: fetch question
-    const md =
-      "# Sample header 1\n" +
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<br /><br />" +
-      "**Example ordered list:**\n" +
-      "1. Item 1\n" +
-      "2. `Item 2`\n\n" +
-      "*Example unordered list:*\n" +
-      "- Item 1\n" +
-      "- Item 2";
-    setQuestion({
-      title: "Test Question",
-      description: md,
-      complexity: "Medium",
-      categories: ["Category 1", "Category 2"],
-    });
-    setIsLoading(false);
+    getQuestionById(questionId, dispatch);
   }, []);
 
-  if (!question) {
-    if (isLoading) {
+  if (!state.selectedQuestion) {
+    if (state.selectedQuestionError) {
       return (
         <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
           <NotFound
@@ -83,22 +64,22 @@ const QuestionDetail: React.FC = () => {
           })}
         >
           <Typography component={"h1"} variant="h3">
-            {question.title}
+            {state.selectedQuestion.title}
           </Typography>
           <Stack
             direction={"row"}
             sx={(theme) => ({ marginTop: theme.spacing(2) })}
           >
             <Chip
-              key={question.complexity}
-              label={question.complexity}
+              key={state.selectedQuestion.complexity}
+              label={state.selectedQuestion.complexity}
               color="primary"
               sx={(theme) => ({
                 marginLeft: theme.spacing(1),
                 marginRight: theme.spacing(1),
               })}
             />
-            {question.categories.map((cat) => (
+            {state.selectedQuestion.categories.map((cat) => (
               <Chip
                 key={cat}
                 label={cat}
@@ -164,7 +145,7 @@ const QuestionDetail: React.FC = () => {
             },
           }}
         >
-          {question.description}
+          {state.selectedQuestion.description}
         </Markdown>
       </Box>
     </AppMargin>

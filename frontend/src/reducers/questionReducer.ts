@@ -10,12 +10,13 @@ type QuestionDetail = {
 };
 
 enum QuestionActionTypes {
+  ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
   VIEW_QUESTION = "view_question",
 }
 
 type QuestionActions = {
   type: QuestionActionTypes;
-  payload: Array<QuestionDetail> | QuestionDetail;
+  payload: Array<QuestionDetail> | QuestionDetail | string;
 };
 
 type QuestionsState = {
@@ -24,10 +25,21 @@ type QuestionsState = {
   selectedQuestionError: string | null;
 };
 
-const isQuestionList = (
-  questionsList: Array<QuestionDetail> | QuestionDetail
-): questionsList is Array<QuestionDetail> => {
-  return Array.isArray(questionsList);
+const isQuestion = (question: any): question is QuestionDetail => {
+  if (!question || typeof question !== "object") {
+    return false;
+  }
+
+  return (
+    typeof question.questionId === "string" &&
+    typeof question.title === "string" &&
+    typeof question.description === "string" &&
+    typeof question.complexity === "string" &&
+    Array.isArray(question.categories) &&
+    (question.categories as Array<any>).every(
+      (value) => typeof value === "string"
+    )
+  );
 };
 
 export const initialState: QuestionsState = {
@@ -36,7 +48,10 @@ export const initialState: QuestionsState = {
   selectedQuestionError: null,
 };
 
-export const getQuestionById = (questionId: string, dispatch: Dispatch<QuestionActions>) => {
+export const getQuestionById = (
+  questionId: string,
+  dispatch: Dispatch<QuestionActions>
+) => {
   // questionClient
   //   .get(`/questions/${questionId}`)
   //   .then((res) =>
@@ -63,13 +78,33 @@ export const getQuestionById = (questionId: string, dispatch: Dispatch<QuestionA
   });
 };
 
-const reducer = (state: QuestionsState, action: QuestionActions): QuestionsState => {
+export const setSelectedQuestionError = (
+  error: string,
+  dispatch: React.Dispatch<QuestionActions>
+) => {
+  dispatch({
+    type: QuestionActionTypes.ERROR_FETCHING_SELECTED_QN,
+    payload: error,
+  });
+};
+
+const reducer = (
+  state: QuestionsState,
+  action: QuestionActions
+): QuestionsState => {
   const { type } = action;
 
   switch (type) {
+    case QuestionActionTypes.ERROR_FETCHING_SELECTED_QN: {
+      const { payload } = action;
+      if (typeof payload !== "string") {
+        return state;
+      }
+      return { ...state, selectedQuestionError: payload };
+    }
     case QuestionActionTypes.VIEW_QUESTION: {
       const { payload } = action;
-      if (isQuestionList(payload)) {
+      if (!isQuestion(payload)) {
         return state;
       }
       return { ...state, selectedQuestion: payload };
