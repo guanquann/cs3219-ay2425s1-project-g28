@@ -25,6 +25,7 @@ type QuestionsState = {
   selectedQuestionError: string | null;
 };
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
 const isQuestion = (question: any): question is QuestionDetail => {
   if (!question || typeof question !== "object") {
     return false;
@@ -36,6 +37,7 @@ const isQuestion = (question: any): question is QuestionDetail => {
     typeof question.description === "string" &&
     typeof question.complexity === "string" &&
     Array.isArray(question.categories) &&
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     (question.categories as Array<any>).every(
       (value) => typeof value === "string"
     )
