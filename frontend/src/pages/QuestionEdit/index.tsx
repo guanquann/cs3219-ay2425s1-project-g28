@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useReducer } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
@@ -8,12 +8,16 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { questionClient } from "../../utils/api";
 import { complexityList, categoryList } from "../../utils/constants";
+import reducer, { getQuestionById, initialState } from "../../reducers/questionReducer";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
 
-const NewQuestion = () => {
+const QuestionEdit = () => {
   const navigate = useNavigate();
+
+  const { questionId } = useParams<{ questionId: string }>();
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
@@ -21,11 +25,26 @@ const NewQuestion = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
 
+  useEffect(() => {
+    if (!questionId) {
+      return;
+    }
+    getQuestionById(questionId, dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (state.selectedQuestion) {
+      setTitle(state.selectedQuestion.title);
+      setMarkdownText(state.selectedQuestion.description);
+      setselectedComplexity(state.selectedQuestion.complexity);
+      setSelectedCategories(state.selectedQuestion.categories);
+    }
+  }, [state.selectedQuestion]);
+
   const handleBack = () => {
-    if (title || markdownText || selectedComplexity || selectedCategories.length > 0) {
-      if (!confirm("Are you sure you want to leave this page? All process will be lost.")) {
-        return;
-      }
+    if (!confirm("Are you sure you want to leave this page? All process will be lost.")) {
+      return;
     }
     navigate("/questions");
   };
@@ -73,15 +92,24 @@ const NewQuestion = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!title || !markdownText || !selectedComplexity || selectedCategories.length === 0) {
-      toast.error("Please fill in all fields");
+  const handleUpdate = async () => {
+    if (!state.selectedQuestion) {
+      return;
+    }
+
+    if (
+      title === state.selectedQuestion.title &&
+      markdownText === state.selectedQuestion.description &&
+      selectedComplexity === state.selectedQuestion.complexity &&
+      selectedCategories === state.selectedQuestion.categories
+    ) {
+      toast.error("You have not made any changes to the question");
       return;
     }
 
     try {
-      await questionClient.post(
-        "/",
+      await questionClient.put(
+        `/${state.selectedQuestion.questionId}`,
         {
           title,
           description: markdownText,
@@ -95,13 +123,14 @@ const NewQuestion = () => {
           },
         }
       );
+
       navigate("/questions");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data.message || "Failed to create question";
+        const message = error.response?.data.message || "Failed to update question";
         toast.error(message);
       } else {
-        toast.error("Failed to create question");
+        toast.error("Failed to update question");
       }
     }
   };
@@ -127,6 +156,7 @@ const NewQuestion = () => {
         options={complexityList}
         size="small"
         sx={{ marginTop: 2 }}
+        value={selectedComplexity}
         onChange={(e, newcomplexitySelected) => {
           setselectedComplexity(newcomplexitySelected);
         }}
@@ -138,6 +168,7 @@ const NewQuestion = () => {
         options={categoryList}
         size="small"
         sx={{ marginTop: 2 }}
+        value={selectedCategories}
         onChange={(e, newCategoriesSelected) => {
           setSelectedCategories(newCategoriesSelected);
         }}
@@ -151,12 +182,9 @@ const NewQuestion = () => {
 
       <QuestionMarkdown markdownText={markdownText} setMarkdownText={setMarkdownText} />
 
-      <Stack spacing={2} direction="row" paddingTop={2} paddingBottom={8}>
-        <Button variant="contained" fullWidth onClick={handleSubmit}>
-          Submit Question
-        </Button>
-        <Button variant="contained" color="secondary" fullWidth>
-          Preview Question
+      <Stack paddingTop={2} paddingBottom={8}>
+        <Button variant="contained" fullWidth onClick={handleUpdate}>
+          Update Question
         </Button>
       </Stack>
 
@@ -165,4 +193,4 @@ const NewQuestion = () => {
   );
 };
 
-export default NewQuestion;
+export default QuestionEdit;

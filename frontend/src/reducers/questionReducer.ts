@@ -36,10 +36,7 @@ export const initialState: QuestionsState = {
   selectedQuestionError: null,
 };
 
-export const getQuestionById = (
-  questionId: string,
-  dispatch: Dispatch<QuestionActions>
-) => {
+export const getQuestionById = (questionId: string, dispatch: Dispatch<QuestionActions>) => {
   // questionClient
   //   .get(`/questions/${questionId}`)
   //   .then((res) =>
@@ -61,15 +58,12 @@ export const getQuestionById = (
       title: "Test Question",
       description: md,
       complexity: "Easy",
-      categories: ["Category1", "Category2"],
+      categories: ["Strings", "Databases"],
     },
   });
 };
 
-const reducer = (
-  state: QuestionsState,
-  action: QuestionActions
-): QuestionsState => {
+const reducer = (state: QuestionsState, action: QuestionActions): QuestionsState => {
   const { type } = action;
 
   switch (type) {
