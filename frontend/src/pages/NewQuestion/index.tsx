@@ -2,9 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { questionClient } from "../../utils/api";
 import { complexityList, categoryList } from "../../utils/constants";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
@@ -48,23 +50,26 @@ const NewQuestion = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/questions/images", {
-        method: "POST",
-        body: formData,
+      const response = await questionClient.post("/images", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: false,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to upload image");
-      }
-
-      const data = await response.json();
+      const data = response.data;
       for (const imageUrl of data.imageUrls) {
         setUploadedImagesUrl((prev) => [...prev, imageUrl]);
       }
+
       toast.success("File uploaded successfully");
     } catch (error) {
-      console.error(error);
-      toast.error("Error uploading file");
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message || "Error uploading file");
+      } else {
+        console.error(error);
+        toast.error("Error uploading file");
+      }
     }
   };
 
@@ -75,29 +80,29 @@ const NewQuestion = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/questions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      await questionClient.post(
+        "/",
+        {
           title,
           description: markdownText,
           complexity: selectedComplexity,
           category: selectedCategories,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.status === 400) {
-        toast.error(data.message);
-        return;
-      }
-
+        },
+        {
+          withCredentials: false,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       navigate("/questions");
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to create question");
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data.message || "Failed to create question";
+        toast.error(message);
+      } else {
+        toast.error("Failed to create question");
+      }
     }
   };
 
