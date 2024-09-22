@@ -12,7 +12,7 @@ router.post("/questions", createQuestion);
 
 router.put("/questions/:id", updateQuestion);
 
-router.post("/questionsquery/:currPage", readQuestionsList);
+router.get("/questions", readQuestionsList);
 
 router.get("/questions/:id", readQuestionIndiv);
 

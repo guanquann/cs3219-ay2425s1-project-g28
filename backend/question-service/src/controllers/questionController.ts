@@ -5,10 +5,12 @@ import {
   DUPLICATE_QUESTION_RESPONSE_MESSAGE,
   QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
   QN_DESC_CHAR_LIMIT,
-  QN_CREATED,
-  QN_NOT_FOUND,
-  SERVER_ERROR,
-  QN_RETRIEVED,
+  QN_CREATED_MESSAGE,
+  QN_NOT_FOUND_MESSAGE,
+  SERVER_ERROR_MESSAGE,
+  QN_RETRIEVED_MESSAGE,
+  PAGE_LIMIT_REQUIRED_MESSAGE,
+  PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE,
 } from "../utils/constants.ts";
 
 export const createQuestion = async (
@@ -43,11 +45,11 @@ export const createQuestion = async (
     await newQuestion.save();
 
     res.status(201).json({
-      message: QN_CREATED,
+      message: QN_CREATED_MESSAGE,
       question: newQuestion,
     });
   } catch (error) {
-    res.status(500).json({ message: SERVER_ERROR, error });
+    res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
   }
 };
 
@@ -61,7 +63,7 @@ export const updateQuestion = async (
 
     const currentQuestion = await Question.findById(id);
     if (!currentQuestion) {
-      res.status(404).json({ message: QN_NOT_FOUND });
+      res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
     }
 
@@ -89,72 +91,74 @@ export const updateQuestion = async (
       question: updatedQuestion,
     });
   } catch (error) {
-    res.status(500).json({ message: SERVER_ERROR, error });
+    res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
   }
 };
 
+interface QnListSearchFilterParams {
+  page: string;
+  qnLimit: string;
+  title?: string;
+  complexities?: string | string[];
+  categories?: string | string[];
+}
+
 export const readQuestionsList = async (
-  req: Request,
+  req: Request<unknown, unknown, unknown, QnListSearchFilterParams>,
   res: Response,
 ): Promise<void> => {
   try {
-    const qnLimit = 10;
+    const { page, qnLimit, title, complexities, categories } = req.query;
 
-    const { currPage } = req.params;
-    const currPageInt = parseInt(currPage);
-
-    if (!req.body || Object.keys(req.body).length == 0) {
-      const totalQuestions = await Question.countDocuments();
-      if (totalQuestions == 0) {
-        res.status(404).json({ message: QN_NOT_FOUND });
-        return;
-      }
-      const totalPages = Math.ceil(totalQuestions / qnLimit);
-
-      const currPageQuestions = await Question.find()
-        .skip((currPageInt - 1) * qnLimit)
-        .limit(qnLimit);
-
-      res.status(200).json({
-        message: QN_RETRIEVED,
-        pages: totalPages,
-        questions: currPageQuestions,
-      });
-    } else {
-      const { title, complexities, categories } = req.body;
-      const query: any = {};
-
-      if (title) {
-        query.title = { $regex: new RegExp(title, "i") };
-      }
-
-      if (complexities && complexities.length > 0) {
-        query.complexity = { $in: complexities };
-      }
-
-      if (categories && categories.length > 0) {
-        query.category = { $in: categories };
-      }
-
-      const filteredTotalQuestions = await Question.countDocuments(query);
-      if (filteredTotalQuestions == 0) {
-        res.status(404).json({ message: QN_NOT_FOUND });
-        return;
-      }
-      const filteredTotalPages = Math.ceil(filteredTotalQuestions / qnLimit);
-
-      const filteredQuestions = await Question.find(query)
-        .skip((currPageInt - 1) * qnLimit)
-        .limit(qnLimit);
-
-      res.status(200).json({
-        message: QN_RETRIEVED,
-        pages: filteredTotalPages,
-        questions: filteredQuestions,
-      });
+    if (!page || !qnLimit) {
+      res.status(400).json({ message: PAGE_LIMIT_REQUIRED_MESSAGE });
+      return;
     }
+
+    const pageInt = parseInt(page, 10);
+    const qnLimitInt = parseInt(qnLimit, 10);
+
+    if (pageInt < 1 || qnLimitInt < 1) {
+      res.status(400).json({ message: PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE });
+      return;
+    }
+
+    const query: any = {};
+
+    if (title) {
+      query.title = { $regex: new RegExp(title, "i") };
+    }
+
+    if (complexities) {
+      query.complexity = {
+        $in: Array.isArray(complexities) ? complexities : [complexities],
+      };
+    }
+
+    if (categories) {
+      query.category = {
+        $in: Array.isArray(categories) ? categories : [categories],
+      };
+    }
+
+    const filteredTotalQuestions = await Question.countDocuments(query);
+    if (filteredTotalQuestions == 0) {
+      res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
+      return;
+    }
+    const filteredTotalPages = Math.ceil(filteredTotalQuestions / qnLimitInt);
+
+    const filteredQuestions = await Question.find(query)
+      .skip((pageInt - 1) * qnLimitInt)
+      .limit(qnLimitInt);
+
+    res.status(200).json({
+      message: QN_RETRIEVED_MESSAGE,
+      pages: filteredTotalPages,
+      questions: filteredQuestions,
+    });
   } catch (error) {
-    res.status(500).json({ message: SERVER_ERROR, error });
+    res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
   }
 };
 
@@ -167,14 +171,14 @@ export const readQuestionIndiv = async (
 
     const questionDetails = await Question.findById(id);
     if (!questionDetails) {
-      res.status(404).json({ message: QN_NOT_FOUND });
+      res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
     }
     res.status(200).json({
-      message: QN_RETRIEVED,
+      message: QN_RETRIEVED_MESSAGE,
       question: questionDetails,
     });
   } catch (error) {
-    res.status(500).json({ message: SERVER_ERROR, error });
+    res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
   }
 };
