@@ -7,6 +7,7 @@ import {
   QN_DESC_CHAR_LIMIT,
   QN_CREATED_MESSAGE,
   QN_NOT_FOUND_MESSAGE,
+  QN_DELETED_MESSAGE,
   SERVER_ERROR_MESSAGE,
   QN_RETRIEVED_MESSAGE,
   PAGE_LIMIT_REQUIRED_MESSAGE,
@@ -127,6 +128,25 @@ export const updateQuestion = async (
   }
 };
 
+export const deleteQuestion = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const currentQuestion = await Question.findById(id);
+    if (!currentQuestion) {
+      res.status(400).json({ message: QN_NOT_FOUND_MESSAGE });
+      return;
+    }
+
+    await Question.findByIdAndDelete(id);
+    res.status(200).json({ message: QN_DELETED_MESSAGE });
+  } catch (error) {
+    res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
+  }
+};
+
 interface QnListSearchFilterParams {
   page: string;
   qnLimit: string;
@@ -206,6 +226,7 @@ export const readQuestionIndiv = async (
       res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
     }
+
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
       question: questionDetails,

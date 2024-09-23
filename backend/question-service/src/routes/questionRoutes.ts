@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createQuestion,
+  deleteQuestion,
   createImageLink,
   updateQuestion,
   readQuestionsList,
@@ -18,5 +19,7 @@ router.put("/questions/:id", updateQuestion);
 router.get("/questions", readQuestionsList);
 
 router.get("/questions/:id", readQuestionIndiv);
+
+router.delete("/questions/:id", deleteQuestion);
 
 export default router;

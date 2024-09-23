@@ -7,60 +7,87 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { FunctionComponent, useEffect, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import Markdown from "markdown-to-jsx";
 import AppMargin from "../../components/AppMargin";
+import { grey } from "@mui/material/colors";
+import classes from "./index.module.css";
+import NotFound from "../../components/NotFound";
 import reducer, {
   getQuestionById,
   initialState,
+  setSelectedQuestionError,
 } from "../../reducers/questionReducer";
-import { grey } from "@mui/material/colors";
 
-const QuestionDetail: FunctionComponent = () => {
+const QuestionDetail: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
   const [state, dispatch] = useReducer(reducer, initialState);
   const theme = useTheme();
 
   useEffect(() => {
     if (!questionId) {
+      setSelectedQuestionError("Unable to fetch question.", dispatch);
       return;
     }
+
     getQuestionById(questionId, dispatch);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line  react-hooks/exhaustive-deps
   }, []);
 
   if (!state.selectedQuestion) {
-    return;
+    if (state.selectedQuestionError) {
+      return (
+        <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
+          <NotFound
+            title="Question not found..."
+            subtitle="Unfortunately, we can't find what you're looking for 😥"
+          />
+        </AppMargin>
+      );
+    } else {
+      return;
+    }
   }
 
   return (
     <AppMargin>
-      <Box sx={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+      <Box
+        sx={(theme) => ({
+          marginTop: theme.spacing(4),
+          marginBottom: theme.spacing(4),
+        })}
+      >
         <Box
-          sx={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}
+          sx={(theme) => ({
+            marginTop: theme.spacing(4),
+            marginBottom: theme.spacing(4),
+          })}
         >
           <Typography component={"h1"} variant="h3">
             {state.selectedQuestion.title}
           </Typography>
-          <Stack direction={"row"} sx={{ marginTop: theme.spacing(2) }}>
+          <Stack
+            direction={"row"}
+            sx={(theme) => ({ marginTop: theme.spacing(2) })}
+          >
             <Chip
               key={state.selectedQuestion.complexity}
               label={state.selectedQuestion.complexity}
               color="primary"
-              sx={{
+              sx={(theme) => ({
                 marginLeft: theme.spacing(1),
                 marginRight: theme.spacing(1),
-              }}
+              })}
             />
             {state.selectedQuestion.categories.map((cat) => (
               <Chip
                 key={cat}
                 label={cat}
-                sx={{
+                sx={(theme) => ({
                   marginLeft: theme.spacing(1),
                   marginRight: theme.spacing(1),
-                }}
+                })}
               />
             ))}
           </Stack>

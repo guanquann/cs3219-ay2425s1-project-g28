@@ -10,6 +10,8 @@ export const QN_CREATED_MESSAGE = "Question created successfully.";
 
 export const QN_NOT_FOUND_MESSAGE = "Question not found.";
 
+export const QN_DELETED_MESSAGE = "Question deleted successfully.";
+
 export const SERVER_ERROR_MESSAGE = "Server error.";
 
 export const QN_RETRIEVED_MESSAGE = "Question retrieved successfully.";
