@@ -21,3 +21,8 @@ export const PAGE_LIMIT_REQUIRED_MESSAGE =
 
 export const PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE =
   "Page number and question limit per page should be positive integers.";
+
+export const CATEGORIES_NOT_FOUND_MESSAGE = "No categories found.";
+
+export const CATEGORIES_RETRIEVED_MESSAGE =
+  "Categories retrieved successfully.";

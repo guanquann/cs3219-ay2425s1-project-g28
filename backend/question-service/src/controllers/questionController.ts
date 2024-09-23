@@ -12,6 +12,8 @@ import {
   QN_RETRIEVED_MESSAGE,
   PAGE_LIMIT_REQUIRED_MESSAGE,
   PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE,
+  CATEGORIES_NOT_FOUND_MESSAGE,
+  CATEGORIES_RETRIEVED_MESSAGE,
 } from "../utils/constants.ts";
 
 import { upload } from "../../config/multer";
@@ -136,7 +138,7 @@ export const deleteQuestion = async (
     const { id } = req.params;
     const currentQuestion = await Question.findById(id);
     if (!currentQuestion) {
-      res.status(400).json({ message: QN_NOT_FOUND_MESSAGE });
+      res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
     }
 
@@ -230,6 +232,25 @@ export const readQuestionIndiv = async (
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
       question: questionDetails,
+    });
+  } catch (error) {
+    res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
+  }
+};
+
+export const readCategories = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const uniqueCats = await Question.distinct("category");
+    if (!uniqueCats || uniqueCats.length == 0) {
+      res.status(404).json({ message: CATEGORIES_NOT_FOUND_MESSAGE });
+    }
+
+    res.status(200).json({
+      message: CATEGORIES_RETRIEVED_MESSAGE,
+      categories: uniqueCats,
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
