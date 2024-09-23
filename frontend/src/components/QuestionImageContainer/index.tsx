@@ -2,10 +2,17 @@ import { useState } from "react";
 import { styled } from "@mui/material/styles";
 import { Button, ImageList, ImageListItem } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
+import axios from "axios";
 
+import { questionClient } from "../../utils/api";
 import QuestionImage from "../QuestionImage";
 import QuestionImageDialog from "../QuestionImageDialog";
+
+interface QuestionImageContainerProps {
+  uploadedImagesUrl: string[];
+  setUploadedImagesUrl: React.Dispatch<React.SetStateAction<string[]>>;
+}
 
 const FileUploadInput = styled("input")({
   height: 1,
@@ -16,14 +23,9 @@ const FileUploadInput = styled("input")({
   width: 1,
 });
 
-interface QuestionImageContainerProps {
-  handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  uploadedImagesUrl: string[];
-}
-
 const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
-  handleImageUpload,
   uploadedImagesUrl,
+  setUploadedImagesUrl,
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   const [selectedValue, setSelectedValue] = useState<string>("");
@@ -35,6 +37,49 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
 
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files) {
+      return;
+    }
+
+    const formData = new FormData();
+    for (const file of event.target.files) {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not an image`);
+        continue;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} is more than 5MB`);
+        continue;
+      }
+      formData.append("images[]", file);
+    }
+
+    try {
+      const response = await questionClient.post("/images", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: false,
+      });
+
+      const data = response.data;
+      for (const imageUrl of data.imageUrls) {
+        setUploadedImagesUrl((prev) => [...prev, imageUrl]);
+      }
+
+      toast.success("File uploaded successfully");
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message || "Error uploading file");
+      } else {
+        console.error(error);
+        toast.error("Error uploading file");
+      }
+    }
   };
 
   if (uploadedImagesUrl.length === 0) {
