@@ -176,9 +176,9 @@ paths:
                   message:
                     type: string
                     description: Message
-                  pages:
+                  totalQns:
                     type: integer
-                    description: Total number of pages of questions
+                    description: Total number of questions
                   questions:
                     type: array
                     items:

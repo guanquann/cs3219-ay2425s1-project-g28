@@ -200,7 +200,6 @@ export const readQuestionsList = async (
       res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
     }
-    const filteredTotalPages = Math.ceil(filteredTotalQuestions / qnLimitInt);
 
     const filteredQuestions = await Question.find(query)
       .skip((pageInt - 1) * qnLimitInt)
@@ -208,7 +207,7 @@ export const readQuestionsList = async (
 
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
-      pages: filteredTotalPages,
+      totalQns: filteredTotalQuestions,
       questions: filteredQuestions,
     });
   } catch (error) {
