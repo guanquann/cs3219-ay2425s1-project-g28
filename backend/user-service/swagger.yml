@@ -4,6 +4,38 @@ info:
   title: User Service
   version: 1.0.0
 
+definitions:
+  UserOutput:
+    properties:
+      id:
+        type: string
+        required: true
+      username:
+        type: string
+        required: true
+      firstName:
+        type: string
+        required: true
+      lastName:
+        type: string
+        required: true
+      email:
+        type: string
+        required: true
+      isAdmin:
+        type: boolean
+        required: true
+        default: false
+      biography:
+        type: string
+        required: false
+      profilePictureUrl:
+        type: string
+        required: false
+      createdAt:
+        type: string
+        required: true
+
 components:
   schemas:
     User:
@@ -35,37 +67,10 @@ components:
           required: true
     UserResponse:
       properties:
-        accessToken:
+        message:
           type: string
-          required: false
-        id:
-          type: string
-          required: true
-        username:
-          type: string
-          required: true
-        firstName:
-          type: string
-          required: true
-        lastName:
-          type: string
-          required: true
-        email:
-          type: string
-          required: true
-        isAdmin:
-          type: boolean
-          required: true
-          default: false
-        biography:
-          type: string
-          required: false
-        profilePictureUrl:
-          type: string
-          required: false
-        createdAt:
-          type: string
-          required: true
+        data:
+          $ref: "#/definitions/UserOutput"
     ErrorResponse:
       properties:
         message:
@@ -127,9 +132,13 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserResponse"
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/definitions/UserOutput"
   /api/users/{id}:
     get:
       summary: Get a user by id
@@ -197,7 +206,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                      user:
+                        type: object
+                        $ref: "#/definitions/UserOutput"
 
   /api/auth/verify-token:
     get:

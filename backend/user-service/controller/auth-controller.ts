@@ -33,7 +33,7 @@ export async function handleLogin(
       );
       return res.status(200).json({
         message: "User logged in",
-        data: { accessToken, ...formatUserResponse(user) },
+        data: { accessToken, user: formatUserResponse(user) },
       });
     } catch (err) {
       return res.status(500).json({ message: "Server error", err });
