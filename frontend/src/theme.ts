@@ -1,3 +1,4 @@
+import grey from "@mui/material/colors/grey";
 import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
@@ -9,12 +10,12 @@ const theme = createTheme({
     common: { white: "#FFFFFF", black: "#2F2F2F" },
   },
   typography: {
-    h1: { fontWeight: 600 },
-    h2: { fontWeight: 600 },
-    h3: { fontWeight: 600 },
-    h4: { fontWeight: 600 },
-    h5: { fontWeight: 600 },
-    h6: { fontWeight: 600 },
+    h1: { fontWeight: 600, fontSize: "36px" },
+    h2: { fontWeight: 600, fontSize: "32px" },
+    h3: { fontWeight: 600, fontSize: "28px" },
+    h4: { fontWeight: 600, fontSize: "24px" },
+    h5: { fontWeight: 600, fontSize: "20px" },
+    h6: { fontWeight: 600, fontSize: "16px" },
   },
   components: {
     MuiButton: {
@@ -22,6 +23,25 @@ const theme = createTheme({
         root: {
           textTransform: "none",
           fontWeight: "bold",
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          "& ::-webkit-scrollbar": { 
+            height: "6px",
+            width: "6px",
+          },
+          "& ::-webkit-scrollbar-track": {
+            backgroundColor: grey[200]
+          },
+          "& ::-webkit-scrollbar-thumb": {
+            backgroundColor: grey[400]
+          },
+          "& ::-webkit-scrollbar-thumb:hover": {
+            backgroundColor: grey[500]
+          },
         },
       },
     },
