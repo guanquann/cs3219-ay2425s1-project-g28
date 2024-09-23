@@ -1,9 +1,8 @@
 import { Box } from "@mui/material";
-import { FunctionComponent } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "../Navbar";
 
-const Layout: FunctionComponent = () => {
+const Layout: React.FC = () => {
   return (
     <Box
       sx={{

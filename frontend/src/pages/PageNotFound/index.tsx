@@ -1,9 +1,8 @@
-import { FunctionComponent } from "react";
 import AppMargin from "../../components/AppMargin";
 import { Box, Typography } from "@mui/material";
 import classes from "./index.module.css";
 
-const PageNotFound: FunctionComponent = () => {
+const PageNotFound: React.FC = () => {
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
       <Box>

@@ -3,7 +3,7 @@ import Layout from "./components/Layout";
 import NewQuestion from "./pages/NewQuestion";
 import QuestionDetail from "./pages/QuestionDetail";
 import QuestionEdit from "./pages/QuestionEdit";
-import PageNotFound from "./pages/Error";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   return (
