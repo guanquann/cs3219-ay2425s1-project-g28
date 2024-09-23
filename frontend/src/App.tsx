@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import NewQuestion from "./pages/NewQuestion";
 import QuestionDetail from "./pages/QuestionDetail";
-import PageNotFound from "./pages/Error";
+import QuestionEdit from "./pages/QuestionEdit";
+import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/Profile";
 import AuthProvider from "./contexts/AuthContext";
 
@@ -16,6 +17,7 @@ function App() {
               <Route index element={<>question page list</>} />
               <Route path="new" element={<NewQuestion />} />
               <Route path=":questionId" element={<QuestionDetail />} />
+              <Route path=":questionId/edit" element={<QuestionEdit />} />
             </Route>
             <Route path="profile/:username" element={<ProfilePage />} />
             <Route path="*" element={<PageNotFound />} />

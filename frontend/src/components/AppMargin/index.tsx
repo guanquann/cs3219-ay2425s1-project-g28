@@ -1,11 +1,8 @@
 import { Box } from "@mui/material";
-import { FunctionComponent, ReactNode } from "react";
 
-type AppMarginProps = { classname?: string; children: ReactNode };
+type AppMarginProps = { classname?: string; children: React.ReactNode };
 
-const AppMargin: FunctionComponent<AppMarginProps> = (
-  props: AppMarginProps
-) => {
+const AppMargin: React.FC<AppMarginProps> = (props) => {
   const { classname, children } = props;
   return (
     <Box

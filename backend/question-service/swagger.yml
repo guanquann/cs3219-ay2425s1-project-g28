@@ -4,6 +4,71 @@ info:
   title: Question Service
   version: 1.0.0
 
+components:
+  schemas:
+    Question:
+      properties:
+        title:
+          type: string
+          description: Title
+        description:
+          type: string
+          description: Description
+        complexity:
+          type: string
+          description: Complexity - Easy, Medium, Hard
+        category:
+          type: array
+          items:
+            type: string
+          description: Categories
+
+definitions:
+  Question:
+    type: object
+    properties:
+      _id:
+        type: string
+        description: Question id
+      title:
+        type: string
+        description: Title
+      description:
+        type: string
+        description: Description
+      complexity:
+        type: string
+        description: Complexity - Easy, Medium, Hard
+      category:
+        type: array
+        items:
+          type: string
+        description: Categories
+      createdAt:
+        type: string
+        description: Date of creation
+      updatedAt:
+        type: string
+        description: Latest update
+      __v:
+        type: string
+        description: Document version
+  Error:
+    type: object
+    properties:
+      message:
+        type: string
+        deescription: Message
+  ServerError:
+    type: object
+    properties:
+      message:
+        type: string
+        description: Message
+      error:
+        type: string
+        description: Error
+
 paths:
   /:
     get:
@@ -12,7 +77,7 @@ paths:
       summary: Root
       description: Ping the server
       responses:
-        "200":
+        200:
           description: Successful Response
           content:
             application/json:
@@ -22,3 +87,117 @@ paths:
                   message:
                     type: string
                     description: Message
+  /api/questions:
+    post:
+      tags:
+        - questions
+      summary: Creates a question
+      description: Creates a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Question"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
+                  question:
+                    $ref: "#/definitions/Question"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServerError"
+  /api/questions/{id}:
+    put:
+      tags:
+        - questions
+      summary: Updates a question
+      description: Updates a question
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Question id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Question"
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
+                  question:
+                    $ref: "#/definitions/Question"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServerError"
+    delete:
+      tags:
+        - questions
+      summary: Deletes a question
+      description: Deletes a question
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+          description: Question id
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/Error"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/definitions/ServerError"

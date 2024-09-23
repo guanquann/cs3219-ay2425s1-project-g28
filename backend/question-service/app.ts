@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import swaggerUi from "swagger-ui-express";
 import yaml from "yaml";
 import fs from "fs";
+import cors from "cors";
 
 import connectDB from "./config/db.ts";
 import questionRoutes from "./src/routes/questionRoutes.ts";
@@ -15,6 +16,9 @@ const swaggerDocument = yaml.parse(file);
 const app = express();
 
 connectDB();
+
+app.use(cors());
+app.options("*", cors());
 
 app.use(express.json());
 app.use("/api", questionRoutes);

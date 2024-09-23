@@ -5,7 +5,13 @@ import {
   DUPLICATE_QUESTION_RESPONSE_MESSAGE,
   QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
   QN_DESC_CHAR_LIMIT,
+  QN_NOT_FOUND,
+  QN_DELETED,
+  SERVER_ERROR,
 } from "../utils/constants.ts";
+
+import { upload } from "../../config/multer";
+import { uploadFileToFirebase } from "../utils/utils";
 
 export const createQuestion = async (
   req: Request,
@@ -43,8 +49,37 @@ export const createQuestion = async (
       question: newQuestion,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: SERVER_ERROR, error });
   }
+};
+
+export const createImageLink = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to upload images", error: err.message });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    try {
+      const files = req.files as Express.Multer.File[];
+
+      const uploadPromises = files.map((file) => uploadFileToFirebase(file));
+      const imageUrls = await Promise.all(uploadPromises);
+      res
+        .status(200)
+        .json({ message: "Images uploaded successfully", imageUrls });
+    } catch (error) {
+      res.status(500).json({ message: "Server error", error });
+    }
+  });
 };
 
 export const updateQuestion = async (
@@ -57,7 +92,7 @@ export const updateQuestion = async (
 
     const currentQuestion = await Question.findById(id);
     if (!currentQuestion) {
-      res.status(404).json({ message: "Question not found" });
+      res.status(404).json({ message: QN_NOT_FOUND });
       return;
     }
 
@@ -85,6 +120,25 @@ export const updateQuestion = async (
       question: updatedQuestion,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error });
+    res.status(500).json({ message: SERVER_ERROR, error });
+  }
+};
+
+export const deleteQuestion = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const currentQuestion = await Question.findById(id);
+    if (!currentQuestion) {
+      res.status(400).json({ message: QN_NOT_FOUND });
+      return;
+    }
+
+    await Question.findByIdAndDelete(id);
+    res.status(200).json({ message: QN_DELETED });
+  } catch (error) {
+    res.status(500).json({ message: SERVER_ERROR, error });
   }
 };

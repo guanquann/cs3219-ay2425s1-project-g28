@@ -13,16 +13,16 @@ import {
   Typography,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
-import { FunctionComponent, useState } from "react";
 import AppMargin from "../AppMargin";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import { useState } from "react";
 
 type NavbarItem = { label: string; link: string };
 
 type NavbarProps = { navbarItems?: Array<NavbarItem> };
 
-const Navbar: FunctionComponent<NavbarProps> = (props: NavbarProps) => {
+const Navbar: React.FC<NavbarProps> = (props) => {
   const { navbarItems = [{ label: "Questions", link: "/questions" }] } = props;
   const navigate = useNavigate();
   const auth = useAuth();
