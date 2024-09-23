@@ -16,7 +16,7 @@ type UserProfile = {
   isAdmin: boolean;
   biography?: string;
   profilePictureUrl?: string;
-  createdAt: Date;
+  createdAt: string;
 };
 
 const ProfilePage: React.FC = () => {
@@ -31,15 +31,9 @@ const ProfilePage: React.FC = () => {
   const { user } = auth;
 
   useEffect(() => {
-    // temp user token obtained from the backend to test cors
-    const accessToken =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWU2MDI1MTQzOWQ1YWRhNTNhOGIyMiIsImlhdCI6MTcyNzA4MDMzOSwiZXhwIjoxNzI3Njg1MTM5fQ.rofXQgtvcGuEkucv78MTQgqrP0XtPdQ-XPISiW9V_JM";
     userClient
-      .get(`/users/${userId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
+      .get(`/users/${userId}`)
       .then((res) => {
-        console.log(res.data.data);
         setUserProfile(res.data.data);
       })
       .catch(() => setUserProfile(null));

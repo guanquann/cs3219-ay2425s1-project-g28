@@ -1,4 +1,5 @@
-import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Divider, Stack, Typography } from "@mui/material";
+import React from "react";
 
 type ProfileSectionProps = {
   firstName: string;
@@ -15,11 +16,17 @@ const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
     <Box>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Box
-          sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+          sx={(theme) => ({
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+          })}
         >
           <Avatar sx={{ width: 56, height: 56 }} />
           <Box sx={(theme) => ({ marginLeft: theme.spacing(2) })}>
-            <Typography fontSize={"h5.fontSize"}>
+            <Typography fontSize={"h6.fontSize"}>
               {firstName} {lastName}
             </Typography>
             <Typography>@{username}</Typography>
@@ -35,18 +42,21 @@ const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
         </Typography>
       </Box>
       {isCurrentUser && (
-        <Stack
-          spacing={2}
-          sx={(theme) => ({
-            marginTop: theme.spacing(4),
-            marginBottom: theme.spacing(4),
-          })}
-        >
-          <Button variant="contained">Edit profile</Button>
-          <Button variant="contained" color="secondary">
-            Edit password
-          </Button>
-        </Stack>
+        <>
+          <Divider />
+          <Stack
+            spacing={2}
+            sx={(theme) => ({
+              marginTop: theme.spacing(4),
+              marginBottom: theme.spacing(4),
+            })}
+          >
+            <Button variant="contained">Edit profile</Button>
+            <Button variant="contained" color="secondary">
+              Edit password
+            </Button>
+          </Stack>
+        </>
       )}
     </Box>
   );
