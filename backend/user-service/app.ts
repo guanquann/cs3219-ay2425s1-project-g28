@@ -1,8 +1,14 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import fs from "fs";
+import yaml from "yaml";
+import swaggerUi from "swagger-ui-express";
 
 import userRoutes from "./routes/user-routes.js";
 import authRoutes from "./routes/auth-routes.js";
+
+const file = fs.readFileSync("./swagger.yml", "utf-8");
+const swaggerDocument = yaml.parse(file);
 
 const app = express();
 
@@ -30,9 +36,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use("/users", userRoutes);
-app.use("/auth", authRoutes);
-
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   console.log("Sending Greetings!");
   res.json({

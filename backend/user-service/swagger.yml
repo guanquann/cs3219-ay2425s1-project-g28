@@ -1,0 +1,183 @@
+openapi: 3.0.0
+
+info:
+  title: User Service
+  version: 1.0.0
+
+components:
+  schemas:
+    User:
+      properties:
+        username:
+          type: string
+          required: true
+        firstName:
+          type: string
+          required: true
+        lastName:
+          type: string
+          required: true
+        email:
+          type: string
+          required: true
+        isAdmin:
+          type: boolean
+          required: true
+          default: false
+        biography:
+          type: string
+          required: false
+        profilePictureUrl:
+          type: string
+          required: false
+        password:
+          type: string
+          required: true
+    UserResponse:
+      properties:
+        id:
+          type: string
+          required: true
+        username:
+          type: string
+          required: true
+        firstName:
+          type: string
+          required: true
+        lastName:
+          type: string
+          required: true
+        email:
+          type: string
+          required: true
+        isAdmin:
+          type: boolean
+          required: true
+          default: false
+        biography:
+          type: string
+          required: false
+        profilePictureUrl:
+          type: string
+          required: false
+        createdAt:
+          type: string
+          required: true
+    ErrorResponse:
+      properties:
+        message:
+          type: string
+
+paths:
+  /:
+    get:
+      tags:
+        - root
+      summary: Ping the server
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
+  /api/users:
+    post:
+      tags:
+        - users
+      summary: Creates a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        201:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      tags:
+        - users
+      summary: Get all users
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserResponse"
+  /api/users/{id}:
+    get:
+      summary: Get a user by id
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      summary: Update a user's particulars
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+    delete:
+      summary: Delete a user account
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+  /api/auth/login:
+    post:
+      summary: Login
+      tags:
+        - auth
+  /api/auth/verify-token:
+    get:
+      summary: Verify token
+      tags:
+        - auth
