@@ -8,7 +8,11 @@ export async function seedAdminAccount() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@gmail.com";
   const adminPassword = process.env.ADMIN_PASSWORD || "Admin@123";
 
-  if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+  if (
+    !process.env.ADMIN_USERNAME ||
+    !process.env.ADMIN_EMAIL ||
+    !process.env.ADMIN_PASSWORD
+  ) {
     console.error(
       "Admin account not seeded in .env. Using default admin account credentials (username: administrator, email: admin@gmail.com, password: Admin@123)"
     );

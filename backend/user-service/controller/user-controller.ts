@@ -21,26 +21,34 @@ import {
 } from "../utils/validators";
 import { IUser } from "../model/user-model";
 
-export async function createUser(req: Request, res: Response): Promise<Response> {
+export async function createUser(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const { username, email, password } = req.body;
     const existingUser = await _findUserByUsernameOrEmail(username, email);
     if (existingUser) {
-      return res.status(409).json({ message: "username or email already exists" });
+      return res
+        .status(409)
+        .json({ message: "username or email already exists" });
     }
 
     if (username && email && password) {
-      const { isValid: isValidUsername, message: usernameMessage } = validateUsername(username);
+      const { isValid: isValidUsername, message: usernameMessage } =
+        validateUsername(username);
       if (!isValidUsername) {
         return res.status(400).json({ message: usernameMessage });
       }
 
-      const { isValid: isValidEmail, message: emailMessage } = validateEmail(email);
+      const { isValid: isValidEmail, message: emailMessage } =
+        validateEmail(email);
       if (!isValidEmail) {
         return res.status(400).json({ message: emailMessage });
       }
 
-      const { isValid: isValidPassword, message: passwordMessage } = validatePassword(password);
+      const { isValid: isValidPassword, message: passwordMessage } =
+        validatePassword(password);
       if (!isValidPassword) {
         return res.status(400).json({ message: passwordMessage });
       }
@@ -53,11 +61,15 @@ export async function createUser(req: Request, res: Response): Promise<Response>
         data: formatUserResponse(createdUser),
       });
     } else {
-      return res.status(400).json({ message: "username and/or email and/or password are missing" });
+      return res
+        .status(400)
+        .json({ message: "username and/or email and/or password are missing" });
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when creating new user!" });
+    return res
+      .status(500)
+      .json({ message: "Unknown error when creating new user!" });
   }
 }
 
@@ -72,30 +84,59 @@ export async function getUser(req: Request, res: Response): Promise<Response> {
     if (!user) {
       return res.status(404).json({ message: `User ${userId} not found` });
     } else {
-      return res.status(200).json({ message: `Found user`, data: formatUserResponse(user) });
+      return res
+        .status(200)
+        .json({ message: `Found user`, data: formatUserResponse(user) });
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when getting user!" });
+    return res
+      .status(500)
+      .json({ message: "Unknown error when getting user!" });
   }
 }
 
-export async function getAllUsers(req: Request, res: Response): Promise<Response> {
+export async function getAllUsers(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const users = await _findAllUsers();
 
-    return res.status(200).json({ message: `Found users`, data: users.map(formatUserResponse) });
+    return res
+      .status(200)
+      .json({ message: `Found users`, data: users.map(formatUserResponse) });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when getting all users!" });
+    return res
+      .status(500)
+      .json({ message: "Unknown error when getting all users!" });
   }
 }
 
-export async function updateUser(req: Request, res: Response): Promise<Response> {
+export async function updateUser(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
-    const { username, email, password, profilePictureUrl, firstName, lastName, biography } =
-      req.body;
-    if (username || email || password || profilePictureUrl || firstName || lastName || biography) {
+    const {
+      username,
+      email,
+      password,
+      profilePictureUrl,
+      firstName,
+      lastName,
+      biography,
+    } = req.body;
+    if (
+      username ||
+      email ||
+      password ||
+      profilePictureUrl ||
+      firstName ||
+      lastName ||
+      biography
+    ) {
       const userId = req.params.id;
 
       if (!isValidObjectId(userId)) {
@@ -108,7 +149,8 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
       }
 
       if (username) {
-        const { isValid: isValidUsername, message: usernameMessage } = validateUsername(username);
+        const { isValid: isValidUsername, message: usernameMessage } =
+          validateUsername(username);
         if (!isValidUsername) {
           return res.status(400).json({ message: usernameMessage });
         }
@@ -120,7 +162,8 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
       }
 
       if (email) {
-        const { isValid: isValidEmail, message: emailMessage } = validateEmail(email);
+        const { isValid: isValidEmail, message: emailMessage } =
+          validateEmail(email);
         if (!isValidEmail) {
           return res.status(400).json({ message: emailMessage });
         }
@@ -133,7 +176,8 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
 
       let hashedPassword: string | undefined;
       if (password) {
-        const { isValid: isValidPassword, message: passwordMessage } = validatePassword(password);
+        const { isValid: isValidPassword, message: passwordMessage } =
+          validatePassword(password);
         if (!isValidPassword) {
           return res.status(400).json({ message: passwordMessage });
         }
@@ -143,20 +187,16 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
       }
 
       if (firstName) {
-        const { isValid: isValidFirstName, message: firstNameMessage } = validateName(
-          firstName,
-          "first name"
-        );
+        const { isValid: isValidFirstName, message: firstNameMessage } =
+          validateName(firstName, "first name");
         if (!isValidFirstName) {
           return res.status(400).json({ message: firstNameMessage });
         }
       }
 
       if (lastName) {
-        const { isValid: isValidLastName, message: lastNameMessage } = validateName(
-          lastName,
-          "last name"
-        );
+        const { isValid: isValidLastName, message: lastNameMessage } =
+          validateName(lastName, "last name");
         if (!isValidLastName) {
           return res.status(400).json({ message: lastNameMessage });
         }
@@ -192,11 +232,16 @@ export async function updateUser(req: Request, res: Response): Promise<Response>
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when updating user!" });
+    return res
+      .status(500)
+      .json({ message: "Unknown error when updating user!" });
   }
 }
 
-export async function updateUserPrivilege(req: Request, res: Response): Promise<Response> {
+export async function updateUserPrivilege(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const { isAdmin } = req.body;
 
@@ -211,7 +256,10 @@ export async function updateUserPrivilege(req: Request, res: Response): Promise<
         return res.status(404).json({ message: `User ${userId} not found` });
       }
 
-      const updatedUser = await _updateUserPrivilegeById(userId, isAdmin === true);
+      const updatedUser = await _updateUserPrivilegeById(
+        userId,
+        isAdmin === true
+      );
       return res.status(200).json({
         message: `Updated privilege for user ${userId}`,
         data: formatUserResponse(updatedUser as IUser),
@@ -221,11 +269,16 @@ export async function updateUserPrivilege(req: Request, res: Response): Promise<
     }
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when updating user privilege!" });
+    return res
+      .status(500)
+      .json({ message: "Unknown error when updating user privilege!" });
   }
 }
 
-export async function deleteUser(req: Request, res: Response): Promise<Response> {
+export async function deleteUser(
+  req: Request,
+  res: Response
+): Promise<Response> {
   try {
     const userId = req.params.id;
     if (!isValidObjectId(userId)) {
@@ -237,10 +290,14 @@ export async function deleteUser(req: Request, res: Response): Promise<Response>
     }
 
     await _deleteUserById(userId);
-    return res.status(200).json({ message: `Deleted user ${userId} successfully` });
+    return res
+      .status(200)
+      .json({ message: `Deleted user ${userId} successfully` });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Unknown error when deleting user!" });
+    return res
+      .status(500)
+      .json({ message: "Unknown error when deleting user!" });
   }
 }
 

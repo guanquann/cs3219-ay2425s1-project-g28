@@ -88,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                   <MenuItem
                     onClick={() => {
                       handleClose();
-                      navigate(`/profile/${user?.username}}`);
+                      navigate(`/profile/${user.id}}`);
                     }}
                   >
                     Profile

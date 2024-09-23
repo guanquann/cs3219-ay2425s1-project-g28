@@ -35,6 +35,9 @@ components:
           required: true
     UserResponse:
       properties:
+        accessToken:
+          type: string
+          required: false
         id:
           type: string
           required: true
@@ -176,6 +179,26 @@ paths:
       summary: Login
       tags:
         - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: true
+                password:
+                  type: string
+                  required: true
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+
   /api/auth/verify-token:
     get:
       summary: Verify token

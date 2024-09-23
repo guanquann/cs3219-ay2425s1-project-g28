@@ -19,7 +19,7 @@ function App() {
               <Route path=":questionId" element={<QuestionDetail />} />
               <Route path=":questionId/edit" element={<QuestionEdit />} />
             </Route>
-            <Route path="profile/:username" element={<ProfilePage />} />
+            <Route path="profile/:userId" element={<ProfilePage />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
         </Routes>

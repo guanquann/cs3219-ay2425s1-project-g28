@@ -4,6 +4,8 @@ import ProfileSection from "../../components/ProfileSection";
 import { Box, Typography } from "@mui/material";
 import classes from "./index.module.css";
 import { useEffect, useState } from "react";
+import { userClient } from "../../utils/api";
+import { useAuth } from "../../contexts/AuthContext";
 
 type UserProfile = {
   id: string;
@@ -11,26 +13,36 @@ type UserProfile = {
   firstName: string;
   lastName: string;
   email: string;
+  isAdmin: boolean;
   biography?: string;
+  profilePictureUrl?: string;
+  createdAt: Date;
 };
 
 const ProfilePage: React.FC = () => {
-  const { username } = useParams<{ username: string }>();
+  const { userId } = useParams<{ userId: string }>();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const auth = useAuth();
 
-  console.log(username);
+  if (!auth) {
+    throw new Error("useAuth() must be used within AuthProvider");
+  }
+
+  const { user } = auth;
 
   useEffect(() => {
-    // TODO: fetch user details
-    setUserProfile({
-      id: "1",
-      username: "johndoe",
-      firstName: "John",
-      lastName: "Doe",
-      email: "johndoe@example.com",
-      biography:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-    });
+    // temp user token obtained from the backend to test cors
+    const accessToken =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZWU2MDI1MTQzOWQ1YWRhNTNhOGIyMiIsImlhdCI6MTcyNzA4MDMzOSwiZXhwIjoxNzI3Njg1MTM5fQ.rofXQgtvcGuEkucv78MTQgqrP0XtPdQ-XPISiW9V_JM";
+    userClient
+      .get(`/users/${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      .then((res) => {
+        console.log(res.data.data);
+        setUserProfile(res.data.data);
+      })
+      .catch(() => setUserProfile(null));
   }, []);
 
   if (!userProfile) {
@@ -67,7 +79,7 @@ const ProfilePage: React.FC = () => {
             lastName={userProfile.lastName}
             username={userProfile.username}
             biography={userProfile.biography}
-            isCurrentUser={true} // change this to hide the buttons, hardcoding the details for now
+            isCurrentUser={user?.id === userId}
           />
         </Box>
         <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>

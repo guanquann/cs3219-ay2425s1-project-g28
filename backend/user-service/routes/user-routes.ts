@@ -18,7 +18,12 @@ const router = express.Router();
 
 router.get("/", verifyAccessToken, verifyIsAdmin, getAllUsers);
 
-router.patch("/:id/privilege", verifyAccessToken, verifyIsAdmin, updateUserPrivilege);
+router.patch(
+  "/:id/privilege",
+  verifyAccessToken,
+  verifyIsAdmin,
+  updateUserPrivilege
+);
 
 router.post("/", createUser);
 
