@@ -5,8 +5,8 @@ import fs from "fs";
 import yaml from "yaml";
 import swaggerUi from "swagger-ui-express";
 
-import userRoutes from "./routes/user-routes.js";
-import authRoutes from "./routes/auth-routes.js";
+import userRoutes from "./routes/user-routes";
+import authRoutes from "./routes/auth-routes";
 
 dotenv.config();
 
