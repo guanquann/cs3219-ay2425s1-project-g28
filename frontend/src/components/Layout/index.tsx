@@ -9,6 +9,7 @@ const Layout: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
+        minWidth: "755px",
         // minInlineSize: "100vw",
       }}
     >
