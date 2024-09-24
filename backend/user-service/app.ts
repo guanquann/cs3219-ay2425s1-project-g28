@@ -1,19 +1,42 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+import fs from "fs";
+import yaml from "yaml";
+import swaggerUi from "swagger-ui-express";
 
 import userRoutes from "./routes/user-routes.js";
 import authRoutes from "./routes/auth-routes.js";
+
+dotenv.config();
+
+const file = fs.readFileSync("./swagger.yml", "utf-8");
+const swaggerDocument = yaml.parse(file);
+const origin = process.env.ORIGINS
+  ? process.env.ORIGINS.split(",")
+  : ["http://localhost:5173", "http://127.0.0.1:5173"];
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors()); // config cors so that front-end can use
-app.options("*", cors());
+app.use(
+  cors({
+    origin: origin,
+    credentials: true,
+  })
+); // config cors so that front-end can use
+app.options(
+  "*",
+  cors({
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    credentials: true,
+  })
+);
 
 // To handle CORS Errors
 app.use((req: Request, res: Response, next: NextFunction) => {
-  res.header("Access-Control-Allow-Origin", "*"); // "*" -> Allow all links to access
+  res.header("Access-Control-Allow-Origin", req.headers.origin); // "*" -> Allow all links to access
 
   res.header(
     "Access-Control-Allow-Headers",
@@ -30,9 +53,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use("/users", userRoutes);
-app.use("/auth", authRoutes);
-
+app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   console.log("Sending Greetings!");
   res.json({
