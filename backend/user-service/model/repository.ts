@@ -37,7 +37,9 @@ export async function findUserById(userId: string): Promise<IUser | null> {
   return UserModel.findById(userId);
 }
 
-export async function findUserByUsername(username: string): Promise<IUser | null> {
+export async function findUserByUsername(
+  username: string
+): Promise<IUser | null> {
   return UserModel.findOne({ username });
 }
 

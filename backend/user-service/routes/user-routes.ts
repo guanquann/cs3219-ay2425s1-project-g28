@@ -18,11 +18,16 @@ const router = express.Router();
 
 router.get("/", verifyAccessToken, verifyIsAdmin, getAllUsers);
 
-router.patch("/:id/privilege", verifyAccessToken, verifyIsAdmin, updateUserPrivilege);
+router.patch(
+  "/:id/privilege",
+  verifyAccessToken,
+  verifyIsAdmin,
+  updateUserPrivilege
+);
 
 router.post("/", createUser);
 
-router.get("/:id", verifyAccessToken, getUser);
+router.get("/:id", getUser);
 
 router.patch("/:id", verifyAccessToken, verifyIsOwnerOrAdmin, updateUser);
 
