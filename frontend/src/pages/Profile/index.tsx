@@ -37,6 +37,7 @@ const ProfilePage: React.FC = () => {
         setUserProfile(res.data.data);
       })
       .catch(() => setUserProfile(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!userProfile) {
