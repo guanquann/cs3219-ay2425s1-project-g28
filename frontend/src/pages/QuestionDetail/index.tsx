@@ -1,12 +1,4 @@
-import {
-  Box,
-  Chip,
-  List,
-  ListItem,
-  Stack,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Chip, List, ListItem, Typography, useTheme } from "@mui/material";
 import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import Markdown from "markdown-to-jsx";
@@ -67,30 +59,28 @@ const QuestionDetail: React.FC = () => {
           <Typography component={"h1"} variant="h3">
             {state.selectedQuestion.title}
           </Typography>
-          <Stack
-            direction={"row"}
-            sx={(theme) => ({ marginTop: theme.spacing(2) })}
+          <Box
+            sx={(theme) => ({
+              marginTop: theme.spacing(2),
+              display: "flex",
+              flexDirection: "row",
+              flexWrap: "wrap",
+            })}
           >
             <Chip
               key={state.selectedQuestion.complexity}
               label={state.selectedQuestion.complexity}
               color="primary"
-              sx={(theme) => ({
-                marginLeft: theme.spacing(1),
-                marginRight: theme.spacing(1),
-              })}
+              sx={(theme) => ({ margin: theme.spacing(1) })}
             />
             {state.selectedQuestion.categories.map((cat) => (
               <Chip
                 key={cat}
                 label={cat}
-                sx={(theme) => ({
-                  marginLeft: theme.spacing(1),
-                  marginRight: theme.spacing(1),
-                })}
+                sx={(theme) => ({ margin: theme.spacing(1) })}
               />
             ))}
-          </Stack>
+          </Box>
         </Box>
         <Markdown
           options={{
