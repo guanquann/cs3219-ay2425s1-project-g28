@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Question from "../models/Question.ts";
+import Question, { IQuestion } from "../models/Question.ts";
 import { checkIsExistingQuestion } from "../utils/utils.ts";
 import {
   DUPLICATE_QUESTION_RESPONSE_MESSAGE,
@@ -52,7 +52,7 @@ export const createQuestion = async (
 
     res.status(201).json({
       message: QN_CREATED_MESSAGE,
-      question: newQuestion,
+      question: formatQuestionResponse(newQuestion),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
@@ -123,7 +123,7 @@ export const updateQuestion = async (
 
     res.status(200).json({
       message: "Question updated successfully",
-      question: updatedQuestion,
+      question: formatQuestionResponse(updatedQuestion as IQuestion),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
@@ -208,7 +208,7 @@ export const readQuestionsList = async (
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
       totalQns: filteredTotalQuestions,
-      questions: filteredQuestions,
+      questions: filteredQuestions.map(formatQuestionResponse),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
@@ -230,7 +230,7 @@ export const readQuestionIndiv = async (
 
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
-      question: questionDetails,
+      question: formatQuestionResponse(questionDetails),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
@@ -254,4 +254,14 @@ export const readCategories = async (
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
   }
+};
+
+const formatQuestionResponse = (question: IQuestion) => {
+  return {
+    id: question._id,
+    title: question.title,
+    description: question.description,
+    complexity: question.complexity,
+    categories: question.category,
+  };
 };

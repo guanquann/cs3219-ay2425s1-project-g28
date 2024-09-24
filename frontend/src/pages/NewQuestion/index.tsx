@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -17,20 +23,33 @@ const NewQuestion = () => {
 
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
-  const [selectedComplexity, setselectedComplexity] = useState<string | null>(null);
+  const [selectedComplexity, setselectedComplexity] = useState<string | null>(
+    null
+  );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
 
   const handleBack = () => {
-    if (title || markdownText || selectedComplexity || selectedCategories.length > 0) {
-      if (!confirm("Are you sure you want to leave this page? All process will be lost.")) {
+    if (
+      title ||
+      markdownText ||
+      selectedComplexity ||
+      selectedCategories.length > 0
+    ) {
+      if (
+        !confirm(
+          "Are you sure you want to leave this page? All process will be lost."
+        )
+      ) {
         return;
       }
     }
     navigate("/questions");
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (!event.target.files) {
       return;
     }
@@ -74,7 +93,12 @@ const NewQuestion = () => {
   };
 
   const handleSubmit = async () => {
-    if (!title || !markdownText || !selectedComplexity || selectedCategories.length === 0) {
+    if (
+      !title ||
+      !markdownText ||
+      !selectedComplexity ||
+      selectedCategories.length === 0
+    ) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -98,7 +122,8 @@ const NewQuestion = () => {
       navigate("/questions");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data.message || "Failed to create question";
+        const message =
+          error.response?.data.message || "Failed to create question";
         toast.error(message);
       } else {
         toast.error("Failed to create question");
@@ -149,7 +174,10 @@ const NewQuestion = () => {
         uploadedImagesUrl={uploadedImagesUrl}
       />
 
-      <QuestionMarkdown markdownText={markdownText} setMarkdownText={setMarkdownText} />
+      <QuestionMarkdown
+        markdownText={markdownText}
+        setMarkdownText={setMarkdownText}
+      />
 
       <Stack spacing={2} direction="row" paddingTop={2} paddingBottom={8}>
         <Button variant="contained" fullWidth onClick={handleSubmit}>

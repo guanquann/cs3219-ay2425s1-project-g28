@@ -1,6 +1,12 @@
 import { useEffect, useState, useReducer } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -8,7 +14,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { questionClient } from "../../utils/api";
 import { complexityList, categoryList } from "../../utils/constants";
-import reducer, { getQuestionById, initialState } from "../../reducers/questionReducer";
+import reducer, {
+  getQuestionById,
+  initialState,
+} from "../../reducers/questionReducer";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
@@ -21,7 +30,9 @@ const QuestionEdit = () => {
 
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
-  const [selectedComplexity, setselectedComplexity] = useState<string | null>(null);
+  const [selectedComplexity, setselectedComplexity] = useState<string | null>(
+    null
+  );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
 
@@ -43,13 +54,19 @@ const QuestionEdit = () => {
   }, [state.selectedQuestion]);
 
   const handleBack = () => {
-    if (!confirm("Are you sure you want to leave this page? All process will be lost.")) {
+    if (
+      !confirm(
+        "Are you sure you want to leave this page? All process will be lost."
+      )
+    ) {
       return;
     }
     navigate("/questions");
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (!event.target.files) {
       return;
     }
@@ -109,7 +126,7 @@ const QuestionEdit = () => {
 
     try {
       await questionClient.put(
-        `/${state.selectedQuestion.questionId}`,
+        `/${state.selectedQuestion.id}`,
         {
           title,
           description: markdownText,
@@ -127,7 +144,8 @@ const QuestionEdit = () => {
       navigate("/questions");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const message = error.response?.data.message || "Failed to update question";
+        const message =
+          error.response?.data.message || "Failed to update question";
         toast.error(message);
       } else {
         toast.error("Failed to update question");
@@ -180,7 +198,10 @@ const QuestionEdit = () => {
         uploadedImagesUrl={uploadedImagesUrl}
       />
 
-      <QuestionMarkdown markdownText={markdownText} setMarkdownText={setMarkdownText} />
+      <QuestionMarkdown
+        markdownText={markdownText}
+        setMarkdownText={setMarkdownText}
+      />
 
       <Stack paddingTop={2} paddingBottom={8}>
         <Button variant="contained" fullWidth onClick={handleUpdate}>

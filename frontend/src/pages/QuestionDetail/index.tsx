@@ -143,6 +143,10 @@ const QuestionDetail: React.FC = () => {
                   },
                 },
               },
+              img: {
+                component: "img",
+                props: { style: { height: "350px", width: "auto" } },
+              },
             },
           }}
         >
