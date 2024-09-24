@@ -1,7 +1,22 @@
-import { AppBar, Box, Link, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  Link,
+  Menu,
+  MenuItem,
+  Stack,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { grey } from "@mui/material/colors";
 import AppMargin from "../AppMargin";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { useState } from "react";
 
 type NavbarItem = { label: string; link: string };
 
@@ -10,6 +25,19 @@ type NavbarProps = { navbarItems?: Array<NavbarItem> };
 const Navbar: React.FC<NavbarProps> = (props) => {
   const { navbarItems = [{ label: "Questions", link: "/questions" }] } = props;
   const navigate = useNavigate();
+  const auth = useAuth();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  if (!auth) {
+    throw new Error("useAuth() must be used within AuthProvider");
+  }
+
+  const { user } = auth;
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) =>
+    setAnchorEl(event.currentTarget);
+
+  const handleClose = () => setAnchorEl(null);
 
   return (
     <AppBar
@@ -24,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
       }}
     >
       <AppMargin>
-        <Toolbar>
+        <Toolbar sx={{ padding: 0 }}>
           <Typography
             component={Box}
             variant="h5"
@@ -33,7 +61,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
           >
             PeerPrep
           </Typography>
-          <Box>
+          <Stack direction={"row"} alignItems={"center"} spacing={2}>
             {navbarItems.map((item) => (
               <Link
                 key={item.label}
@@ -44,7 +72,37 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 {item.label}
               </Link>
             ))}
-          </Box>
+            {user ? (
+              <>
+                <Tooltip title={"Account settings"}>
+                  <IconButton onClick={handleClick}>
+                    <Avatar />
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={!!anchorEl}
+                  onClose={handleClose}
+                  onClick={handleClose}
+                >
+                  <MenuItem
+                    onClick={() => {
+                      handleClose();
+                      navigate(`/profile/${user.id}}`);
+                    }}
+                  >
+                    Profile
+                  </MenuItem>
+                  <MenuItem>Logout</MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <>
+                <Button variant="contained">Sign up</Button>
+                <Button variant="outlined">Log in</Button>
+              </>
+            )}
+          </Stack>
         </Toolbar>
       </AppMargin>
     </AppBar>
