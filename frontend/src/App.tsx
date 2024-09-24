@@ -6,6 +6,7 @@ import QuestionEdit from "./pages/QuestionEdit";
 import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/Profile";
 import AuthProvider from "./contexts/AuthContext";
+import QuestionList from "./pages/QuestionList";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route path="questions">
-              <Route index element={<>question page list</>} />
+              <Route index element={<QuestionList />} />
               <Route path="new" element={<NewQuestion />} />
               <Route path=":questionId" element={<QuestionDetail />} />
               <Route path=":questionId/edit" element={<QuestionEdit />} />
