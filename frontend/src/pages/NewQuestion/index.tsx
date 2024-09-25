@@ -13,10 +13,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { questionClient } from "../../utils/api";
-import { complexityList, categoryList } from "../../utils/constants";
+import { complexityList } from "../../utils/constants";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
+import QuestionCategoryAutoComplete from "../../components/QuestionCategoryAutoComplete";
+import QuestionDetail from "../../components/QuestionDetail";
 
 const NewQuestion = () => {
   const navigate = useNavigate();
@@ -28,6 +30,7 @@ const NewQuestion = () => {
   );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
+  const [isPreviewQuestion, setIsPreviewQuestion] = useState<boolean>(false);
 
   const handleBack = () => {
     if (
@@ -45,51 +48,6 @@ const NewQuestion = () => {
       }
     }
     navigate("/questions");
-  };
-
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (!event.target.files) {
-      return;
-    }
-
-    const formData = new FormData();
-    for (const file of event.target.files) {
-      if (!file.type.startsWith("image/")) {
-        toast.error(`${file.name} is not an image`);
-        continue;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error(`${file.name} is more than 5MB`);
-        continue;
-      }
-      formData.append("images[]", file);
-    }
-
-    try {
-      const response = await questionClient.post("/images", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: false,
-      });
-
-      const data = response.data;
-      for (const imageUrl of data.imageUrls) {
-        setUploadedImagesUrl((prev) => [...prev, imageUrl]);
-      }
-
-      toast.success("File uploaded successfully");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message || "Error uploading file");
-      } else {
-        console.error(error);
-        toast.error("Error uploading file");
-      }
-    }
   };
 
   const handleSubmit = async () => {
@@ -137,54 +95,71 @@ const NewQuestion = () => {
         <ArrowBackIcon />
       </IconButton>
 
-      <TextField
-        label="Title"
-        variant="outlined"
-        size="small"
-        fullWidth
-        autoComplete="off"
-        value={title}
-        sx={{ marginTop: 2 }}
-        onChange={(value) => setTitle(value.target.value)}
-      />
+      {isPreviewQuestion ? (
+        <QuestionDetail
+          title={title}
+          complexity={selectedComplexity}
+          categories={selectedCategories}
+          description={markdownText}
+        />
+      ) : (
+        <>
+          <TextField
+            label="Title"
+            variant="outlined"
+            size="small"
+            fullWidth
+            autoComplete="off"
+            value={title}
+            sx={{ marginTop: 2 }}
+            onChange={(value) => setTitle(value.target.value)}
+          />
 
-      <Autocomplete
-        options={complexityList}
-        size="small"
-        sx={{ marginTop: 2 }}
-        onChange={(e, newcomplexitySelected) => {
-          setselectedComplexity(newcomplexitySelected);
-        }}
-        renderInput={(params) => <TextField {...params} label="Complexity" />}
-      />
+          <Autocomplete
+            options={complexityList}
+            size="small"
+            sx={{ marginTop: 2 }}
+            onChange={(e, newcomplexitySelected) => {
+              setselectedComplexity(newcomplexitySelected);
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Complexity" />
+            )}
+          />
 
-      <Autocomplete
-        multiple
-        options={categoryList}
-        size="small"
-        sx={{ marginTop: 2 }}
-        onChange={(e, newCategoriesSelected) => {
-          setSelectedCategories(newCategoriesSelected);
-        }}
-        renderInput={(params) => <TextField {...params} label="Category" />}
-      />
+          <QuestionCategoryAutoComplete
+            setSelectedCategories={setSelectedCategories}
+          />
 
-      <QuestionImageContainer
-        handleImageUpload={handleImageUpload}
-        uploadedImagesUrl={uploadedImagesUrl}
-      />
+          <QuestionImageContainer
+            uploadedImagesUrl={uploadedImagesUrl}
+            setUploadedImagesUrl={setUploadedImagesUrl}
+          />
 
-      <QuestionMarkdown
-        markdownText={markdownText}
-        setMarkdownText={setMarkdownText}
-      />
+          <QuestionMarkdown
+            markdownText={markdownText}
+            setMarkdownText={setMarkdownText}
+          />
+        </>
+      )}
 
       <Stack spacing={2} direction="row" paddingTop={2} paddingBottom={8}>
         <Button variant="contained" fullWidth onClick={handleSubmit}>
           Submit Question
         </Button>
-        <Button variant="contained" color="secondary" fullWidth>
-          Preview Question
+        <Button
+          variant="contained"
+          color="secondary"
+          fullWidth
+          disabled={
+            !title &&
+            !markdownText &&
+            !selectedComplexity &&
+            selectedCategories.length === 0
+          }
+          onClick={() => setIsPreviewQuestion((prev) => !prev)}
+        >
+          {isPreviewQuestion ? "Edit Question" : "Preview Question"}
         </Button>
       </Stack>
 

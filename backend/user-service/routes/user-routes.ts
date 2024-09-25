@@ -7,12 +7,12 @@ import {
   getUser,
   updateUser,
   updateUserPrivilege,
-} from "../controller/user-controller.js";
+} from "../controller/user-controller";
 import {
   verifyAccessToken,
   verifyIsAdmin,
   verifyIsOwnerOrAdmin,
-} from "../middleware/basic-access-control.js";
+} from "../middleware/basic-access-control";
 
 const router = express.Router();
 

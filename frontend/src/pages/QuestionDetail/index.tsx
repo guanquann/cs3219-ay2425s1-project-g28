@@ -1,11 +1,9 @@
-import { Box, Chip, List, ListItem, Typography, useTheme } from "@mui/material";
 import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
-import Markdown from "markdown-to-jsx";
 import AppMargin from "../../components/AppMargin";
-import { grey } from "@mui/material/colors";
 import classes from "./index.module.css";
 import NotFound from "../../components/NotFound";
+import QuestionDetailComponent from "../../components/QuestionDetail";
 import reducer, {
   getQuestionById,
   initialState,
@@ -15,7 +13,6 @@ import reducer, {
 const QuestionDetail: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const theme = useTheme();
 
   useEffect(() => {
     if (!questionId) {
@@ -44,105 +41,12 @@ const QuestionDetail: React.FC = () => {
 
   return (
     <AppMargin>
-      <Box
-        sx={(theme) => ({
-          marginTop: theme.spacing(4),
-          marginBottom: theme.spacing(4),
-        })}
-      >
-        <Box
-          sx={(theme) => ({
-            marginTop: theme.spacing(4),
-            marginBottom: theme.spacing(4),
-          })}
-        >
-          <Typography component={"h1"} variant="h3">
-            {state.selectedQuestion.title}
-          </Typography>
-          <Box
-            sx={(theme) => ({
-              marginTop: theme.spacing(2),
-              display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-            })}
-          >
-            <Chip
-              key={state.selectedQuestion.complexity}
-              label={state.selectedQuestion.complexity}
-              color="primary"
-              sx={(theme) => ({ margin: theme.spacing(1) })}
-            />
-            {state.selectedQuestion.categories.map((cat) => (
-              <Chip
-                key={cat}
-                label={cat}
-                sx={(theme) => ({ margin: theme.spacing(1) })}
-              />
-            ))}
-          </Box>
-        </Box>
-        <Markdown
-          options={{
-            overrides: {
-              h1: {
-                component: Typography,
-                props: { component: "h1", variant: "h4" },
-              },
-              h2: {
-                component: Typography,
-                props: { component: "h2", variant: "h5" },
-              },
-              h3: {
-                component: Typography,
-                props: { component: "h3", variant: "h6" },
-              },
-              p: {
-                component: Typography,
-              },
-              ol: {
-                component: List,
-                props: {
-                  component: "ol",
-                  sx: {
-                    paddingLeft: theme.spacing(4),
-                    listStyleType: "decimal",
-                  },
-                },
-              },
-              ul: {
-                component: List,
-                props: {
-                  component: "ul",
-                  sx: {
-                    paddingLeft: theme.spacing(4),
-                    listStyleType: "disc",
-                  },
-                },
-              },
-              li: {
-                component: ListItem,
-                props: { sx: { display: "list-item" } },
-              },
-              code: {
-                props: {
-                  style: {
-                    backgroundColor: grey[200],
-                    padding: "0.2em",
-                    borderRadius: "0.4em",
-                  },
-                },
-              },
-              img: {
-                component: "img",
-                props: { style: { height: "350px", width: "auto" } },
-              },
-            },
-          }}
-        >
-          {state.selectedQuestion.description}
-        </Markdown>
-      </Box>
+      <QuestionDetailComponent
+        title={state.selectedQuestion.title}
+        complexity={state.selectedQuestion.complexity}
+        categories={state.selectedQuestion.categories}
+        description={state.selectedQuestion.description}
+      />
     </AppMargin>
   );
 };
