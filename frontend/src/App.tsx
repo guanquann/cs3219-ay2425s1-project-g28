@@ -7,6 +7,7 @@ import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/Profile";
 import AuthProvider from "./contexts/AuthContext";
 import QuestionList from "./pages/QuestionList";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
             <Route path="questions">
               <Route index element={<QuestionList />} />
               <Route path="new" element={<NewQuestion />} />

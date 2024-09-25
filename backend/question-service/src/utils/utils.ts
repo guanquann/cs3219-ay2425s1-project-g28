@@ -32,7 +32,7 @@ export const uploadFileToFirebase = async (
       },
     });
 
-    blobStream.on("error", (error) => {
+    blobStream.on("error", (error: any) => {
       reject(error);
     });
 

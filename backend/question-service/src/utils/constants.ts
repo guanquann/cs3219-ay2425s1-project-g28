@@ -1,9 +1,9 @@
 export const QN_DESC_CHAR_LIMIT = 6000;
 
-export const QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE =
+export const QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE =
   "Question description must be at most 6000 characters";
 
-export const DUPLICATE_QUESTION_RESPONSE_MESSAGE =
+export const DUPLICATE_QUESTION_MESSAGE =
   "Duplicate question: A question with the same title already exists.";
 
 export const QN_CREATED_MESSAGE = "Question created successfully.";
@@ -26,3 +26,7 @@ export const CATEGORIES_NOT_FOUND_MESSAGE = "No categories found.";
 
 export const CATEGORIES_RETRIEVED_MESSAGE =
   "Categories retrieved successfully.";
+
+export const MONGO_OBJ_ID_FORMAT = /^[0-9a-fA-F]{24}$/;
+
+export const MONGO_OBJ_ID_MALFORMED_MESSAGE = "The question ID is not valid";
