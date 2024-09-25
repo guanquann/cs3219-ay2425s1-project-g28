@@ -26,21 +26,20 @@ import AppMargin from "../../components/AppMargin";
 import { useNavigate } from "react-router-dom";
 import reducer, {
   deleteQuestionById,
+  getQuestionCategories,
   getQuestionList,
   initialState,
 } from "../../reducers/questionReducer";
-import { categoryList, complexityList } from "../../utils/constants";
+import { complexityList } from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
-
-// TODO: get dynamic category list from DB
 
 const tableHeaders = ["Title", "Complexity", "Categories"];
 const searchCharacterLimit = 255;
 const categorySelectionLimit = 10;
 const rowsPerPage = 10;
-const isAdmin = false; // TODO: check using auth context
+const isAdmin = true; // TODO: check using auth context
 
 const QuestionList: React.FC = () => {
   const [page, setPage] = useState<number>(0);
@@ -56,6 +55,10 @@ const QuestionList: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const areQuestionsFiltered = () => {
+    return searchFilter || complexityFilter.length > 0 || categoryFilter.length > 0;
+  };
+
   // For handling edit / delete question for the admin user
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const menuOpen = Boolean(anchorEl);
@@ -65,15 +68,40 @@ const QuestionList: React.FC = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const handleQuestionDelete = (questionId: string) => {
-    // TODO
-    // handleMenuClose();
-    deleteQuestionById(questionId, dispatch);
+  const handleQuestionDelete = async (questionId: string) => {
+    handleMenuClose();
+    
+    // TODO: confirmation pop up
+
+    const result = await deleteQuestionById(
+      questionId,
+      dispatch
+    );
+
+    if (!result) {
+      // TODO: notif about failed delete
+      console.log("error deleting question");
+      return;
+    }
+
+    // TODO: notif about successful delete
+    getQuestionList(
+      page + 1, // convert from 0-based indexing
+      rowsPerPage,
+      searchFilter,
+      complexityFilter,
+      categoryFilter,
+      dispatch
+    );
   };
 
   useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
+
+  useEffect(() => {
     getQuestionList(
-      page,
+      page + 1, // convert from 0-based indexing
       rowsPerPage,
       searchFilter,
       complexityFilter,
@@ -81,6 +109,11 @@ const QuestionList: React.FC = () => {
       dispatch
     );
   }, [page, searchFilter, complexityFilter, categoryFilter]);
+
+  if (state.questionCategoriesError || state.selectedQuestionError) {
+    console.log("something went wrong");
+    // TODO: page for something went wrong
+  }
 
   return (
     <AppMargin>
@@ -136,12 +169,12 @@ const QuestionList: React.FC = () => {
               label="Title"
               onChange={(input) => {
                 setSearchInput(input.target.value);
-                setSearchFilter(input.target.value);
+                setSearchFilter(input.target.value.toLowerCase().trim());
               }}
               helperText={
                 searchInput.length + ` / ${searchCharacterLimit} characters`
               }
-              disabled={state.questions.length === 0}
+              disabled={state.questions.length === 0 && !areQuestionsFiltered()}
             />
           </Grid2>
           <Grid2 size={4}>
@@ -155,14 +188,14 @@ const QuestionList: React.FC = () => {
               renderInput={(params) => (
                 <TextField {...params} label="Complexity" />
               )}
-              disabled={state.questions.length === 0}
+              disabled={state.questions.length === 0 && !areQuestionsFiltered()} 
             />
           </Grid2>
           <Grid2 size={8}>
             <Autocomplete
               multiple
               disableCloseOnSelect
-              options={categoryList}
+              options={state.questionCategories}
               getOptionDisabled={(option) =>
                 selectedCategories.length > categorySelectionLimit &&
                 !selectedCategories.includes(option as string)
@@ -186,7 +219,7 @@ const QuestionList: React.FC = () => {
                   }}
                 />
               )}
-              disabled={state.questions.length === 0}
+              disabled={state.questions.length === 0 && !areQuestionsFiltered()}
             />
           </Grid2>
         </Grid2>
@@ -321,7 +354,7 @@ const QuestionList: React.FC = () => {
           page={page}
           onPageChange={(_, page) => setPage(page)}
         />
-        {state.questions.length === 0 && (
+        {state.questions.length === 0 && !areQuestionsFiltered() && (
           <Stack
             direction="column"
             spacing={1}
