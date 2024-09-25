@@ -3,7 +3,11 @@ import jwt from "jsonwebtoken";
 import { findUserById as _findUserById } from "../model/repository";
 import { AuthenticatedRequest } from "../types/request";
 
-export function verifyAccessToken(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export function verifyAccessToken(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) {
   const authHeader = req.headers["authorization"];
   if (!authHeader) {
     return res.status(401).json({ message: "Authentication failed" });
@@ -25,22 +29,36 @@ export function verifyAccessToken(req: AuthenticatedRequest, res: Response, next
     req.user = {
       id: dbUser.id,
       username: dbUser.username,
+      firstName: dbUser.firstName,
+      lastName: dbUser.lastName,
       email: dbUser.email,
+      biography: dbUser.biography,
+      profilePictureUrl: dbUser.profilePictureUrl,
       isAdmin: dbUser.isAdmin,
     };
     next();
   });
 }
 
-export function verifyIsAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export function verifyIsAdmin(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) {
   if (req.user?.isAdmin) {
     next();
   } else {
-    return res.status(403).json({ message: "Not authorized to access this resource" });
+    return res
+      .status(403)
+      .json({ message: "Not authorized to access this resource" });
   }
 }
 
-export function verifyIsOwnerOrAdmin(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+export function verifyIsOwnerOrAdmin(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) {
   if (req.user?.isAdmin) {
     return next();
   }
@@ -52,5 +70,7 @@ export function verifyIsOwnerOrAdmin(req: AuthenticatedRequest, res: Response, n
     return next();
   }
 
-  return res.status(403).json({ message: "Not authorized to access this resource" });
+  return res
+    .status(403)
+    .json({ message: "Not authorized to access this resource" });
 }

@@ -177,6 +177,7 @@ export const readQuestionsList = async (
       return;
     }
 
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
     const query: any = {};
 
     if (title) {

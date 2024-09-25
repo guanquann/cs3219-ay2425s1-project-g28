@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { userClient } from "../utils/api";
 
 type User = {
   id: string;
@@ -26,6 +27,16 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const { children } = props;
   const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("token");
+    userClient
+      .get("/auth/verify-token", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      .then((res) => setUser(res.data.data))
+      .catch(() => setUser(null));
+  }, []);
 
   // TODO
   const signup = () => {};
