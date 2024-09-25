@@ -1,8 +1,8 @@
 import { Dispatch } from "react";
-// import { questionClient } from "../utils/api";
+import { questionClient } from "../utils/api";
 
 type QuestionDetail = {
-  questionId: string;
+  id: string;
   title: string;
   description: string;
   complexity: string;
@@ -12,7 +12,7 @@ type QuestionDetail = {
 type QuestionList = {
   questions: Array<QuestionDetail>;
   questionCount: number;
-}
+};
 
 enum QuestionActionTypes {
   ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
@@ -40,7 +40,7 @@ const isQuestion = (question: any): question is QuestionDetail => {
   }
 
   return (
-    typeof question.questionId === "string" &&
+    typeof question.id === "string" &&
     typeof question.title === "string" &&
     typeof question.description === "string" &&
     typeof question.complexity === "string" &&
@@ -77,30 +77,20 @@ export const getQuestionById = (
   questionId: string,
   dispatch: Dispatch<QuestionActions>
 ) => {
-  // questionClient
-  //   .get(`/questions/${questionId}`)
-  //   .then((res) =>
-  //     dispatch({ type: QuestionActionTypes.VIEW_QUESTION, payload: res.data })
-  //   );
-  const md =
-    "# Sample header 1\n" +
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<br /><br />" +
-    "**Example ordered list:**\n" +
-    "1. Item 1\n" +
-    "2. `Item 2`\n\n" +
-    "*Example unordered list:*\n" +
-    "- Item 1\n" +
-    "- Item 2";
-  dispatch({
-    type: QuestionActionTypes.VIEW_QUESTION,
-    payload: {
-      questionId,
-      title: "Test Question",
-      description: md,
-      complexity: "Easy",
-      categories: ["Strings", "Databases"],
-    },
-  });
+  questionClient
+    .get(`/${questionId}`)
+    .then((res) => {
+      dispatch({
+        type: QuestionActionTypes.VIEW_QUESTION,
+        payload: res.data.question,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: QuestionActionTypes.ERROR_FETCHING_SELECTED_QN,
+        payload: err.response.data.message,
+      })
+    );
 };
 
 export const setSelectedQuestionError = (
@@ -159,14 +149,14 @@ export const getQuestionList = (
     payload: {
       questions: [
         {
-          questionId: "1",
+          id: "1",
           title: "Test Question 1",
           description: md,
           complexity: "Easy",
           categories: ["Databases", "Strings"],
         },
         {
-          questionId: "2",
+          id: "2",
           title: "Test Question 2",
           description: md,
           complexity: "Medium",
@@ -219,7 +209,11 @@ const reducer = (
       if (!isQuestionList(payload)) {
         return state;
       }
-      return { ...state, questions: payload.questions, questionCount: payload.questionCount };
+      return {
+        ...state,
+        questions: payload.questions,
+        questionCount: payload.questionCount,
+      };
     }
     case QuestionActionTypes.DELETE_QUESTION: {
       // TODO

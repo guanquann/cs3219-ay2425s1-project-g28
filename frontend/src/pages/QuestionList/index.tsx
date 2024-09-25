@@ -46,7 +46,10 @@ const QuestionList: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [searchInput, setSearchInput] = useState<string>("");
   const [searchFilter, setSearchFilter] = useDebounce<string>("", 1000);
-  const [complexityFilter, setComplexityFilter] = useDebounce<string[]>([], 1000);
+  const [complexityFilter, setComplexityFilter] = useDebounce<string[]>(
+    [],
+    1000
+  );
   const [categoryFilter, setCategoryFilter] = useDebounce<string[]>([], 1000);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -207,7 +210,7 @@ const QuestionList: React.FC = () => {
             </TableHead>
             <TableBody>
               {state.questions.slice(0, rowsPerPage).map((question) => (
-                <TableRow key={question.questionId}>
+                <TableRow key={question.id}>
                   <TableCell
                     sx={{
                       width: "50%",
@@ -221,7 +224,7 @@ const QuestionList: React.FC = () => {
                       sx={{
                         "&:hover": { cursor: "pointer", color: "primary.main" },
                       }}
-                      onClick={() => navigate(`${question.questionId}`)}
+                      onClick={() => navigate(`${question.id}`)}
                     >
                       {question.title}
                     </Typography>
@@ -283,9 +286,7 @@ const QuestionList: React.FC = () => {
                         onClose={handleMenuClose}
                       >
                         <MenuItem
-                          onClick={() =>
-                            navigate(`${question.questionId}/edit`)
-                          }
+                          onClick={() => navigate(`${question.id}/edit`)}
                         >
                           <ListItemIcon>
                             <Edit
@@ -295,9 +296,7 @@ const QuestionList: React.FC = () => {
                           Edit
                         </MenuItem>
                         <MenuItem
-                          onClick={() =>
-                            handleQuestionDelete(question.questionId)
-                          }
+                          onClick={() => handleQuestionDelete(question.id)}
                         >
                           <ListItemIcon>
                             <Delete
