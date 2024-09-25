@@ -35,7 +35,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
       .then((res) => setUser(res.data.data))
-      .catch((_err) => setUser(null));
+      .catch(() => setUser(null));
   }, []);
 
   // TODO
