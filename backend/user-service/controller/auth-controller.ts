@@ -1,14 +1,11 @@
 import { Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { findUserByEmail as _findUserByEmail } from "../model/repository.js";
-import { formatUserResponse } from "./user-controller.js";
-import { AuthenticatedRequest } from "../types/request.js";
+import { findUserByEmail as _findUserByEmail } from "../model/repository";
+import { formatUserResponse } from "./user-controller";
+import { AuthenticatedRequest } from "../types/request";
 
-export async function handleLogin(
-  req: AuthenticatedRequest,
-  res: Response
-): Promise<Response> {
+export async function handleLogin(req: AuthenticatedRequest, res: Response): Promise<Response> {
   const { email, password } = req.body;
   if (email && password) {
     try {
@@ -49,9 +46,7 @@ export async function handleVerifyToken(
 ): Promise<Response> {
   try {
     const verifiedUser = req.user;
-    return res
-      .status(200)
-      .json({ message: "Token verified", data: verifiedUser });
+    return res.status(200).json({ message: "Token verified", data: verifiedUser });
   } catch (err) {
     return res.status(500).json({ message: "Server error", err });
   }
