@@ -27,6 +27,7 @@ import reducer, {
   getQuestionCategories,
   initialState,
 } from "../../reducers/questionReducer";
+import homepageImage from "/homepage_image.svg";
 
 const Home: React.FC = () => {
   const [complexity, setComplexity] = useState<string[]>([]);
@@ -69,7 +70,20 @@ const Home: React.FC = () => {
         Your ultimate technical interview preparation platform to practice
         whiteboard style interview questions with a peer.
       </Typography>
-
+{/* 
+      <Box
+        component="img"
+        src={homepageImage}
+        alt="Interview Practice Buddy"
+        sx={{
+          position: "absolute",
+          top: "35%",
+          left: "10%",
+          width: "128px",
+          height: "auto",
+          objectFit: "contain",
+        }}
+      /> */}
       <Card
         sx={{
           padding: 4,
@@ -78,7 +92,7 @@ const Home: React.FC = () => {
           backgroundColor: "#F5F5F5",
         }}
       >
-        <Grid2 container rowSpacing={1} columnSpacing={2} alignItems="center">
+        <Grid2 container rowSpacing={2} columnSpacing={2} alignItems="center">
           <Grid2 size={2}>
             <Typography
               align="left"
@@ -89,10 +103,7 @@ const Home: React.FC = () => {
           </Grid2>
 
           <Grid2 size={10}>
-            <FormControl
-              fullWidth
-              sx={{ marginBottom: 2, backgroundColor: "white" }}
-            >
+            <FormControl fullWidth sx={{ backgroundColor: "white" }}>
               <Select
                 multiple
                 value={complexity}
@@ -151,10 +162,7 @@ const Home: React.FC = () => {
           </Grid2>
 
           <Grid2 size={10}>
-            <FormControl
-              fullWidth
-              sx={{ marginBottom: 2, backgroundColor: "white" }}
-            >
+            <FormControl fullWidth sx={{ backgroundColor: "white" }}>
               <Select
                 multiple
                 value={selectedCategories}
@@ -215,10 +223,7 @@ const Home: React.FC = () => {
           </Grid2>
 
           <Grid2 size={10}>
-            <FormControl
-              fullWidth
-              sx={{ marginBottom: 2, backgroundColor: "white" }}
-            >
+            <FormControl fullWidth sx={{ backgroundColor: "white" }}>
               <Select
                 multiple
                 value={language}
