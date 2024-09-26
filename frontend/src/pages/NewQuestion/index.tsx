@@ -103,6 +103,7 @@ const NewQuestion = () => {
           />
 
           <QuestionCategoryAutoComplete
+            selectedCategories={selectedCategories}
             setSelectedCategories={setSelectedCategories}
           />
 

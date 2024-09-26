@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface IQuestion extends Document {
+export interface IQuestion extends Document {
   title: string;
   description: string;
   complexity: string;

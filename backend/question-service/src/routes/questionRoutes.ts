@@ -11,18 +11,18 @@ import {
 
 const router = express.Router();
 
-router.post("/questions", createQuestion);
+router.post("/", createQuestion);
 
-router.post("/questions/images", createImageLink);
+router.post("/images", createImageLink);
 
-router.put("/questions/:id", updateQuestion);
+router.put("/:id", updateQuestion);
 
-router.get("/questions/categories", readCategories);
+router.get("/categories", readCategories);
 
-router.get("/questions", readQuestionsList);
+router.get("/", readQuestionsList);
 
-router.get("/questions/:id", readQuestionIndiv);
+router.get("/:id", readQuestionIndiv);
 
-router.delete("/questions/:id", deleteQuestion);
+router.delete("/:id", deleteQuestion);
 
 export default router;
