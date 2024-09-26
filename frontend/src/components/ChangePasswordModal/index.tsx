@@ -15,8 +15,8 @@ interface ChangePasswordModalProps {
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ 
   open, 
   handleClose,
-  userId, 
-  onUpdate
+  //userId, 
+  //onUpdate
 }) => {
 
   const [currPassword, setCurrPassword] = useState<string>('');

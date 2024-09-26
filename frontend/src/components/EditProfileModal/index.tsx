@@ -20,8 +20,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
   currFirstName,
   currLastName,
   currBiography,
-  userId,
-  onUpdate,
+  //userId,
+  //onUpdate,
 }) => {
   const nameCharLimit = 50;
   const bioCharLimit = 255;
