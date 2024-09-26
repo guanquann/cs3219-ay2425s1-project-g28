@@ -14,23 +14,31 @@ type QuestionList = {
   questionCount: number;
 };
 
+type CategoryList = {
+  categories: Array<string>;
+};
+
 enum QuestionActionTypes {
   ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
+  ERROR_FETCHING_CATEGORY_LIST = "error_fetching_category_list",
   VIEW_QUESTION = "view_question",
   VIEW_QUESTION_LIST = "view_question_list",
+  VIEW_CATEGORY_LIST = "view_category_list",
   DELETE_QUESTION = "delete_question",
 }
 
 type QuestionActions = {
   type: QuestionActionTypes;
-  payload: QuestionList | QuestionDetail | string;
+  payload: QuestionList | QuestionDetail | CategoryList | string;
 };
 
 type QuestionsState = {
+  categories: Array<string>;
   questions: Array<QuestionDetail>;
   questionCount: number;
   selectedQuestion: QuestionDetail | null;
   selectedQuestionError: string | null;
+  categoryListError: string | null;
 };
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -66,11 +74,28 @@ const isQuestionList = (questionList: any): questionList is QuestionList => {
   );
 };
 
+// eslint-disable-next-line  @typescript-eslint/no-explicit-any
+const isCategoryList = (categoryList: any): categoryList is CategoryList => {
+  if (!categoryList || typeof categoryList !== "object") {
+    return false;
+  }
+
+  return (
+    Array.isArray(categoryList.categories) &&
+    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
+    (categoryList.categories as Array<any>).every(
+      (value) => typeof value === "string"
+    )
+  );
+};
+
 export const initialState: QuestionsState = {
+  categories: [],
   questions: [],
   questionCount: 0,
   selectedQuestion: null,
   selectedQuestionError: null,
+  categoryListError: null,
 };
 
 export const getQuestionById = (
@@ -88,6 +113,23 @@ export const getQuestionById = (
     .catch((err) =>
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_SELECTED_QN,
+        payload: err.response.data.message,
+      })
+    );
+};
+
+export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
+  questionClient
+    .get(`/categories`)
+    .then((res) => {
+      dispatch({
+        type: QuestionActionTypes.VIEW_CATEGORY_LIST,
+        payload: res.data,
+      });
+    })
+    .catch((err) =>
+      dispatch({
+        type: QuestionActionTypes.ERROR_FETCHING_CATEGORY_LIST,
         payload: err.response.data.message,
       })
     );
@@ -197,6 +239,13 @@ const reducer = (
       }
       return { ...state, selectedQuestionError: payload };
     }
+    case QuestionActionTypes.ERROR_FETCHING_CATEGORY_LIST: {
+      const { payload } = action;
+      if (typeof payload !== "string") {
+        return state;
+      }
+      return { ...state, categoryListError: payload };
+    }
     case QuestionActionTypes.VIEW_QUESTION: {
       const { payload } = action;
       if (!isQuestion(payload)) {
@@ -213,6 +262,16 @@ const reducer = (
         ...state,
         questions: payload.questions,
         questionCount: payload.questionCount,
+      };
+    }
+    case QuestionActionTypes.VIEW_CATEGORY_LIST: {
+      const { payload } = action;
+      if (!isCategoryList(payload)) {
+        return state;
+      }
+      return {
+        ...state,
+        categories: payload.categories,
       };
     }
     case QuestionActionTypes.DELETE_QUESTION: {

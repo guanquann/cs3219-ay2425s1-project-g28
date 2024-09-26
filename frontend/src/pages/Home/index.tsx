@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import classes from "./index.module.css";
 import AppMargin from "../../components/AppMargin";
@@ -23,30 +23,27 @@ import {
   maxMatchTimeout,
   minMatchTimeout,
 } from "../../utils/constants";
+import reducer, {
+  getQuestionCategories,
+  initialState,
+} from "../../reducers/questionReducer";
 
 const Home: React.FC = () => {
   const [complexity, setComplexity] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [language, setLanguage] = useState<string[]>([]);
   const [timeout, setTimeout] = useState<number>(30);
 
-  //   useEffect(() => {
-  //     // Fetch categories from the backend
-  //     getCategories().then((res) => setCategories(res));
-  //   }, []);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const handleCategoryChange = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    const {
-      target: { value },
-    } = event;
-    // setSelectedCategories(typeof value === 'string' ? value.split(',') : value);
-  };
+  useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
 
   return (
-    <AppMargin classname={`${classes.fullheight} ${classes.center} ${classes.margins}`}>
+    <AppMargin
+      classname={`${classes.fullheight} ${classes.center} ${classes.margins}`}
+    >
       <Typography
         component={"h1"}
         variant="h1"
@@ -66,7 +63,7 @@ const Home: React.FC = () => {
         sx={(theme) => ({
           fontSize: "h5.fontSize",
           marginBottom: theme.spacing(4),
-          maxWidth: '80%'
+          maxWidth: "80%",
         })}
       >
         Your ultimate technical interview preparation platform to practice
@@ -161,16 +158,42 @@ const Home: React.FC = () => {
               <Select
                 multiple
                 value={selectedCategories}
-                // onChange={handleCategoryChange}
-                renderValue={(selected) => (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                )}
+                onChange={(event) => {
+                  setSelectedCategories(event.target.value as string[]);
+                }}
+                renderValue={(selected) =>
+                  selected.map((value) => {
+                    return (
+                      <Chip
+                        size="medium"
+                        label={value}
+                        key={value}
+                        deleteIcon={
+                          <CloseIcon
+                            onMouseDown={(event: any) =>
+                              event.stopPropagation()
+                            }
+                          />
+                        }
+                        onDelete={() => {
+                          setSelectedCategories((prev) =>
+                            prev.filter((v) => v != value)
+                          );
+                        }}
+                        sx={(theme) => ({
+                          backgroundColor: "primary.main",
+                          color: "primary.contrastText",
+                          marginRight: theme.spacing(1),
+                          "& .MuiChip-deleteIcon": {
+                            color: "primary.contrastText",
+                          },
+                        })}
+                      />
+                    );
+                  })
+                }
               >
-                {categories.map((category) => (
+                {state.categories.map((category) => (
                   <MenuItem key={category} value={category}>
                     <Checkbox
                       checked={selectedCategories.indexOf(category) > -1}
@@ -264,7 +287,11 @@ const Home: React.FC = () => {
                 inputProps: { min: minMatchTimeout, max: maxMatchTimeout },
               }}
               helperText={`Set a timeout between ${minMatchTimeout} to ${maxMatchTimeout} seconds`}
-              error={isNaN(timeout) || timeout < minMatchTimeout || timeout > maxMatchTimeout}
+              error={
+                isNaN(timeout) ||
+                timeout < minMatchTimeout ||
+                timeout > maxMatchTimeout
+              }
               sx={{
                 backgroundColor: "white",
                 "& .MuiFormHelperText-root": {
@@ -282,7 +309,19 @@ const Home: React.FC = () => {
           color="primary"
           fullWidth
           sx={{ marginTop: 2 }}
-          disabled={isNaN(timeout) || timeout < minMatchTimeout || timeout > maxMatchTimeout}
+          disabled={
+            isNaN(timeout) ||
+            timeout < minMatchTimeout ||
+            timeout > maxMatchTimeout ||
+            complexity.length == 0 ||
+            selectedCategories.length == 0 ||
+            language.length == 0
+          }
+          onClick={() => {
+            alert(
+              `${complexity}, ${selectedCategories}, ${language}, ${timeout}`
+            );
+          }}
         >
           Find my match!
         </Button>
