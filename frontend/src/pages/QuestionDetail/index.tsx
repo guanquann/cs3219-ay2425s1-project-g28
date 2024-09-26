@@ -1,8 +1,7 @@
 import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import AppMargin from "../../components/AppMargin";
-import classes from "./index.module.css";
-import NotFound from "../../components/NotFound";
+import Error from "../../components/Error";
 import QuestionDetailComponent from "../../components/QuestionDetail";
 import reducer, {
   getQuestionById,
@@ -27,12 +26,10 @@ const QuestionDetail: React.FC = () => {
   if (!state.selectedQuestion) {
     if (state.selectedQuestionError) {
       return (
-        <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
-          <NotFound
-            title="Question not found..."
-            subtitle="Unfortunately, we can't find what you're looking for 😥"
-          />
-        </AppMargin>
+        <Error
+          title="Question not found..."
+          subtitle="Unfortunately, we can't find what you're looking for 😥"
+        />
       );
     } else {
       return;

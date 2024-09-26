@@ -19,11 +19,9 @@ enum QuestionActionTypes {
   VIEW_QUESTION_CATEGORIES = "view_question_categories",
   VIEW_QUESTION_LIST = "view_question_list",
   VIEW_QUESTION = "view_question",
-  DELETE_QUESTION = "delete_question",
   ERROR_FETCHING_QUESTION_CATEGORIES = "error_fetching_question_categories",
   ERROR_FETCHING_QUESTION_LIST = "error_fetching_question_list",
   ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
-  ERROR_DELETING_QUESTION = "error_deleting_question",
 }
 
 type QuestionActions = {
@@ -39,7 +37,6 @@ type QuestionsState = {
   questionCategoriesError: string | null;
   questionListError: string | null;
   selectedQuestionError: string | null;
-  deleteQuestionError: string | null;
 };
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -79,17 +76,14 @@ export const initialState: QuestionsState = {
   questionCategoriesError: null,
   questionListError: null,
   selectedQuestionError: null,
-  deleteQuestionError: null,
 };
 
-export const getQuestionCategories = (
-  dispatch: Dispatch<QuestionActions>
-) => {
+export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
   questionClient
     .get("/categories")
     .then((res) =>
-      dispatch({ 
-        type: QuestionActionTypes.VIEW_QUESTION_CATEGORIES, 
+      dispatch({
+        type: QuestionActionTypes.VIEW_QUESTION_CATEGORIES,
         payload: res.data.categories,
       })
     )
@@ -110,16 +104,18 @@ export const getQuestionList = (
   dispatch: Dispatch<QuestionActions>
 ) => {
   questionClient
-    .get("", {params: {
-      page: page,
-      qnLimit: qnLimit,
-      title: title,
-      complexities: complexities,
-      categories: categories,
-    }})
+    .get("", {
+      params: {
+        page: page,
+        qnLimit: qnLimit,
+        title: title,
+        complexities: complexities,
+        categories: categories,
+      },
+    })
     .then((res) =>
-      dispatch({ 
-        type: QuestionActionTypes.VIEW_QUESTION_LIST, 
+      dispatch({
+        type: QuestionActionTypes.VIEW_QUESTION_LIST,
         payload: res.data,
       })
     )
@@ -151,26 +147,13 @@ export const getQuestionById = (
     );
 };
 
-export const deleteQuestionById = (
-  questionId: string,
-  dispatch: Dispatch<QuestionActions>
-) => {
-  return questionClient
-    .delete(`/${questionId}`)
-    .then((res) => {
-      dispatch({ 
-        type: QuestionActionTypes.DELETE_QUESTION, 
-        payload: res.data,
-      });
-      return true;
-    })
-    .catch((err) => {
-      dispatch({
-        type: QuestionActionTypes.ERROR_DELETING_QUESTION,
-        payload: err.response.data.message,
-      });
-      return false;
-    });
+export const deleteQuestionById = async (questionId: string) => {
+  try {
+    await questionClient.delete(`/${questionId}`);
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const setSelectedQuestionError = (
@@ -185,7 +168,7 @@ export const setSelectedQuestionError = (
 
 const reducer = (
   state: QuestionsState,
-  action: QuestionActions,
+  action: QuestionActions
 ): QuestionsState => {
   const { type } = action;
 
@@ -195,11 +178,7 @@ const reducer = (
       if (!isStringArray(payload)) {
         return state;
       }
-      return {
-        ...state,
-        questionCategories: payload,
-        questionCategoriesError: null,
-      };
+      return { ...state, questionCategories: payload };
     }
     case QuestionActionTypes.VIEW_QUESTION_LIST: {
       const { payload } = action;
@@ -210,7 +189,6 @@ const reducer = (
         ...state,
         questions: payload.questions,
         questionCount: payload.questionCount,
-        questionListError: null,
       };
     }
     case QuestionActionTypes.VIEW_QUESTION: {
@@ -218,21 +196,7 @@ const reducer = (
       if (!isQuestion(payload)) {
         return state;
       }
-      return { 
-        ...state, 
-        selectedQuestion: payload,
-        selectedQuestionError: null,
-      };
-    }
-    case QuestionActionTypes.DELETE_QUESTION: {
-      const { payload } = action;
-      if (!isString(payload)) {
-        return state;
-      }
-      return { 
-        ...state,
-        deleteQuestionError: null,
-      };
+      return { ...state, selectedQuestion: payload };
     }
     case QuestionActionTypes.ERROR_FETCHING_QUESTION_CATEGORIES: {
       const { payload } = action;
@@ -254,13 +218,6 @@ const reducer = (
         return state;
       }
       return { ...state, selectedQuestionError: payload };
-    }
-    case QuestionActionTypes.ERROR_DELETING_QUESTION: {
-      const { payload } = action;
-      if (!isString(payload)) {
-        return state;
-      }
-      return { ...state, deleteQuestionError: payload };
     }
   }
 };
