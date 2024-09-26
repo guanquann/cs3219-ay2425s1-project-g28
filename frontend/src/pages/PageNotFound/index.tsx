@@ -1,8 +1,8 @@
-import Error from "../../components/Error";
+import ServerError from "../../components/ServerError";
 
 const PageNotFound: React.FC = () => {
   return (
-    <Error
+    <ServerError
       title="Oops, page not found..."
       subtitle="Unfortunately, we can't find what you're looking for 😥"
     />

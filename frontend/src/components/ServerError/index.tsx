@@ -2,9 +2,9 @@ import { Box, Typography } from "@mui/material";
 import AppMargin from "../AppMargin";
 import classes from "./index.module.css";
 
-type ErrorProps = { title: string; subtitle: string };
+type ServerErrorProps = { title: string; subtitle: string };
 
-const Error: React.FC<ErrorProps> = (props) => {
+const ServerError: React.FC<ServerErrorProps> = (props) => {
   const { title, subtitle } = props;
 
   return (
@@ -24,4 +24,4 @@ const Error: React.FC<ErrorProps> = (props) => {
   );
 };
 
-export default Error;
+export default ServerError;

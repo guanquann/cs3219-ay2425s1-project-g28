@@ -12,6 +12,7 @@ type User = {
   biography: string;
   profilePictureUrl: string;
   createdAt: Date;
+  isAdmin: boolean;
 };
 
 type AuthContextType = {

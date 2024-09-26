@@ -34,13 +34,13 @@ import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
-import Error from "../../components/Error";
+import ServerError from "../../components/ServerError";
+// import { useAuth } from "../../contexts/AuthContext";
 
 const tableHeaders = ["Title", "Complexity", "Categories"];
 const searchCharacterLimit = 255;
 const categorySelectionLimit = 10;
 const rowsPerPage = 10;
-const isAdmin = true; // TODO: check using auth context
 
 const QuestionList: React.FC = () => {
   const [page, setPage] = useState<number>(0);
@@ -54,7 +54,7 @@ const QuestionList: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const navigate = useNavigate();
-
+  
   const areQuestionsFiltered = () => {
     return (
       searchFilter || complexityFilter.length > 0 || categoryFilter.length > 0
@@ -126,9 +126,20 @@ const QuestionList: React.FC = () => {
     );
   }, [page, searchFilter, complexityFilter, categoryFilter]);
 
+  // Check if the user is admin
+  // const auth = useAuth();
+  // if (!auth) {
+  //   throw new Error("useAuth() must be used within AuthProvider");
+  // }
+  // const { user } = auth;
+  // if (!user) {
+  //   return;
+  // }
+  const isAdmin = true; // user.isAdmin;
+
   if (state.questionCategoriesError || state.selectedQuestionError) {
     return (
-      <Error
+      <ServerError
         title="Sorry, something went wrong..."
         subtitle="Please refresh the page or try again later!"
       />

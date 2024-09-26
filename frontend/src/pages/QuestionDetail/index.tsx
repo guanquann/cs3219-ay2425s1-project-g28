@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from "react";
 import { useParams } from "react-router-dom";
 import AppMargin from "../../components/AppMargin";
-import Error from "../../components/Error";
+import ServerError from "../../components/ServerError";
 import QuestionDetailComponent from "../../components/QuestionDetail";
 import reducer, {
   getQuestionById,
@@ -26,7 +26,7 @@ const QuestionDetail: React.FC = () => {
   if (!state.selectedQuestion) {
     if (state.selectedQuestionError) {
       return (
-        <Error
+        <ServerError
           title="Question not found..."
           subtitle="Unfortunately, we can't find what you're looking for 😥"
         />
