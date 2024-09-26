@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   Checkbox,
@@ -27,7 +26,7 @@ import reducer, {
   getQuestionCategories,
   initialState,
 } from "../../reducers/questionReducer";
-import homepageImage from "/homepage_image.svg";
+// import homepageImage from "/homepage_image.svg";
 
 const Home: React.FC = () => {
   const [complexity, setComplexity] = useState<string[]>([]);
@@ -119,7 +118,7 @@ const Home: React.FC = () => {
                         key={value}
                         deleteIcon={
                           <CloseIcon
-                            onMouseDown={(event: any) =>
+                            onMouseDown={(event) =>
                               event.stopPropagation()
                             }
                           />
@@ -178,7 +177,7 @@ const Home: React.FC = () => {
                         key={value}
                         deleteIcon={
                           <CloseIcon
-                            onMouseDown={(event: any) =>
+                            onMouseDown={(event) =>
                               event.stopPropagation()
                             }
                           />
@@ -239,7 +238,7 @@ const Home: React.FC = () => {
                         key={value}
                         deleteIcon={
                           <CloseIcon
-                            onMouseDown={(event: any) =>
+                            onMouseDown={(event) =>
                               event.stopPropagation()
                             }
                           />
