@@ -20,11 +20,10 @@ export async function handleLogin(req: AuthenticatedRequest, res: Response): Pro
       }
 
       const accessToken = jwt.sign(
-        { id: user.id },
+        { id: user.id, admin: user.isAdmin },
         process.env.JWT_SECRET as string,
         { expiresIn: "7d" }
       );
-      console.log(accessToken);
       return res.status(200).json({
         message: "User logged in",
         data: { accessToken, user: formatUserResponse(user) },
