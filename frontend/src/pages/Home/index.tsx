@@ -6,6 +6,7 @@ import {
   Checkbox,
   Chip,
   FormControl,
+  Grid2,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -71,6 +72,7 @@ const Home: React.FC = () => {
       >
         Level up in your technical interviews!
       </Typography>
+
       <Typography
         variant="subtitle1"
         textAlign={"center"}
@@ -87,86 +89,140 @@ const Home: React.FC = () => {
         sx={{
           padding: 4,
           width: "100%",
-          maxWidth: "500px",
+          maxWidth: "700px",
           backgroundColor: "#F5F5F5",
         }}
       >
-        <FormControl
-          fullWidth
-          sx={{ marginBottom: 2, backgroundColor: "white" }}
-        >
-          <InputLabel>Complexity</InputLabel>
-          <Select
-            value={complexity}
-            // onChange={handleComplexityChange}
-            label="Complexity"
-          >
-            <MenuItem value="Easy">Easy</MenuItem>
-            <MenuItem value="Medium">Medium</MenuItem>
-            <MenuItem value="Hard">Hard</MenuItem>
-          </Select>
-        </FormControl>
+        <Grid2 container rowSpacing={1} columnSpacing={2} alignItems="center">
+          <Grid2 size={2}>
+            <Typography
+              align="left"
+              sx={{ fontWeight: "bold", paddingRight: 2 }}
+            >
+              Complexity
+            </Typography>
+          </Grid2>
 
-        <FormControl
-          fullWidth
-          sx={{ marginBottom: 2, backgroundColor: "white" }}
-        >
-          <InputLabel>Category</InputLabel>
-          <Select
-            multiple
-            value={selectedCategories}
-            // onChange={handleCategoryChange}
-            input={<OutlinedInput label="Category" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip key={value} label={value} />
+          <Grid2 size={10}>
+            <FormControl
+              fullWidth
+              sx={{ marginBottom: 2, backgroundColor: "white" }}
+            >
+              <InputLabel>Complexity</InputLabel>
+              <Select
+                value={complexity}
+                // onChange={handleComplexityChange}
+                label="Complexity"
+              >
+                <MenuItem value="Easy">Easy</MenuItem>
+                <MenuItem value="Medium">Medium</MenuItem>
+                <MenuItem value="Hard">Hard</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid2>
+
+          <Grid2 size={2}>
+            <Typography
+              align="left"
+              sx={{ fontWeight: "bold", paddingRight: 2 }}
+            >
+              Category
+            </Typography>
+          </Grid2>
+
+          <Grid2 size={10}>
+            <FormControl
+              fullWidth
+              sx={{ marginBottom: 2, backgroundColor: "white" }}
+            >
+              <InputLabel>Category</InputLabel>
+              <Select
+                multiple
+                value={selectedCategories}
+                // onChange={handleCategoryChange}
+                input={<OutlinedInput label="Category" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    <Checkbox
+                      checked={selectedCategories.indexOf(category) > -1}
+                    />
+                    <ListItemText primary={category} />
+                  </MenuItem>
                 ))}
-              </Box>
-            )}
-          >
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>
-                <Checkbox checked={selectedCategories.indexOf(category) > -1} />
-                <ListItemText primary={category} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              </Select>
+            </FormControl>
+          </Grid2>
 
-        <FormControl
-          fullWidth
-          sx={{ marginBottom: 2, backgroundColor: "white" }}
-        >
-          <InputLabel>Language</InputLabel>
-          <Select
-            multiple
-            value={language}
-            // onChange={handleLanguageChange}
-            input={<OutlinedInput label="Language" />}
-            renderValue={(selected) => selected.join(", ")}
-          >
-            {languages.map((lang) => (
-              <MenuItem key={lang} value={lang}>
-                <Checkbox checked={language.indexOf(lang) > -1} />
-                <ListItemText primary={lang} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+          <Grid2 size={2}>
+            <Typography
+              align="left"
+              sx={{ fontWeight: "bold", paddingRight: 2 }}
+            >
+              Language
+            </Typography>
+          </Grid2>
 
-        <TextField
-          fullWidth
-          label="Match Timeout"
-          type="number"
-          value={timeout}
-          onChange={handleTimeoutChange}
-          InputProps={{
-            inputProps: { min: 5, max: 30 },
-          }}
-          helperText="Set a timeout between 5 to 30 minutes"
-          sx={{ backgroundColor: "white" }}
-        />
+          <Grid2 size={10}>
+            <FormControl
+              fullWidth
+              sx={{ marginBottom: 2, backgroundColor: "white" }}
+            >
+              <InputLabel>Language</InputLabel>
+              <Select
+                multiple
+                value={language}
+                // onChange={handleLanguageChange}
+                input={<OutlinedInput label="Language" />}
+                renderValue={(selected) => selected.join(", ")}
+              >
+                {languages.map((lang) => (
+                  <MenuItem key={lang} value={lang}>
+                    <Checkbox checked={language.indexOf(lang) > -1} />
+                    <ListItemText primary={lang} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid2>
+
+          <Grid2 size={2}>
+            <Typography
+              align="left"
+              sx={{ fontWeight: "bold", paddingRight: 2 }}
+            >
+              Match Timeout
+            </Typography>
+          </Grid2>
+
+          <Grid2 size={10}>
+            <TextField
+              fullWidth
+              label="Match Timeout"
+              type="number"
+              value={timeout}
+              onChange={handleTimeoutChange}
+              InputProps={{
+                inputProps: { min: 1, max: 30 },
+              }}
+              helperText="Set a timeout between 1 to 30 minutes"
+              sx={{
+                backgroundColor: "white",
+                "& .MuiFormHelperText-root": {
+                  margin: "0px",
+                  backgroundColor: "#F5F5F5",
+                },
+              }}
+            />
+          </Grid2>
+        </Grid2>
 
         <Button
           variant="contained"
