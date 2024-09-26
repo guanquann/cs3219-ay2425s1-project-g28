@@ -8,3 +8,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.margins {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}

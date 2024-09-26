@@ -46,7 +46,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
+    <AppMargin classname={`${classes.fullheight} ${classes.center} ${classes.margins}`}>
       <Typography
         component={"h1"}
         variant="h1"
@@ -66,6 +66,7 @@ const Home: React.FC = () => {
         sx={(theme) => ({
           fontSize: "h5.fontSize",
           marginBottom: theme.spacing(4),
+          maxWidth: '80%'
         })}
       >
         Your ultimate technical interview preparation platform to practice
