@@ -7,36 +7,30 @@ import {
   Chip,
   FormControl,
   Grid2,
-  InputLabel,
   ListItemText,
   MenuItem,
-  OutlinedInput,
   Select,
   TextField,
   Typography,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import classes from "./index.module.css";
 import { useState } from "react";
 
 const Home: React.FC = () => {
-  const [complexity, setComplexity] = useState("");
+  const [complexity, setComplexity] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [language, setLanguage] = useState<string[]>([]);
   const [timeout, setTimeout] = useState<number>(5);
 
+  const complexities = ["Easy", "Medium", "Hard"];
   const languages = ["Python", "Java"];
 
   //   useEffect(() => {
   //     // Fetch categories from the backend
   //     getCategories().then((res) => setCategories(res));
   //   }, []);
-
-  const handleComplexityChange = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setComplexity(event.target.value as string);
-  };
 
   const handleCategoryChange = (
     event: React.ChangeEvent<{ value: unknown }>
@@ -45,12 +39,6 @@ const Home: React.FC = () => {
       target: { value },
     } = event;
     // setSelectedCategories(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const handleLanguageChange = (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
-    setLanguage(event.target.value as string[]);
   };
 
   const handleTimeoutChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,15 +96,50 @@ const Home: React.FC = () => {
               fullWidth
               sx={{ marginBottom: 2, backgroundColor: "white" }}
             >
-              <InputLabel>Complexity</InputLabel>
               <Select
+                multiple
                 value={complexity}
-                // onChange={handleComplexityChange}
-                label="Complexity"
+                onChange={(event) =>
+                  setComplexity(event.target.value as string[])
+                }
+                renderValue={(selected) =>
+                  selected.map((value) => {
+                    return (
+                      <Chip
+                        size="medium"
+                        label={value}
+                        key={value}
+                        deleteIcon={
+                          <CloseIcon
+                            onMouseDown={(event: any) =>
+                              event.stopPropagation()
+                            }
+                          />
+                        }
+                        onDelete={() => {
+                          setComplexity((prev) =>
+                            prev.filter((v) => v != value)
+                          );
+                        }}
+                        sx={(theme) => ({
+                          backgroundColor: "primary.main",
+                          color: "primary.contrastText",
+                          marginRight: theme.spacing(1),
+                          "& .MuiChip-deleteIcon": {
+                                color: "primary.contrastText"
+                              },
+                        })}
+                      />
+                    );
+                  })
+                }
               >
-                <MenuItem value="Easy">Easy</MenuItem>
-                <MenuItem value="Medium">Medium</MenuItem>
-                <MenuItem value="Hard">Hard</MenuItem>
+                {complexities.map((comp) => (
+                  <MenuItem key={comp} value={comp}>
+                    <Checkbox checked={complexity.indexOf(comp) > -1} />
+                    <ListItemText primary={comp} />
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid2>
@@ -135,12 +158,10 @@ const Home: React.FC = () => {
               fullWidth
               sx={{ marginBottom: 2, backgroundColor: "white" }}
             >
-              <InputLabel>Category</InputLabel>
               <Select
                 multiple
                 value={selectedCategories}
                 // onChange={handleCategoryChange}
-                input={<OutlinedInput label="Category" />}
                 renderValue={(selected) => (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                     {selected.map((value) => (
@@ -175,12 +196,12 @@ const Home: React.FC = () => {
               fullWidth
               sx={{ marginBottom: 2, backgroundColor: "white" }}
             >
-              <InputLabel>Language</InputLabel>
               <Select
                 multiple
                 value={language}
-                // onChange={handleLanguageChange}
-                input={<OutlinedInput label="Language" />}
+                onChange={(event) =>
+                  setLanguage(event.target.value as string[])
+                }
                 renderValue={(selected) => selected.join(", ")}
               >
                 {languages.map((lang) => (
@@ -205,7 +226,6 @@ const Home: React.FC = () => {
           <Grid2 size={10}>
             <TextField
               fullWidth
-              label="Match Timeout"
               type="number"
               value={timeout}
               onChange={handleTimeoutChange}
