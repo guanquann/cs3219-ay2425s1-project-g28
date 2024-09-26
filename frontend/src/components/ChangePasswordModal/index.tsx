@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Modal, Stack, Typography } from '@mui/material';
 import PasswordTextField from '../PasswordTextField';
-import { userClient } from '../../utils/api';
-import axios from 'axios';
-import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils/constants';
+//import { userClient } from '../../utils/api';
+//import axios from 'axios';
+//import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils/constants';
 
 interface ChangePasswordModalProps {
   open: boolean;

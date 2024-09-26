@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, FormControl, FormHelperText, Modal, Stack, TextField, Typography } from '@mui/material';
-import { userClient } from '../../utils/api';
-import axios from 'axios';
-import { FAILED_PROFILE_UPDATE_MESSAGE, SUCCESS_PROFILE_UPDATE_MESSAGE } from '../../utils/constants';
+//import { userClient } from '../../utils/api';
+//import axios from 'axios';
+//import { FAILED_PROFILE_UPDATE_MESSAGE, SUCCESS_PROFILE_UPDATE_MESSAGE } from '../../utils/constants';
 
 interface EditProfileModalProps {
   open: boolean;
