@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import { categoryList } from "../../utils/constants";
 
 interface QuestionCategoryAutoCompleteProps {
-  selectedCategories?: string[];
+  selectedCategories: string[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
@@ -15,10 +14,6 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
   // TODO
   // Fetch category list from the server
 
-  // copy is created to ensure that Autocomplete rerenders when the selectedCategories change
-  const [selectedCategoriesCopy, setSelectedCategoriesCopy] = useState<string[]>(
-    selectedCategories || []
-  );
   const filter = createFilterOptions<string>();
 
   return (
@@ -28,16 +23,14 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
       options={categoryList}
       size="small"
       sx={{ marginTop: 2 }}
-      value={selectedCategoriesCopy}
+      value={selectedCategories}
       onChange={(e, newCategoriesSelected) => {
         const newValue = newCategoriesSelected[newCategoriesSelected.length - 1];
         if (typeof newValue === "string" && newValue.startsWith(`Add: "`)) {
           const newCategory = newValue.slice(6, -1);
           categoryList.push(newCategory);
-          setSelectedCategoriesCopy((prev) => [...prev, newCategory]);
           setSelectedCategories((prev) => [...prev, newCategory]);
         } else {
-          setSelectedCategoriesCopy(newCategoriesSelected);
           setSelectedCategories(newCategoriesSelected);
         }
       }}
