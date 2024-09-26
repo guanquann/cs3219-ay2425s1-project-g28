@@ -11,4 +11,15 @@ const categoryList: string[] = [
   "Brainteaser",
 ];
 
-export { complexityList, categoryList };
+const languageList = ["Python", "Java"];
+
+const minMatchTimeout = 30;
+const maxMatchTimeout = 300;
+
+export {
+  complexityList,
+  categoryList,
+  languageList,
+  minMatchTimeout,
+  maxMatchTimeout,
+};

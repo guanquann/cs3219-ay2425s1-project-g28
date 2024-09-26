@@ -1,4 +1,3 @@
-import AppMargin from "../../components/AppMargin";
 import {
   Box,
   Button,
@@ -14,18 +13,23 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import classes from "./index.module.css";
 import { useState } from "react";
+
+import classes from "./index.module.css";
+import AppMargin from "../../components/AppMargin";
+import {
+  complexityList,
+  languageList,
+  maxMatchTimeout,
+  minMatchTimeout,
+} from "../../utils/constants";
 
 const Home: React.FC = () => {
   const [complexity, setComplexity] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [language, setLanguage] = useState<string[]>([]);
-  const [timeout, setTimeout] = useState<number>(5);
-
-  const complexities = ["Easy", "Medium", "Hard"];
-  const languages = ["Python", "Java"];
+  const [timeout, setTimeout] = useState<number>(30);
 
   //   useEffect(() => {
   //     // Fetch categories from the backend
@@ -39,11 +43,6 @@ const Home: React.FC = () => {
       target: { value },
     } = event;
     // setSelectedCategories(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const handleTimeoutChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10);
-    setTimeout(value > 30 ? 30 : value); // Ensure the timeout is <= 30
   };
 
   return (
@@ -126,15 +125,15 @@ const Home: React.FC = () => {
                           color: "primary.contrastText",
                           marginRight: theme.spacing(1),
                           "& .MuiChip-deleteIcon": {
-                                color: "primary.contrastText"
-                              },
+                            color: "primary.contrastText",
+                          },
                         })}
                       />
                     );
                   })
                 }
               >
-                {complexities.map((comp) => (
+                {complexityList.map((comp) => (
                   <MenuItem key={comp} value={comp}>
                     <Checkbox checked={complexity.indexOf(comp) > -1} />
                     <ListItemText primary={comp} />
@@ -202,9 +201,37 @@ const Home: React.FC = () => {
                 onChange={(event) =>
                   setLanguage(event.target.value as string[])
                 }
-                renderValue={(selected) => selected.join(", ")}
+                renderValue={(selected) =>
+                  selected.map((value) => {
+                    return (
+                      <Chip
+                        size="medium"
+                        label={value}
+                        key={value}
+                        deleteIcon={
+                          <CloseIcon
+                            onMouseDown={(event: any) =>
+                              event.stopPropagation()
+                            }
+                          />
+                        }
+                        onDelete={() => {
+                          setLanguage((prev) => prev.filter((v) => v != value));
+                        }}
+                        sx={(theme) => ({
+                          backgroundColor: "primary.main",
+                          color: "primary.contrastText",
+                          marginRight: theme.spacing(1),
+                          "& .MuiChip-deleteIcon": {
+                            color: "primary.contrastText",
+                          },
+                        })}
+                      />
+                    );
+                  })
+                }
               >
-                {languages.map((lang) => (
+                {languageList.map((lang) => (
                   <MenuItem key={lang} value={lang}>
                     <Checkbox checked={language.indexOf(lang) > -1} />
                     <ListItemText primary={lang} />
@@ -228,11 +255,15 @@ const Home: React.FC = () => {
               fullWidth
               type="number"
               value={timeout}
-              onChange={handleTimeoutChange}
-              InputProps={{
-                inputProps: { min: 1, max: 30 },
+              onChange={(event) => {
+                const value = parseInt(event.target.value, 10);
+                setTimeout(value);
               }}
-              helperText="Set a timeout between 1 to 30 minutes"
+              InputProps={{
+                inputProps: { min: minMatchTimeout, max: maxMatchTimeout },
+              }}
+              helperText={`Set a timeout between ${minMatchTimeout} to ${maxMatchTimeout} seconds`}
+              error={isNaN(timeout) || timeout < minMatchTimeout || timeout > maxMatchTimeout}
               sx={{
                 backgroundColor: "white",
                 "& .MuiFormHelperText-root": {
@@ -245,10 +276,12 @@ const Home: React.FC = () => {
         </Grid2>
 
         <Button
+          type="submit"
           variant="contained"
           color="primary"
           fullWidth
           sx={{ marginTop: 2 }}
+          disabled={isNaN(timeout) || timeout < minMatchTimeout || timeout > maxMatchTimeout}
         >
           Find my match!
         </Button>
