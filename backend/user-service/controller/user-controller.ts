@@ -122,7 +122,8 @@ export async function updateUser(
     const {
       username,
       email,
-      password,
+      oldPassword,
+      newPassword,
       profilePictureUrl,
       firstName,
       lastName,
@@ -131,7 +132,7 @@ export async function updateUser(
     if (
       username ||
       email ||
-      password ||
+      (oldPassword && newPassword) ||
       profilePictureUrl ||
       firstName ||
       lastName ||
@@ -175,15 +176,20 @@ export async function updateUser(
       }
 
       let hashedPassword: string | undefined;
-      if (password) {
+      if (oldPassword && newPassword) {
+        const match = await bcrypt.compare(oldPassword, user.password);
+        if (!match) {
+          return res.status(400).json({ message: "Wrong password" });
+        }
+
         const { isValid: isValidPassword, message: passwordMessage } =
-          validatePassword(password);
+          validatePassword(newPassword);
         if (!isValidPassword) {
           return res.status(400).json({ message: passwordMessage });
         }
 
         const salt = bcrypt.genSaltSync(10);
-        hashedPassword = bcrypt.hashSync(password, salt);
+        hashedPassword = bcrypt.hashSync(newPassword, salt);
       }
 
       if (firstName) {

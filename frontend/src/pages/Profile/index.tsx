@@ -6,6 +6,8 @@ import classes from "./index.module.css";
 import { useEffect, useState } from "react";
 import { userClient } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 type UserProfile = {
   id: string;
@@ -60,8 +62,17 @@ const ProfilePage: React.FC = () => {
     );
   }
 
+  const notify = (message: string, isSuccess: boolean) => {
+    if (isSuccess) {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
+  }
+
   return (
-    <AppMargin classname={classes.fullheight}>
+    userId &&
+    (<AppMargin classname={classes.fullheight}>
       <Box
         sx={(theme) => ({
           marginTop: theme.spacing(4),
@@ -75,13 +86,17 @@ const ProfilePage: React.FC = () => {
             username={userProfile.username}
             biography={userProfile.biography}
             isCurrentUser={user?.id === userId}
+            userId={userId}
+            onUpdate={notify}
           />
         </Box>
         <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>
           <Typography variant="h4">Questions attempted</Typography>
         </Box>
       </Box>
-    </AppMargin>
+
+      <ToastContainer position="bottom-right" />
+    </AppMargin>)
   );
 };
 
