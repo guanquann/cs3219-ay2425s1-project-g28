@@ -78,7 +78,7 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
       }
 
       toast.success("File uploaded successfully");
-    } catch (error) {
+    } catch {
       toast.error("Error uploading file");
     }
   };
