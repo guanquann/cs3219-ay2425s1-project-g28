@@ -1,7 +1,6 @@
 import UserModel, { IUser } from "./user-model";
 import "dotenv/config";
 import { connect } from "mongoose";
-import { faker } from "@faker-js/faker";
 
 export async function connectToDB() {
   const mongoDBUri: string | undefined = process.env.DB_CLOUD_URI;
