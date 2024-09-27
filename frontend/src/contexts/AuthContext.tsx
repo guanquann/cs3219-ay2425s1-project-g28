@@ -69,12 +69,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         email: email,
         password: password,
       })
-      .then((res) => {
-        const { accessToken, user } = res.data.data;
-        localStorage.setItem("token", accessToken);
-        setUser(user);
-        navigate("/");
-      })
+      .then(() => login(email, password))
       .catch(() => setUser(null));
   };
 

@@ -16,7 +16,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route path="questions" element={<ProtectedRoutes />}>
+          <Route path="questions">
             <Route index element={<QuestionList />} />
             <Route path=":questionId" element={<QuestionDetail />} />
             <Route element={<ProtectedRoutes adminOnly />}>

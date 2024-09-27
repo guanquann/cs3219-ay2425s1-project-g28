@@ -26,7 +26,7 @@ export async function createUser(
   res: Response
 ): Promise<Response> {
   try {
-    const { username, email, password } = req.body;
+    const { firstName, lastName, username, email, password } = req.body;
     const existingUser = await _findUserByUsernameOrEmail(username, email);
     if (existingUser) {
       return res
@@ -34,7 +34,8 @@ export async function createUser(
         .json({ message: "username or email already exists" });
     }
 
-    if (username && email && password) {
+    // TODO: validate first and last name
+    if (firstName && lastName && username && email && password) {
       const { isValid: isValidUsername, message: usernameMessage } =
         validateUsername(username);
       if (!isValidUsername) {
@@ -55,15 +56,22 @@ export async function createUser(
 
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const createdUser = await _createUser(username, email, hashedPassword);
+      const createdUser = await _createUser(
+        firstName,
+        lastName,
+        username,
+        email,
+        hashedPassword
+      );
       return res.status(201).json({
         message: `Created new user ${username} successfully`,
         data: formatUserResponse(createdUser),
       });
     } else {
-      return res
-        .status(400)
-        .json({ message: "username and/or email and/or password are missing" });
+      return res.status(400).json({
+        message:
+          "at least one of first name, last name, username, email and password are missing",
+      });
     }
   } catch (err) {
     console.error(err);
