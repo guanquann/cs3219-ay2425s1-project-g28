@@ -107,6 +107,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         <FormControl
           fullWidth>
           <TextField
+            required
             id="outlined-basic" 
             label="First name"
             sx={{marginTop: 2}} 
@@ -118,7 +119,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             defaultValue={currFirstName}
             onChange={(input) => {
               const val = input.target.value;
-              if (!/^[a-zA-Z\s-]*$/.test(val)) {
+              if (!/^[a-zA-Z\s-]*$/.test(val) || (val.length == 0)) {
                 setFirstNameError(true);
               } else {
                 setFirstNameError(false);
@@ -134,7 +135,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   display: "flex",
                   justifyContent: "space-between",
                 }}>
-                <FormHelperText error={firstNameError}>Only alphabetical, hyphen and white space characters allowed</FormHelperText>
+                {newFirstName.length == 0
+                  ? <FormHelperText error={firstNameError}>Required field</FormHelperText>
+                  : <FormHelperText error={firstNameError}>Only alphabetical, hyphen and white space characters allowed</FormHelperText>
+                }
                 <FormHelperText>{newFirstName.length} / {nameCharLimit} characters</FormHelperText>
               </Stack>) 
             : (<FormHelperText sx={{textAlign: "right"}}>{newFirstName.length} / {nameCharLimit} characters</FormHelperText>)}
@@ -142,6 +146,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         <FormControl
           fullWidth>
           <TextField
+            required
             id="outlined-basic" 
             label="Last name"
             sx={{marginTop: 2}} 
@@ -153,7 +158,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             defaultValue={currLastName}
             onChange={(input) => {
               const val = input.target.value;
-              if (!/^[a-zA-Z\s-]*$/.test(val)) {
+              if (!/^[a-zA-Z\s-]*$/.test(val) || (val.length == 0)) {
                 setLastNameError(true);
               } else {
                 setLastNameError(false);
@@ -169,7 +174,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                   display: "flex",
                   justifyContent: "space-between",
                 }}>
-                <FormHelperText error={lastNameError}>Only alphabetical, hyphen and white space characters allowed</FormHelperText>
+                {newLastName.length == 0
+                  ? <FormHelperText error={lastNameError}>Required field</FormHelperText>
+                  : <FormHelperText error={lastNameError}>Only alphabetical, hyphen and white space characters allowed</FormHelperText>
+                }
                 <FormHelperText>{newLastName.length} / {nameCharLimit} characters</FormHelperText>
               </Stack>) 
             : (<FormHelperText sx={{textAlign: "right"}}>{newLastName.length} / {nameCharLimit} characters</FormHelperText>)}
