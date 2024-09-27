@@ -3,8 +3,8 @@ import { createFilterOptions } from "@mui/material/Autocomplete";
 import { categoryList } from "../../utils/constants";
 
 interface QuestionCategoryAutoCompleteProps {
-  selectedCategories?: string[];
-  setSelectedCategories: (value: string[]) => void;
+  selectedCategories: string[];
+  setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> = ({
@@ -27,8 +27,9 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
       onChange={(e, newCategoriesSelected) => {
         const newValue = newCategoriesSelected[newCategoriesSelected.length - 1];
         if (typeof newValue === "string" && newValue.startsWith(`Add: "`)) {
-          categoryList.push(newValue.slice(6, -1));
-          setSelectedCategories([...newCategoriesSelected.slice(0, -1), newValue.slice(6, -1)]);
+          const newCategory = newValue.slice(6, -1);
+          categoryList.push(newCategory);
+          setSelectedCategories((prev) => [...prev, newCategory]);
         } else {
           setSelectedCategories(newCategoriesSelected);
         }

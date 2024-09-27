@@ -10,7 +10,7 @@ import questionRoutes from "./src/routes/questionRoutes.ts";
 
 dotenv.config();
 
-const origin = process.env.ORIGINS
+const allowedOrigins = process.env.ORIGINS
   ? process.env.ORIGINS.split(",")
   : ["http://localhost:5173", "http://127.0.0.1:5173"];
 
@@ -21,8 +21,8 @@ const app = express();
 
 connectDB();
 
-app.use(cors({ origin: origin, credentials: true }));
-app.options("*", cors());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.options("*", cors({ origin: allowedOrigins, credentials: true }));
 
 // To handle CORS Errors
 app.use((req: Request, res: Response, next: NextFunction) => {

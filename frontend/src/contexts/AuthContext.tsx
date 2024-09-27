@@ -11,7 +11,7 @@ type User = {
   email: string;
   biography: string;
   profilePictureUrl: string;
-  createdAt: Date;
+  createdAt: string;
 };
 
 type AuthContextType = {
@@ -19,7 +19,6 @@ type AuthContextType = {
   login: () => void;
   logout: () => void;
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -46,7 +45,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const logout = () => {};
 
   return (
-    <AuthContext.Provider value={{ signup, login, logout, user, setUser }}>
+    <AuthContext.Provider value={{ signup, login, logout, user }}>
       {children}
     </AuthContext.Provider>
   );
