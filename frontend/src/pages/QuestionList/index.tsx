@@ -179,7 +179,6 @@ const QuestionList: React.FC = () => {
           columnSpacing={2}
           sx={(theme) => ({
             marginTop: theme.spacing(2),
-            "& fieldset": { borderRadius: theme.spacing(2.5) },
             "& .MuiTextField-root": { width: "100%" },
           })}
         >
