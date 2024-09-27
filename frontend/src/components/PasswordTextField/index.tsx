@@ -1,6 +1,6 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { FormControl, FormHelperText, IconButton, InputAdornment, TextField } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface PasswordTextFieldProps {
   label: string;
@@ -21,49 +21,32 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
   passwordToMatch,
   setValidity,
 }) => {
-  const [valError, setValError] = useState<boolean>(false);
-  const [mismatchError, setMismatchError] = useState<boolean>(false);
-  const [emptyError, setEmptyError] = useState<boolean>(true);
-  
-  const validatePassword = (password: string) => {
-    if (password.length < 8 || 
+  const validatePasswordError = (passwordVal: boolean, password: string): boolean => {
+    return passwordVal ? 
+      (password.length < 8 || 
       !/[a-z]/.test(password) || 
       !/[A-Z]/.test(password) || 
       !/\d/.test(password) ||
       // eslint-disable-next-line no-useless-escape
-      !/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)) {
-      setValError(true);
-    } else {
-      setValError(false);
-    }
+      !/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password))
+      : false;
   };
 
-  const comparePassword = (password: string, passwordToConfirm: string) => {
-    if (password != passwordToConfirm) {
-      setMismatchError(true);
-    } else {
-      setMismatchError(false);
-    }
+  const comparePasswordError = (isMatch: boolean, password: string, passwordToMatch: string | undefined): boolean => {
+    return isMatch ? (password != passwordToMatch) : false;
   }
 
-  const checkEmpty = (password: string) => {
-    if (!password) {
-      setEmptyError(true);
-    } else {
-      setEmptyError(false);
-    }
+  const checkEmptyError = (password: string): boolean => {
+    return !password;
   }
 
-  useEffect(() => {
-    setValidity(!(valError || mismatchError || emptyError));
-  }, [valError, mismatchError, emptyError])
+  const isInvalid = validatePasswordError(passwordVal, password) || comparePasswordError(isMatch, password, passwordToMatch) || checkEmptyError(password);
 
   //to listen to other password input changes
   useEffect(() => {
-    if (isMatch && passwordToMatch != undefined) {
-      comparePassword(password, passwordToMatch)
-    }
-  }, [passwordToMatch]);
+    setValidity(!(validatePasswordError(passwordVal, password) || comparePasswordError(isMatch, password, passwordToMatch) || checkEmptyError(password)));
+  }, [passwordToMatch, setValidity]);
+
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -81,14 +64,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const val = event.target.value;
     setPassword(val);
-    
-    checkEmpty(val);
-    if (passwordVal) {
-      validatePassword(val);
-    }
-    if (isMatch && passwordToMatch != undefined) {
-      comparePassword(val, passwordToMatch);
-    }
+    setValidity(!(validatePasswordError(passwordVal, val) || comparePasswordError(isMatch, val, passwordToMatch) || checkEmptyError(val)));
   };
 
 
@@ -101,7 +77,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
         type={showPassword ? 'text' : 'password'} 
         sx={{marginTop: 2}} 
         value={password}
-        error={valError || mismatchError}
+        error={isInvalid}
         onChange={handlePasswordChange}
         slotProps={{
           input: {
@@ -119,10 +95,10 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
             ),
           }
         }}/>
-        {emptyError && (
-          <FormHelperText error={emptyError}>Required field</FormHelperText>
+        {checkEmptyError(password) && (
+          <FormHelperText error={checkEmptyError(password)}>Required field</FormHelperText>
         )}
-        {passwordVal && valError && (
+        {validatePasswordError(passwordVal, password) && (
         <div>
           <FormHelperText sx={(theme) => ({color: theme.palette.success.main})} error={password.length < 8}>Password must be at least 8 characters long</FormHelperText>
           <FormHelperText sx={(theme) => ({color: theme.palette.success.main})} error={!/[a-z]/.test(password)}>Password must contain at least 1 lowercase letter</FormHelperText>
@@ -132,8 +108,8 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
           <FormHelperText sx={(theme) => ({color: theme.palette.success.main})} error={!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)}>Password must contain at least 1 special character</FormHelperText>
         </div>
         )}
-        {isMatch && mismatchError && (
-          <FormHelperText error={mismatchError}>Password does not match</FormHelperText>
+        {comparePasswordError(isMatch, password, passwordToMatch) && (
+          <FormHelperText error={comparePasswordError(isMatch, password, passwordToMatch)}>Password does not match</FormHelperText>
         )}
     </FormControl>
   );

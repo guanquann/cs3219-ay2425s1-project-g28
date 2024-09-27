@@ -9,19 +9,12 @@ type ProfileSectionProps = {
   username: string;
   biography?: string;
   isCurrentUser: boolean;
-  userId: string;
-  onUpdate: (message: string, isSuccess: boolean) => void;
+  handleEditProfileOpen: () => void;
+  handleChangePasswordOpen: () => void;
 };
 
 const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
-  const { firstName, lastName, username, biography, isCurrentUser, userId, onUpdate } = props;
-
-  const [editProfileOpen, setEditProfileOpen] = React.useState(false);
-  const handleEditProfileOpen = () => setEditProfileOpen(true);
-  const handleEditProfileClose = () => setEditProfileOpen(false);
-  const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
-  const handleChangePasswordOpen = () => setChangePasswordOpen(true);
-  const handleChangePasswordClose = () => setChangePasswordOpen(false);
+  const { firstName, lastName, username, biography, isCurrentUser, handleEditProfileOpen, handleChangePasswordOpen } = props;
 
   return (
     <Box>
@@ -63,24 +56,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
             })}
           >
             <Button variant="contained" onClick={handleEditProfileOpen}>Edit profile</Button>
-              <EditProfileModal 
-                open={editProfileOpen} 
-                handleClose={handleEditProfileClose} 
-                currFirstName={firstName} 
-                currLastName={lastName}
-                currBiography={biography}
-                userId={userId}
-                onUpdate={onUpdate}>
-              </EditProfileModal>
             <Button variant="contained" color="secondary" onClick={handleChangePasswordOpen}>
               Change password
             </Button>
-              <ChangePasswordModal 
-                open={changePasswordOpen} 
-                handleClose={handleChangePasswordClose}
-                userId={userId}
-                onUpdate={onUpdate}>
-              </ChangePasswordModal>
           </Stack>
         </>
       )}
