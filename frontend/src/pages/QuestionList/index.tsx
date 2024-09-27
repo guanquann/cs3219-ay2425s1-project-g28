@@ -35,7 +35,7 @@ import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
 import ServerError from "../../components/ServerError";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { useAuth } from "../../contexts/AuthContext";
 
 const tableHeaders = ["Title", "Complexity", "Categories"];
@@ -133,10 +133,7 @@ const QuestionList: React.FC = () => {
     throw new Error("useAuth() must be used within AuthProvider");
   }
   const { user } = auth;
-  if (!user) {
-    return;
-  }
-  const isAdmin = user.isAdmin;
+  const isAdmin = user && user.isAdmin;
 
   if (state.questionCategoriesError || state.selectedQuestionError) {
     return (
@@ -424,7 +421,6 @@ const QuestionList: React.FC = () => {
           </Stack>
         )}
       </Box>
-      <ToastContainer position="bottom-right" />
     </AppMargin>
   );
 };

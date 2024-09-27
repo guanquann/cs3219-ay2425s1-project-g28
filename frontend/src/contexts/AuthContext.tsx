@@ -3,8 +3,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { userClient } from "../utils/api";
 import { useNavigate } from "react-router-dom";
-import { Box } from "@mui/material";
 import { toast } from "react-toastify";
+import Loader from "../components/Loader";
 
 type User = {
   id: string;
@@ -48,9 +48,11 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         })
         .then((res) => setUser(res.data.data))
         .catch(() => setUser(null))
-        .finally(() => setLoading(false));
+        .finally(() => {
+          setTimeout(() => setLoading(false), 1500)
+        });
     } else {
-      setLoading(false);
+      setTimeout(() => setLoading(false), 1500);
     }
   }, []);
 
@@ -98,15 +100,11 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     localStorage.removeItem("token");
     setUser(null);
     navigate("/");
+    toast.success("Logged out successfully!");
   };
 
   if (loading) {
-    // TODO: loading page
-    return (
-      <Box>
-        Loading...
-      </Box>
-    );
+    return <Loader />;
   }
 
   return (

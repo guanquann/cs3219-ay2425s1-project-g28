@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { questionClient } from "../../utils/api";
@@ -142,7 +142,7 @@ const QuestionEdit = () => {
             size="small"
             sx={{ marginTop: 2 }}
             value={selectedComplexity}
-            onChange={(e, newcomplexitySelected) => {
+            onChange={(_e, newcomplexitySelected) => {
               setselectedComplexity(newcomplexitySelected);
             }}
             renderInput={(params) => (
@@ -186,8 +186,6 @@ const QuestionEdit = () => {
           {isPreviewQuestion ? "Edit Question" : "Preview Question"}
         </Button>
       </Stack>
-
-      <ToastContainer position="bottom-right" />
     </AppMargin>
   );
 };

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { questionClient } from "../../utils/api";
@@ -96,7 +96,7 @@ const NewQuestion = () => {
             options={complexityList}
             size="small"
             sx={{ marginTop: 2 }}
-            onChange={(e, newcomplexitySelected) => {
+            onChange={(_e, newcomplexitySelected) => {
               setselectedComplexity(newcomplexitySelected);
             }}
             renderInput={(params) => <TextField {...params} label="Complexity" />}
@@ -132,8 +132,6 @@ const NewQuestion = () => {
           {isPreviewQuestion ? "Edit Question" : "Preview Question"}
         </Button>
       </Stack>
-
-      <ToastContainer position="bottom-right" />
     </AppMargin>
   );
 };

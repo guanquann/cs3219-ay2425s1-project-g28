@@ -1,6 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import React from "react";
+import ServerError from "../ServerError";
 
 type ProtectedRoutesProps = { 
   adminOnly?: boolean;
@@ -18,9 +19,12 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ adminOnly = false }) 
   }
   
   if (adminOnly && !user.isAdmin) {
-    // TODO: unauthorized page
-    console.log("unauthorized");
-    return <></>;
+    return (
+      <ServerError
+        title="Oops, access denied..."
+        subtitle="Unfortunately, you do not have the permission to access this page 😥"
+      />
+    );
   } 
   
   return <Outlet />;

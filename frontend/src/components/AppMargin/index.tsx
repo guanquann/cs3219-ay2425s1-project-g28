@@ -1,4 +1,5 @@
 import { Box } from "@mui/material";
+import { ToastContainer } from "react-toastify";
 
 type AppMarginProps = { classname?: string; children: React.ReactNode };
 
@@ -13,6 +14,7 @@ const AppMargin: React.FC<AppMarginProps> = (props) => {
       })}
     >
       {children}
+      <ToastContainer position="bottom-right" />
     </Box>
   );
 };
