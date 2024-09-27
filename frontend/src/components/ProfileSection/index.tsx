@@ -1,7 +1,5 @@
 import { Avatar, Box, Button, Divider, Stack, Typography } from "@mui/material";
 import React from "react";
-import ChangePasswordModal from "../ChangePasswordModal";
-import EditProfileModal from "../EditProfileModal";
 
 type ProfileSectionProps = {
   firstName: string;

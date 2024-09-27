@@ -45,7 +45,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
   //to listen to other password input changes
   useEffect(() => {
     setValidity(!(validatePasswordError(passwordVal, password) || comparePasswordError(isMatch, password, passwordToMatch) || checkEmptyError(password)));
-  }, [passwordToMatch, setValidity]);
+  }, [passwordVal, isMatch, password, passwordToMatch, setValidity]);
 
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
