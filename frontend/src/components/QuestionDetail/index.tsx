@@ -108,6 +108,12 @@ const QuestionDetail: React.FC<QuestionDetailProps> = ({
                 },
               },
             },
+            img: {
+              component: "img",
+              props: {
+                style: { height: "300px", width: "auto", objectFit: "contain" },
+              },
+            },
           },
         }}
       >

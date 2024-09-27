@@ -1,5 +1,4 @@
 import { Avatar, Box, Button, Divider, Stack, Typography } from "@mui/material";
-import React from "react";
 
 type ProfileSectionProps = {
   firstName: string;
