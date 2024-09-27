@@ -6,6 +6,7 @@ import classes from "./index.module.css";
 import { useEffect, useState } from "react";
 import { userClient } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
+import ServerError from "../../components/ServerError";
 
 type UserProfile = {
   id: string;
@@ -42,21 +43,10 @@ const ProfilePage: React.FC = () => {
 
   if (!userProfile) {
     return (
-      <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
-        <Box>
-          <Typography
-            component={"h1"}
-            variant="h3"
-            textAlign={"center"}
-            sx={(theme) => ({ marginBottom: theme.spacing(4) })}
-          >
-            Oops, user not found...
-          </Typography>
-          <Typography textAlign={"center"}>
-            Unfortunately, we can't find who you're looking for 😥
-          </Typography>
-        </Box>
-      </AppMargin>
+      <ServerError
+        title="Oops, user not found..."
+        subtitle="Unfortunately, we can't find who you're looking for 😥"
+      />
     );
   }
 
