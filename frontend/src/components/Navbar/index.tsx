@@ -32,7 +32,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
     throw new Error("useAuth() must be used within AuthProvider");
   }
 
-  const { user } = auth;
+  const { logout, user } = auth;
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) =>
     setAnchorEl(event.currentTarget);
@@ -93,13 +93,17 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                   >
                     Profile
                   </MenuItem>
-                  <MenuItem>Logout</MenuItem>
+                  <MenuItem onClick={logout}>Logout</MenuItem>
                 </Menu>
               </>
             ) : (
               <>
-                <Button variant="contained">Sign up</Button>
-                <Button variant="outlined">Log in</Button>
+                <Button variant="contained" onClick={() => navigate("/signup")}>
+                  Sign up
+                </Button>
+                <Button variant="outlined" onClick={() => navigate("/login")}>
+                  Log in
+                </Button>
               </>
             )}
           </Stack>
