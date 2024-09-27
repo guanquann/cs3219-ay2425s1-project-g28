@@ -17,14 +17,16 @@ export async function createUser(
   username: string,
   email: string,
   password: string,
+  firstName: string,
+  lastName: string,
   isAdmin: boolean = false
 ): Promise<IUser> {
   return new UserModel({
     username,
     email,
     password,
-    firstName: faker.person.firstName(),
-    lastName: faker.person.lastName(),
+    firstName,
+    lastName,
     isAdmin,
   }).save();
 }
@@ -58,8 +60,6 @@ export async function findAllUsers(): Promise<IUser[]> {
 
 export async function updateUserById(
   userId: string,
-  username: string,
-  email: string,
   password: string | undefined,
   profilePictureUrl: string,
   firstName: string,
@@ -70,8 +70,6 @@ export async function updateUserById(
     userId,
     {
       $set: {
-        username,
-        email,
         password,
         profilePictureUrl,
         firstName,
