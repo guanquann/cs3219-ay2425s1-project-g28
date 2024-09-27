@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import CustomTextField from "../../components/CustomTextField";
 import { emailValidator } from "../../utils/validators";
+import { ToastContainer } from "react-toastify";
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
@@ -140,6 +141,7 @@ const LogIn: React.FC = () => {
       >
         <LogInSvg width="80%" height="80%" />
       </Box>
+      <ToastContainer position="bottom-right" />
     </Box>
   );
 };

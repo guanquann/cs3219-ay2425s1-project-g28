@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { userClient } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
+import { toast } from "react-toastify";
 
 type User = {
   id: string;
@@ -69,7 +70,10 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         password: password,
       })
       .then(() => login(email, password))
-      .catch(() => setUser(null));
+      .catch((err) => {
+        setUser(null);
+        toast.error(err.response.data.message);
+      });
   };
 
   const login = (email: string, password: string) => {
@@ -84,7 +88,10 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         setUser(user);
         navigate("/");
       })
-      .catch(() => setUser(null));
+      .catch((err) => {
+        setUser(null);
+        toast.error(err.response.data.message);
+      });
   };
 
   const logout = () => {

@@ -31,7 +31,7 @@ export async function createUser(
     if (existingUser) {
       return res
         .status(409)
-        .json({ message: "username or email already exists" });
+        .json({ message: "Username or email already exists" });
     }
 
     // TODO: validate first and last name
@@ -70,7 +70,7 @@ export async function createUser(
     } else {
       return res.status(400).json({
         message:
-          "at least one of first name, last name, username, email and password are missing",
+          "At least one of first name, last name, username, email and password are missing",
       });
     }
   } catch (err) {

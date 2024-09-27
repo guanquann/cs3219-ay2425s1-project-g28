@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import CustomTextField from "../../components/CustomTextField";
 import { emailValidator, nameValidator, passwordValidator, usernameValidator } from "../../utils/validators";
 import { useRef, useState } from "react";
+import { ToastContainer } from "react-toastify";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -168,6 +169,7 @@ const SignUp: React.FC = () => {
       >
         <SignUpSvg width="80%" height="80%" />
       </Box>
+      <ToastContainer position="bottom-right" />
     </Box>
   );
 };
