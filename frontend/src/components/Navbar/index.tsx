@@ -75,7 +75,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             {user ? (
               <>
                 <Tooltip title={"Account settings"}>
-                  <IconButton onClick={handleClick}>
+                  <IconButton onClick={handleClick} data-testid="profile">
                     <Avatar />
                   </IconButton>
                 </Tooltip>
