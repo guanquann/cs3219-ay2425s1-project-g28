@@ -5,7 +5,7 @@ import { Button, ImageList, ImageListItem } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { toast } from "react-toastify";
 
-import { questionClient } from "../../utils/api";
+import { createImageUrls } from "../../reducers/questionReducer";
 import QuestionImage from "../QuestionImage";
 import QuestionImageDialog from "../QuestionImageDialog";
 
@@ -64,23 +64,16 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
       return;
     }
 
-    try {
-      const response = await questionClient.post("/images", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: false,
-      });
-
-      const data = response.data;
-      for (const imageUrl of data.imageUrls) {
-        setUploadedImagesUrl((prev) => [...prev, imageUrl]);
+    createImageUrls(formData).then((res) => {
+      if (res) {
+        for (const imageUrl of res.imageUrls) {
+          setUploadedImagesUrl((prev) => [...prev, imageUrl]);
+        }
+        toast.success("File uploaded successfully");
+      } else {
+        toast.error("Error uploading file");
       }
-
-      toast.success("File uploaded successfully");
-    } catch {
-      toast.error("Error uploading file");
-    }
+    });
   };
 
   if (uploadedImagesUrl.length === 0) {

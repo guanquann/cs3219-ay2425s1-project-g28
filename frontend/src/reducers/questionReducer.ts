@@ -16,12 +16,16 @@ type QuestionList = {
 };
 
 enum QuestionActionTypes {
+  CREATE_QUESTION = "create_question",
   VIEW_QUESTION_CATEGORIES = "view_question_categories",
   VIEW_QUESTION_LIST = "view_question_list",
   VIEW_QUESTION = "view_question",
+  UPDATE_QUESTION = "update_question",
+  ERROR_CREATING_QUESTION = "error_creating_question",
   ERROR_FETCHING_QUESTION_CATEGORIES = "error_fetching_question_categories",
   ERROR_FETCHING_QUESTION_LIST = "error_fetching_question_list",
   ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
+  ERROR_UPDATING_QUESTION = "error_updating_question",
 }
 
 type QuestionActions = {
@@ -76,6 +80,33 @@ export const initialState: QuestionsState = {
   questionCategoriesError: null,
   questionListError: null,
   selectedQuestionError: null,
+};
+
+export const createQuestion = async (
+  question: Omit<QuestionDetail, "id">,
+  dispatch: Dispatch<QuestionActions>
+): Promise<boolean> => {
+  return questionClient
+    .post("/", {
+      title: question.title,
+      description: question.description,
+      complexity: question.complexity,
+      category: question.categories,
+    })
+    .then((res) => {
+      dispatch({
+        type: QuestionActionTypes.CREATE_QUESTION,
+        payload: res.data,
+      });
+      return true;
+    })
+    .catch((err) => {
+      dispatch({
+        type: QuestionActionTypes.ERROR_CREATING_QUESTION,
+        payload: err.response.data.message,
+      });
+      return false;
+    });
 };
 
 export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
@@ -147,6 +178,34 @@ export const getQuestionById = (
     );
 };
 
+export const updateQuestionById = async (
+  questionId: string,
+  question: Omit<QuestionDetail, "id">,
+  dispatch: Dispatch<QuestionActions>
+): Promise<boolean> => {
+  return questionClient
+    .put(`/${questionId}`, {
+      title: question.title,
+      description: question.description,
+      complexity: question.complexity,
+      category: question.categories,
+    })
+    .then((res) => {
+      dispatch({
+        type: QuestionActionTypes.UPDATE_QUESTION,
+        payload: res.data,
+      });
+      return true;
+    })
+    .catch((err) => {
+      dispatch({
+        type: QuestionActionTypes.ERROR_UPDATING_QUESTION,
+        payload: err.response.data.message,
+      });
+      return false;
+    });
+};
+
 export const deleteQuestionById = async (questionId: string) => {
   try {
     await questionClient.delete(`/${questionId}`);
@@ -166,6 +225,21 @@ export const setSelectedQuestionError = (
   });
 };
 
+export const createImageUrls = async (
+  formData: FormData
+): Promise<{ imageUrls: string[]; message: string } | null> => {
+  try {
+    const response = await questionClient.post("/images", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  } catch {
+    return null;
+  }
+};
+
 const reducer = (
   state: QuestionsState,
   action: QuestionActions
@@ -173,6 +247,13 @@ const reducer = (
   const { type } = action;
 
   switch (type) {
+    case QuestionActionTypes.CREATE_QUESTION: {
+      const { payload } = action;
+      if (!isQuestion(payload)) {
+        return state;
+      }
+      return { ...state, questions: [payload, ...state.questions] };
+    }
     case QuestionActionTypes.VIEW_QUESTION_CATEGORIES: {
       const { payload } = action;
       if (!isStringArray(payload)) {
@@ -198,6 +279,25 @@ const reducer = (
       }
       return { ...state, selectedQuestion: payload };
     }
+    case QuestionActionTypes.UPDATE_QUESTION: {
+      const { payload } = action;
+      if (!isQuestion(payload)) {
+        return state;
+      }
+      return {
+        ...state,
+        questions: state.questions.map((question) =>
+          question.id === payload.id ? payload : question
+        ),
+      };
+    }
+    case QuestionActionTypes.ERROR_CREATING_QUESTION: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, selectedQuestionError: payload };
+    }
     case QuestionActionTypes.ERROR_FETCHING_QUESTION_CATEGORIES: {
       const { payload } = action;
       if (!isString(payload)) {
@@ -219,6 +319,15 @@ const reducer = (
       }
       return { ...state, selectedQuestionError: payload };
     }
+    case QuestionActionTypes.ERROR_UPDATING_QUESTION: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, selectedQuestionError: payload };
+    }
+    default:
+      return state;
   }
 };
 
