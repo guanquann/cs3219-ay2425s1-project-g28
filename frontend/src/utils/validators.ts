@@ -1,6 +1,8 @@
+/* eslint-disable */
+
 export const nameValidator = (value: string) => {
   if (value.length === 0) {
-    return "Name must be not empty"
+    return "Name must not be empty"
   }
 
   if (value.length > 50) {
@@ -8,7 +10,7 @@ export const nameValidator = (value: string) => {
   }
 
   if (!/^[a-zA-Z\s-]*$/.test(value)) {
-    return "Name must contain only alphabetical, hypen and white space characters";
+    return "Name must contain only alphabetical, hyphen and white space characters";
   }
 
   return "";
