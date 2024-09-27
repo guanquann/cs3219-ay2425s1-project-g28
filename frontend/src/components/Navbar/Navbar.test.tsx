@@ -25,6 +25,7 @@ describe("Navigation routes", () => {
     const biography = faker.person.bio();
     const profilePictureUrl = "";
     const createdAt = "";
+    const isAdmin = false;
     mockedAxios.get.mockResolvedValue({
       data: {
         data: {
@@ -36,6 +37,7 @@ describe("Navigation routes", () => {
           biography,
           profilePictureUrl,
           createdAt,
+          isAdmin,
         },
       },
     });
@@ -52,6 +54,7 @@ describe("Navigation routes", () => {
         profilePictureUrl,
         biography,
         createdAt,
+        isAdmin,
       },
     }));
     render(<Navbar />);
@@ -94,6 +97,7 @@ describe("Authenticated user", () => {
     const biography = faker.person.bio();
     const profilePictureUrl = "";
     const createdAt = "";
+    const isAdmin = false;
     mockedAxios.get.mockResolvedValue({
       data: {
         data: {
@@ -105,6 +109,7 @@ describe("Authenticated user", () => {
           biography,
           profilePictureUrl,
           createdAt,
+          isAdmin,
         },
       },
     });
@@ -121,6 +126,7 @@ describe("Authenticated user", () => {
         profilePictureUrl,
         biography,
         createdAt,
+        isAdmin,
       },
     }));
     render(<Navbar />);
@@ -135,6 +141,7 @@ describe("Authenticated user", () => {
     const biography = faker.person.bio();
     const profilePictureUrl = "";
     const createdAt = "";
+    const isAdmin = false;
     mockedAxios.get.mockResolvedValue({
       data: {
         data: {
@@ -146,6 +153,7 @@ describe("Authenticated user", () => {
           biography,
           profilePictureUrl,
           createdAt,
+          isAdmin,
         },
       },
     });
@@ -162,6 +170,7 @@ describe("Authenticated user", () => {
         profilePictureUrl,
         biography,
         createdAt,
+        isAdmin,
       },
     }));
     render(<Navbar />);
@@ -180,6 +189,7 @@ describe("Authenticated user", () => {
     const biography = faker.person.bio();
     const profilePictureUrl = "";
     const createdAt = "";
+    const isAdmin = false;
     mockedAxios.get.mockResolvedValue({
       data: {
         data: {
@@ -191,6 +201,7 @@ describe("Authenticated user", () => {
           biography,
           profilePictureUrl,
           createdAt,
+          isAdmin,
         },
       },
     });
@@ -207,6 +218,7 @@ describe("Authenticated user", () => {
         profilePictureUrl,
         biography,
         createdAt,
+        isAdmin,
       },
     }));
     render(<Navbar />);
@@ -223,6 +235,7 @@ describe("Authenticated user", () => {
     const biography = faker.person.bio();
     const profilePictureUrl = "";
     const createdAt = "";
+    const isAdmin = false;
     mockedAxios.get.mockResolvedValue({
       data: {
         data: {
@@ -234,6 +247,7 @@ describe("Authenticated user", () => {
           biography,
           profilePictureUrl,
           createdAt,
+          isAdmin,
         },
       },
     });
@@ -250,6 +264,7 @@ describe("Authenticated user", () => {
         profilePictureUrl,
         biography,
         createdAt,
+        isAdmin,
       },
     }));
     render(<Navbar />);
