@@ -35,7 +35,8 @@ import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
 import ServerError from "../../components/ServerError";
-// import { useAuth } from "../../contexts/AuthContext";
+import { toast, ToastContainer } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 
 const tableHeaders = ["Title", "Complexity", "Categories"];
 const searchCharacterLimit = 255;
@@ -95,11 +96,11 @@ const QuestionList: React.FC = () => {
 
     const result = await deleteQuestionById(targetQuestion);
     if (!result) {
-      // TODO: notif about failed delete
+      toast.error("Failed to delete question");
       return;
     }
 
-    // TODO: notif about successful delete
+    toast.success("Question deleted successfully");
     getQuestionCategories(dispatch);
     getQuestionList(
       page + 1, // convert from 0-based indexing
@@ -127,15 +128,15 @@ const QuestionList: React.FC = () => {
   }, [page, searchFilter, complexityFilter, categoryFilter]);
 
   // Check if the user is admin
-  // const auth = useAuth();
-  // if (!auth) {
-  //   throw new Error("useAuth() must be used within AuthProvider");
-  // }
-  // const { user } = auth;
-  // if (!user) {
-  //   return;
-  // }
-  const isAdmin = true; // user.isAdmin;
+  const auth = useAuth();
+  if (!auth) {
+    throw new Error("useAuth() must be used within AuthProvider");
+  }
+  const { user } = auth;
+  if (!user) {
+    return;
+  }
+  const isAdmin = user.isAdmin;
 
   if (state.questionCategoriesError || state.selectedQuestionError) {
     return (
@@ -423,6 +424,7 @@ const QuestionList: React.FC = () => {
           </Stack>
         )}
       </Box>
+      <ToastContainer position="bottom-right" />
     </AppMargin>
   );
 };

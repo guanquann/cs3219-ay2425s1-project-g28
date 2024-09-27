@@ -93,6 +93,7 @@ const LogIn: React.FC = () => {
               required
               emptyField={emptyFields.password}
               onChange={(value, isValid) => handleInputChange("password", value, isValid)}
+              isPasswordField
             />
             <Button
               type="submit"

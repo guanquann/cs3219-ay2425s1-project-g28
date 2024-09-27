@@ -1,4 +1,5 @@
-import { TextField, TextFieldPropsSizeOverrides, TextFieldVariants } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { IconButton, InputAdornment, TextField, TextFieldPropsSizeOverrides, TextFieldVariants } from "@mui/material";
 import { OverridableStringUnion } from '@mui/types';
 import { useState } from "react";
 
@@ -11,6 +12,7 @@ type CustomTextFieldProps = {
   emptyField?: boolean;
   validator?: (value: string) => string;
   onChange: (value: string, isValid: boolean) => void;
+  isPasswordField?: boolean;
 };
 
 const CustomTextField: React.FC<CustomTextFieldProps> = ({
@@ -21,8 +23,10 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
   emptyField = false,
   validator,
   onChange,
+  isPasswordField = false,
 }) => {
   const [error, setError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(!isPasswordField);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
@@ -45,6 +49,18 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
       onChange={handleChange}
       error={(required && emptyField) || !!error}
       helperText={error}
+      type={showPassword ? "text" : "password"}
+      slotProps={{
+        input: {
+          endAdornment: isPasswordField && (
+            <InputAdornment position="end">
+              <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        }
+      }}
     />
   );
 };

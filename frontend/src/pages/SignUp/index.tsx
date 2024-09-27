@@ -121,6 +121,7 @@ const SignUp: React.FC = () => {
               emptyField={emptyFields.password}
               validator={passwordValidator}
               onChange={(value, isValid) => handleInputChange("password", value, isValid)}
+              isPasswordField
             />
             <Button
               type="submit"
