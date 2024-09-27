@@ -1,19 +1,46 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import LogInSvg from "../../assets/login.svg?react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import CustomTextField from "../../components/CustomTextField";
+import { emailValidator } from "../../utils/validators";
 
 const LogIn: React.FC = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
-
   const auth = useAuth();
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
   }
   const { login } = auth;
+
+  const formValues = useRef({ email: "", password: "" });
+  const formValidity = useRef({ email: false, password: false });
+  const [emptyFields, setEmptyFields] = useState<{ [key: string]: boolean }>({
+    email: false,
+    password: false,
+  });
+
+  const handleInputChange = (field: keyof typeof formValues.current, value: string, isValid: boolean) => {
+    formValues.current[field] = value;
+    formValidity.current[field] = isValid;
+    setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
+  };
+
+  const handleLogIn = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!Object.values(formValidity.current).every((isValid) => isValid)) {
+      // Mark untouched required fields red
+      Object.entries(formValues.current).forEach(([field, value]) => {
+        setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
+      });
+      return;
+    }
+
+    const { email, password } = formValues.current;
+    login(email, password);
+  };
 
   return (
     <Box
@@ -42,43 +69,39 @@ const LogIn: React.FC = () => {
             PeerPrep
           </Typography>
           <Stack 
+            component="form"
             direction="column" 
             spacing={1.5}
             sx={(theme) => ({
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
             })}
+            onSubmit={handleLogIn}
+            noValidate
           >
-            <TextField
+            <CustomTextField
               label="Email"
-              variant="outlined"
               size="small"
-              onChange={(input) => setEmail(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.email}
+              validator={emailValidator}
+              onChange={(value, isValid) => handleInputChange("email", value, isValid)}
             />
-            <TextField
+            <CustomTextField
               label="Password"
-              variant="outlined"
               size="small"
-              onChange={(input) => setPassword(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.password}
+              onChange={(value, isValid) => handleInputChange("password", value, isValid)}
             />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={(theme) => ({ height: theme.spacing(5) })}
+            >
+              Log in
+            </Button>
           </Stack>
-          <Button
-            variant="contained"
-            sx={(theme) => ({
-              marginTop: theme.spacing(1),
-              marginBottom: theme.spacing(1),
-              height: theme.spacing(5),
-            })}
-            onClick={() => login(email, password)}
-          >
-            Log in
-          </Button>
           <Stack 
             direction="row" 
             spacing={0.5}

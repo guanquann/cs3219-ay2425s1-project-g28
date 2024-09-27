@@ -1,22 +1,49 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import SignUpSvg from "../../assets/signup.svg?react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import CustomTextField from "../../components/CustomTextField";
+import { emailValidator, nameValidator, passwordValidator, usernameValidator } from "../../utils/validators";
+import { useRef, useState } from "react";
 
 const SignUp: React.FC = () => {
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
-
   const auth = useAuth();
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
   }
   const { signup } = auth;
+
+  const formValues = useRef({ firstName: "", lastName: "", username: "", email: "", password: "" });
+  const formValidity = useRef({ firstName: false, lastName: false, username: false, email: false, password: false });
+  const [emptyFields, setEmptyFields] = useState<{ [key: string]: boolean }>({
+    firstName: false,
+    lastName: false,
+    username: false,
+    email: false,
+    password: false,
+  });
+
+  const handleInputChange = (field: keyof typeof formValues.current, value: string, isValid: boolean) => {
+    formValues.current[field] = value;
+    formValidity.current[field] = isValid;
+    setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
+  };
+
+  const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!Object.values(formValidity.current).every((isValid) => isValid)) {
+      // Mark untouched required fields red
+      Object.entries(formValues.current).forEach(([field, value]) => {
+        setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
+      });
+      return;
+    }
+
+    const { firstName, lastName, username, email, password } = formValues.current;
+    signup(firstName, lastName, username, email, password);
+  };
 
   return (
     <Box
@@ -44,71 +71,65 @@ const SignUp: React.FC = () => {
           >
             PeerPrep
           </Typography>
-          <Stack 
+          <Stack
+            component="form"
             direction="column" 
             spacing={1.5}
             sx={(theme) => ({
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
             })}
+            onSubmit={handleSignUp}
+            noValidate
           >
-            <TextField
+            <CustomTextField
               label="First Name"
-              variant="outlined"
               size="small"
-              onChange={(input) => setFirstName(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.firstName}
+              validator={nameValidator}
+              onChange={(value, isValid) => handleInputChange("firstName", value, isValid)}
             />
-            <TextField
+            <CustomTextField
               label="Last Name"
-              variant="outlined"
               size="small"
-              onChange={(input) => setLastName(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.lastName}
+              validator={nameValidator}
+              onChange={(value, isValid) => handleInputChange("lastName", value, isValid)}
             />
-            <TextField
+            <CustomTextField
               label="Username"
-              variant="outlined"
               size="small"
-              onChange={(input) => setUsername(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.username}
+              validator={usernameValidator}
+              onChange={(value, isValid) => handleInputChange("username", value, isValid)}
             />
-            <TextField
+            <CustomTextField
               label="Email"
-              variant="outlined"
               size="small"
-              onChange={(input) => setEmail(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.email}
+              validator={emailValidator}
+              onChange={(value, isValid) => handleInputChange("email", value, isValid)}
             />
-            <TextField
+            <CustomTextField
               label="Password"
-              variant="outlined"
               size="small"
-              onChange={(input) => setPassword(input.target.value)}
-              slotProps={{
-
-              }}
+              required
+              emptyField={emptyFields.password}
+              validator={passwordValidator}
+              onChange={(value, isValid) => handleInputChange("password", value, isValid)}
             />
+            <Button
+              type="submit"
+              variant="contained"
+              sx={(theme) => ({ height: theme.spacing(5) })}
+            >
+              Sign up
+            </Button>
           </Stack>
-          <Button
-            variant="contained"
-            sx={(theme) => ({
-              marginTop: theme.spacing(1),
-              marginBottom: theme.spacing(1),
-              height: theme.spacing(5),
-            })}
-            onClick={() => signup(firstName, lastName, username, email, password)}
-          >
-            Sign up
-          </Button>
           <Stack 
             direction="row" 
             spacing={0.5}
