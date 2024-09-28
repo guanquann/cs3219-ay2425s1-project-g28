@@ -86,13 +86,22 @@ export const createQuestion = async (
   question: Omit<QuestionDetail, "id">,
   dispatch: Dispatch<QuestionActions>
 ): Promise<boolean> => {
+  const accessToken = localStorage.getItem("token");
   return questionClient
-    .post("/", {
-      title: question.title,
-      description: question.description,
-      complexity: question.complexity,
-      category: question.categories,
-    })
+    .post(
+      "/",
+      {
+        title: question.title,
+        description: question.description,
+        complexity: question.complexity,
+        category: question.categories,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((res) => {
       dispatch({
         type: QuestionActionTypes.CREATE_QUESTION,
@@ -183,13 +192,22 @@ export const updateQuestionById = async (
   question: Omit<QuestionDetail, "id">,
   dispatch: Dispatch<QuestionActions>
 ): Promise<boolean> => {
+  const accessToken = localStorage.getItem("token");
   return questionClient
-    .put(`/${questionId}`, {
-      title: question.title,
-      description: question.description,
-      complexity: question.complexity,
-      category: question.categories,
-    })
+    .put(
+      `/${questionId}`,
+      {
+        title: question.title,
+        description: question.description,
+        complexity: question.complexity,
+        category: question.categories,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((res) => {
       dispatch({
         type: QuestionActionTypes.UPDATE_QUESTION,
@@ -208,7 +226,12 @@ export const updateQuestionById = async (
 
 export const deleteQuestionById = async (questionId: string) => {
   try {
-    await questionClient.delete(`/${questionId}`);
+    const accessToken = localStorage.getItem("token");
+    await questionClient.delete(`/${questionId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     return true;
   } catch {
     return false;
@@ -229,9 +252,11 @@ export const createImageUrls = async (
   formData: FormData
 ): Promise<{ imageUrls: string[]; message: string } | null> => {
   try {
+    const accessToken = localStorage.getItem("token");
     const response = await questionClient.post("/images", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
     return response.data;
