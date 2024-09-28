@@ -20,16 +20,6 @@ const questionSchema: Schema<IQuestion> = new mongoose.Schema(
     },
     category: {
       type: [String],
-      enum: [
-        "Strings",
-        "Algorithms",
-        "Data Structures",
-        "Bit Manipulation",
-        "Recursion",
-        "Databases",
-        "Arrays",
-        "Brainteaser",
-      ],
       required: true,
     },
   },

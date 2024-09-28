@@ -13,19 +13,19 @@ export async function connectToDB() {
 }
 
 export async function createUser(
+  firstName: string,
+  lastName: string,
   username: string,
   email: string,
   password: string,
-  firstName: string,
-  lastName: string,
   isAdmin: boolean = false
 ): Promise<IUser> {
   return new UserModel({
+    firstName,
+    lastName,
     username,
     email,
     password,
-    firstName,
-    lastName,
     isAdmin,
   }).save();
 }

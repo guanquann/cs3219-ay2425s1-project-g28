@@ -26,15 +26,27 @@ export async function createUser(
   res: Response
 ): Promise<Response> {
   try {
-    const { username, email, password, firstName, lastName } = req.body;
+    const { firstName, lastName, username, email, password } = req.body;
     const existingUser = await _findUserByUsernameOrEmail(username, email);
     if (existingUser) {
       return res
         .status(409)
-        .json({ message: "username or email already exists" });
+        .json({ message: "Username or email already exists" });
     }
 
-    if (username && email && password && firstName && lastName) {
+    if (firstName && lastName && username && email && password) {
+      const { isValid: isValidFirstName, message: firstNameMessage } =
+        validateName(firstName, "first name");
+      if (!isValidFirstName) {
+        return res.status(400).json({ message: firstNameMessage });
+      }
+
+      const { isValid: isValidLastName, message: lastNameMessage } =
+        validateName(lastName, "last name");
+      if (!isValidLastName) {
+        return res.status(400).json({ message: lastNameMessage });
+      }
+
       const { isValid: isValidUsername, message: usernameMessage } =
         validateUsername(username);
       if (!isValidUsername) {
@@ -56,36 +68,22 @@ export async function createUser(
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(password, salt);
 
-      const { isValid: isValidFirstName, message: firstNameMessage } =
-        validateName(firstName, "first name");
-      if (!isValidFirstName) {
-        return res.status(400).json({ message: firstNameMessage });
-      }
-
-      const { isValid: isValidLastName, message: lastNameMessage } =
-        validateName(lastName, "last name");
-      if (!isValidLastName) {
-        return res.status(400).json({ message: lastNameMessage });
-      }
-
       const createdUser = await _createUser(
+        firstName,
+        lastName,
         username,
         email,
         hashedPassword,
-        firstName,
-        lastName
       );
       return res.status(201).json({
         message: `Created new user ${username} successfully`,
         data: formatUserResponse(createdUser),
       });
     } else {
-      return res
-        .status(400)
-        .json({
-          message:
-            "username and/or email and/or password and/or first name and/or last name are missing",
-        });
+      return res.status(400).json({
+        message:
+          "At least one of first name, last name, username, email and password are missing",
+      });
     }
   } catch (err) {
     console.error(err);

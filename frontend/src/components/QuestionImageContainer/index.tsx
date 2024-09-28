@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { createImageUrls } from "../../reducers/questionReducer";
 import QuestionImage from "../QuestionImage";
 import QuestionImageDialog from "../QuestionImageDialog";
+import { FAILED_FILE_UPLOAD, SUCCESS_FILE_UPLOAD } from "../../utils/constants";
 
 interface QuestionImageContainerProps {
   uploadedImagesUrl: string[];
@@ -69,9 +70,9 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
         for (const imageUrl of res.imageUrls) {
           setUploadedImagesUrl((prev) => [...prev, imageUrl]);
         }
-        toast.success("File uploaded successfully");
+        toast.success(SUCCESS_FILE_UPLOAD);
       } else {
-        toast.error("Error uploading file");
+        toast.error(FAILED_FILE_UPLOAD);
       }
     });
   };

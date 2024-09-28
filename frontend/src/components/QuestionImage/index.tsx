@@ -1,9 +1,7 @@
 import { Box, ImageListItem, IconButton } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
-
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 interface QuestionImageProps {
   url: string;

@@ -48,10 +48,12 @@
 
 - Body
 
-  - Required: `username` (string), `email` (string), `password` (string)
+  - Required: `firstName` (string), `lastName` (string), `username` (string), `email` (string), `password` (string)
 
     ```json
     {
+      "firstName": "SampleFirstName",
+      "lastName": "SampleLastName",
       "username": "SampleUserName",
       "email": "sample@gmail.com",
       "password": "SecurePassword"
