@@ -5,6 +5,12 @@ info:
   version: 1.0.0
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Question:
       properties:
@@ -93,6 +99,8 @@ paths:
         - questions
       summary: Creates a question
       description: Creates a question
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -134,11 +142,13 @@ paths:
           name: page
           type: integer
           required: true
+          default: 1
           description: Page of questions to return
         - in: query
           name: qnLimit
           type: integer
           required: true
+          default: 10
           description: Limit on number of questions to return
         - in: query
           name: title
@@ -201,6 +211,8 @@ paths:
         - questions
       summary: Updates a question
       description: Updates a question
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -242,6 +254,8 @@ paths:
       tags:
         - questions
       summary: Deletes a question
+      security:
+        - bearerAuth: []
       description: Deletes a question
       parameters:
         - in: path
