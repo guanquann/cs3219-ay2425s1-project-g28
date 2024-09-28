@@ -42,19 +42,15 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("token");
-    if (accessToken) {
-      userClient
-        .get("/auth/verify-token", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        })
-        .then((res) => setUser(res.data.data))
-        .catch(() => setUser(null))
-        .finally(() => {
-          setTimeout(() => setLoading(false), 1500)
-        });
-    } else {
-      setTimeout(() => setLoading(false), 1500);
-    }
+    userClient
+      .get("/auth/verify-token", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      .then((res) => setUser(res.data.data))
+      .catch(() => setUser(null))
+      .finally(() => {
+        setTimeout(() => setLoading(false), 1000)
+      });
   }, []);
 
   const signup = (
