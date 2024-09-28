@@ -149,8 +149,8 @@ describe("Profiles that belong to the current authenticated user", () => {
         handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
-    const editProfileButton = screen.queryByRole("button", {
-      name: "Edit password",
+    const editProfileButton = screen.getByRole("button", {
+      name: "Change password",
     });
     expect(editProfileButton).toBeInTheDocument();
   });

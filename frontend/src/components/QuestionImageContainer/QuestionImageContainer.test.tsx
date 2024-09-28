@@ -10,6 +10,26 @@ jest.mock("../../utils/api", () => ({
 }));
 
 describe("Question Image Container", () => {
+  const mockLocalStorage = (() => {
+    let store: { [key: string]: string } = { token: "test" };
+
+    return {
+      getItem(key: string) {
+        return store[key];
+      },
+      setItem(key: string, value: string) {
+        store[key] = value;
+      },
+    };
+  })();
+
+  beforeAll(() =>
+    Object.defineProperty(window, "localStorage", {
+      value: mockLocalStorage,
+      writable: true,
+    })
+  );
+
   it("Question Image Container is rendered with no uploaded images", () => {
     const uploadedImagesUrl: string[] = [];
     const setUploadedImagesUrl = jest.fn();
@@ -102,7 +122,10 @@ describe("Question Image Container", () => {
         "/images",
         expect.any(FormData),
         expect.objectContaining({
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            Authorization: `Bearer ${mockLocalStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+          },
         })
       );
 

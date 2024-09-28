@@ -28,9 +28,9 @@ describe("Question Category Auto Complete", () => {
     );
 
     const input = screen.getByLabelText("Category");
-    fireEvent.change(input, { target: { value: "Strings" } });
+    fireEvent.change(input, { target: { value: "DFS" } });
 
-    expect(screen.getByText("Strings")).toBeInTheDocument();
+    expect(screen.getByText("DFS")).toBeInTheDocument();
   });
 
   it("Adding a new category not from the category list", () => {

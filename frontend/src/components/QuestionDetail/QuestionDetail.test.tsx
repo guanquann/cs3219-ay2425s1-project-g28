@@ -2,6 +2,17 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import QuestionDetail from ".";
 
+jest.mock("@uiw/react-md-editor", () => ({
+  Markdown({
+    source,
+  }: {
+    source: string;
+    components: Partial<React.Component>;
+  }) {
+    return <div>{source}</div>;
+  },
+}));
+
 describe("Question details", () => {
   it("Question title is rendered", () => {
     const title = "Test title";
