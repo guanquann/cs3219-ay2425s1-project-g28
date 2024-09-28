@@ -11,7 +11,7 @@ jest.mock("../../utils/api", () => ({
 
 describe("Question Image Container", () => {
   const mockLocalStorage = (() => {
-    let store: { [key: string]: string } = { token: "test" };
+    const store: { [key: string]: string } = { token: "test" };
 
     return {
       getItem(key: string) {
