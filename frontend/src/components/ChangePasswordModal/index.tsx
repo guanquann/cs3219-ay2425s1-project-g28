@@ -1,9 +1,9 @@
 import { forwardRef, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import PasswordTextField from '../PasswordTextField';
-//import { userClient } from '../../utils/api';
-//import axios from 'axios';
-//import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils/constants';
+import { userClient } from '../../utils/api';
+import axios from 'axios';
+import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils/constants';
 
 interface ChangePasswordModalProps {
   handleClose: () => void;
@@ -12,8 +12,7 @@ interface ChangePasswordModalProps {
 }
 
 const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>((props, ref) => {
-  const { handleClose } = props;
-  //const { handleClose, userId, onUpdate } = props;
+  const { handleClose, userId, onUpdate } = props;
   const [currPassword, setCurrPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -26,7 +25,7 @@ const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>
 
   const handleSubmit = async () => {
     //TODO: test with token (only tested without)
-    /*const accessToken = localStorage.getItem("token");
+    const accessToken = localStorage.getItem("token");
 
     try {
       await userClient.patch(
@@ -51,7 +50,7 @@ const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>
       } else {
         onUpdate(FAILED_PW_UPDATE_MESSAGE, false);
       }
-    }*/
+    }
   };
 
   return (
