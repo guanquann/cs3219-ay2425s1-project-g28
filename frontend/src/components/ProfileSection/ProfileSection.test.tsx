@@ -13,6 +13,8 @@ describe("Profile section", () => {
     const username = faker.internet.userName();
     const biography = faker.person.bio();
     const isCurrentUser = false;
+    const handleEditProfileOpen = jest.fn();
+    const handleChangePasswordOpen = jest.fn();
     render(
       <ProfileSection
         firstName={firstName}
@@ -20,6 +22,8 @@ describe("Profile section", () => {
         username={username}
         biography={biography}
         isCurrentUser={isCurrentUser}
+        handleEditProfileOpen={handleEditProfileOpen}
+        handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
     expect(screen.getByText(`${firstName} ${lastName}`)).toBeInTheDocument();
@@ -31,6 +35,8 @@ describe("Profile section", () => {
     const username = faker.internet.userName();
     const biography = faker.person.bio();
     const isCurrentUser = false;
+    const handleEditProfileOpen = jest.fn();
+    const handleChangePasswordOpen = jest.fn();
     render(
       <ProfileSection
         firstName={firstName}
@@ -38,6 +44,8 @@ describe("Profile section", () => {
         username={username}
         biography={biography}
         isCurrentUser={isCurrentUser}
+        handleEditProfileOpen={handleEditProfileOpen}
+        handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
     expect(screen.getByText(`@${username}`)).toBeInTheDocument();
@@ -51,6 +59,8 @@ describe("Profiles that don't belong to the current authenticated user", () => {
     const username = faker.internet.userName();
     const biography = faker.person.bio();
     const isCurrentUser = false;
+    const handleEditProfileOpen = jest.fn();
+    const handleChangePasswordOpen = jest.fn();
     render(
       <ProfileSection
         firstName={firstName}
@@ -58,6 +68,8 @@ describe("Profiles that don't belong to the current authenticated user", () => {
         username={username}
         biography={biography}
         isCurrentUser={isCurrentUser}
+        handleEditProfileOpen={handleEditProfileOpen}
+        handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
     const editProfileButton = screen.queryByRole("button", {
@@ -72,6 +84,8 @@ describe("Profiles that don't belong to the current authenticated user", () => {
     const username = faker.internet.userName();
     const biography = faker.person.bio();
     const isCurrentUser = false;
+    const handleEditProfileOpen = jest.fn();
+    const handleChangePasswordOpen = jest.fn();
     render(
       <ProfileSection
         firstName={firstName}
@@ -79,6 +93,8 @@ describe("Profiles that don't belong to the current authenticated user", () => {
         username={username}
         biography={biography}
         isCurrentUser={isCurrentUser}
+        handleEditProfileOpen={handleEditProfileOpen}
+        handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
     const editProfileButton = screen.queryByRole("button", {
@@ -95,6 +111,8 @@ describe("Profiles that belong to the current authenticated user", () => {
     const username = faker.internet.userName();
     const biography = faker.person.bio();
     const isCurrentUser = true;
+    const handleEditProfileOpen = jest.fn();
+    const handleChangePasswordOpen = jest.fn();
     render(
       <ProfileSection
         firstName={firstName}
@@ -102,6 +120,8 @@ describe("Profiles that belong to the current authenticated user", () => {
         username={username}
         biography={biography}
         isCurrentUser={isCurrentUser}
+        handleEditProfileOpen={handleEditProfileOpen}
+        handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
     const editProfileButton = screen.queryByRole("button", {
@@ -116,6 +136,8 @@ describe("Profiles that belong to the current authenticated user", () => {
     const username = faker.internet.userName();
     const biography = faker.person.bio();
     const isCurrentUser = true;
+    const handleEditProfileOpen = jest.fn();
+    const handleChangePasswordOpen = jest.fn();
     render(
       <ProfileSection
         firstName={firstName}
@@ -123,6 +145,8 @@ describe("Profiles that belong to the current authenticated user", () => {
         username={username}
         biography={biography}
         isCurrentUser={isCurrentUser}
+        handleEditProfileOpen={handleEditProfileOpen}
+        handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
     const editProfileButton = screen.queryByRole("button", {
