@@ -8,10 +8,9 @@ interface QuestionCategoryAutoCompleteProps {
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> = ({
-  selectedCategories,
-  setSelectedCategories,
-}) => {
+const QuestionCategoryAutoComplete: React.FC<
+  QuestionCategoryAutoCompleteProps
+> = ({ selectedCategories, setSelectedCategories }) => {
   const filter = createFilterOptions<string>();
   const [state, dispatch] = useReducer(reducer, initialState);
   
@@ -58,7 +57,8 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
               size="small"
               label={
                 typeof option === "string" && option.startsWith(`Add: "`)
-                  ? option.slice(6, -1)
+                  ? /* c8 ignore next */
+                    option.slice(6, -1)
                   : option
               }
               key={key}

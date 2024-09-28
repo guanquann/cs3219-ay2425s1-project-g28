@@ -8,8 +8,8 @@ export interface IUser extends Document {
   isAdmin: boolean;
 
   profilePictureUrl?: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   biography?: string;
 }
 
@@ -43,11 +43,11 @@ const UserModelSchema: Schema<IUser> = new mongoose.Schema({
   },
   firstName: {
     type: String,
-    required: false,
+    required: true,
   },
   lastName: {
     type: String,
-    required: false,
+    required: true,
   },
   biography: {
     type: String,

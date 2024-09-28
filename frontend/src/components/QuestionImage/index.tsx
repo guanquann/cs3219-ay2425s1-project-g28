@@ -10,7 +10,10 @@ interface QuestionImageProps {
   handleClickOpen: (url: string) => void;
 }
 
-const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) => {
+const QuestionImage: React.FC<QuestionImageProps> = ({
+  url,
+  handleClickOpen,
+}) => {
   return (
     <ImageListItem
       sx={{
@@ -27,7 +30,12 @@ const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) =
       <img
         src={url}
         loading="lazy"
-        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 1 }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          borderRadius: 1,
+        }}
         alt="question image"
       />
 
@@ -54,11 +62,16 @@ const QuestionImage: React.FC<QuestionImageProps> = ({ url, handleClickOpen }) =
             toast.success("Image URL copied to clipboard");
           }}
           sx={{ color: "#fff" }}
+          aria-label="copy"
         >
           <ContentCopyIcon />
         </IconButton>
 
-        <IconButton onClick={() => handleClickOpen(url)} sx={{ color: "#fff " }}>
+        <IconButton
+          onClick={() => handleClickOpen(url)}
+          sx={{ color: "#fff " }}
+          aria-label="fullscreen"
+        >
           <FullscreenIcon />
         </IconButton>
       </Box>

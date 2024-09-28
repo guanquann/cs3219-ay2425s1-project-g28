@@ -21,8 +21,8 @@ export async function createUser(
   isAdmin: boolean = false
 ): Promise<IUser> {
   return new UserModel({
-    firstName: firstName,
-    lastName: lastName,
+    firstName,
+    lastName,
     username,
     email,
     password,
@@ -59,8 +59,6 @@ export async function findAllUsers(): Promise<IUser[]> {
 
 export async function updateUserById(
   userId: string,
-  username: string,
-  email: string,
   password: string | undefined,
   profilePictureUrl: string,
   firstName: string,
@@ -71,8 +69,6 @@ export async function updateUserById(
     userId,
     {
       $set: {
-        username,
-        email,
         password,
         profilePictureUrl,
         firstName,
