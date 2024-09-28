@@ -13,9 +13,8 @@ import reducer, {
   initialState,
 } from "../../reducers/questionReducer";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-import { complexityList } from "../../utils/constants";
+import { complexityList, FAILED_QUESTION_CREATE, FILL_ALL_FIELDS, SUCCESS_QUESTION_CREATE } from "../../utils/constants";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
@@ -61,7 +60,7 @@ const NewQuestion = () => {
       !selectedComplexity ||
       selectedCategories.length === 0
     ) {
-      toast.error("Please fill in all fields");
+      toast.error(FILL_ALL_FIELDS);
       return;
     }
 
@@ -77,8 +76,9 @@ const NewQuestion = () => {
 
     if (result) {
       navigate("/questions");
+      toast.success(SUCCESS_QUESTION_CREATE);
     } else {
-      toast.error(state.selectedQuestionError || "Failed to create question");
+      toast.error(state.selectedQuestionError || FAILED_QUESTION_CREATE);
     }
   };
 

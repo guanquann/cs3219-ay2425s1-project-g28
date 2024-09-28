@@ -9,9 +9,8 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-import { complexityList } from "../../utils/constants";
+import { complexityList, FAILED_QUESTION_UPDATE, FILL_ALL_FIELDS, NO_QUESTION_CHANGES, SUCCESS_QUESTION_UPDATE } from "../../utils/constants";
 import reducer, {
   getQuestionById,
   updateQuestionById,
@@ -77,7 +76,7 @@ const QuestionEdit = () => {
       selectedComplexity === state.selectedQuestion.complexity &&
       selectedCategories === state.selectedQuestion.categories
     ) {
-      toast.error("You have not made any changes to the question");
+      toast.error(NO_QUESTION_CHANGES);
       return;
     }
 
@@ -87,7 +86,7 @@ const QuestionEdit = () => {
       !selectedComplexity ||
       selectedCategories.length === 0
     ) {
-      toast.error("Please fill in all fields");
+      toast.error(FILL_ALL_FIELDS);
       return;
     }
 
@@ -104,8 +103,9 @@ const QuestionEdit = () => {
 
     if (result) {
       navigate("/questions");
+      toast.success(SUCCESS_QUESTION_UPDATE);
     } else {
-      toast.error(state.selectedQuestionError || "Failed to update question");
+      toast.error(state.selectedQuestionError || FAILED_QUESTION_UPDATE);
     }
   };
 

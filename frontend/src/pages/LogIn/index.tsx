@@ -6,6 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import CustomTextField from "../../components/CustomTextField";
 import { emailValidator } from "../../utils/validators";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();

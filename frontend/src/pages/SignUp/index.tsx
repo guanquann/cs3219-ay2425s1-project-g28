@@ -6,6 +6,7 @@ import CustomTextField from "../../components/CustomTextField";
 import { emailValidator, nameValidator, passwordValidator, usernameValidator } from "../../utils/validators";
 import { useRef, useState } from "react";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();

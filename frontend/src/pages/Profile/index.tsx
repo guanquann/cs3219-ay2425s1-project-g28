@@ -6,8 +6,7 @@ import classes from "./index.module.css";
 import { useEffect, useState } from "react";
 import { userClient } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
-import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from "react-toastify";
 import ServerError from "../../components/ServerError";
 import EditProfileModal from "../../components/EditProfileModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
@@ -122,8 +121,6 @@ const ProfilePage: React.FC = () => {
             onUpdate={notify} />
         </Modal>
       </Box>
-
-      <ToastContainer position="bottom-right" />
     </AppMargin>)
   );
 };

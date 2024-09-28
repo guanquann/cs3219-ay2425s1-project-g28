@@ -29,7 +29,7 @@ import reducer, {
   getQuestionList,
   initialState,
 } from "../../reducers/questionReducer";
-import { complexityList } from "../../utils/constants";
+import { complexityList, FAILED_QUESTION_DELETE, SUCCESS_QUESTION_DELETE } from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
@@ -96,11 +96,11 @@ const QuestionList: React.FC = () => {
 
     const result = await deleteQuestionById(targetQuestion);
     if (!result) {
-      toast.error("Failed to delete question");
+      toast.error(FAILED_QUESTION_DELETE);
       return;
     }
 
-    toast.success("Question deleted successfully");
+    toast.success(SUCCESS_QUESTION_DELETE);
     getQuestionCategories(dispatch);
     getQuestionList(
       page + 1, // convert from 0-based indexing

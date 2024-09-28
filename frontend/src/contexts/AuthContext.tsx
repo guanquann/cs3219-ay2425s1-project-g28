@@ -5,6 +5,7 @@ import { userClient } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
+import { SUCCESS_LOG_OUT } from "../utils/constants";
 
 type User = {
   id: string;
@@ -100,7 +101,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     localStorage.removeItem("token");
     setUser(null);
     navigate("/");
-    toast.success("Logged out successfully!");
+    toast.success(SUCCESS_LOG_OUT);
   };
 
   if (loading) {

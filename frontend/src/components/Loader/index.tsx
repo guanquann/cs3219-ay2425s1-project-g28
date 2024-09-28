@@ -1,5 +1,4 @@
-import { Box, Typography } from "@mui/material";
-import { Oval } from "react-loader-spinner";
+import { Box, CircularProgress, Typography } from "@mui/material";
 
 const Loader: React.FC = () => {
   return (
@@ -13,12 +12,7 @@ const Loader: React.FC = () => {
         justifyContent: "center",
       }}
     >
-      <Oval
-        height="80"
-        width="80"
-        color="#8FB8ED"
-        secondaryColor="#9E9E9E"
-      />
+      <CircularProgress color="primary" size="80px" />
       <Typography
         variant="h4"
         sx={(theme) => ({ marginTop: theme.spacing(2) })}
