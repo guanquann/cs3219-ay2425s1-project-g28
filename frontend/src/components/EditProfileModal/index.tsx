@@ -37,7 +37,6 @@ const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>((prop
   const isUpdateDisabled = firstNameError || lastNameError || !checkForChanges();
 
   const handleSubmit = async () => {
-    // TODO: test with token (only tested without)
     const accessToken = localStorage.getItem("token");
 
     try {

@@ -24,7 +24,6 @@ const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>
   const isUpdateDisabled = !(isCurrPasswordValid && isNewPasswordValid && isConfirmPasswordValid);
 
   const handleSubmit = async () => {
-    //TODO: test with token (only tested without)
     const accessToken = localStorage.getItem("token");
 
     try {
