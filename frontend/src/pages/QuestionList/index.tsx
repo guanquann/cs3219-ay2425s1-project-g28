@@ -29,13 +29,14 @@ import reducer, {
   getQuestionList,
   initialState,
 } from "../../reducers/questionReducer";
-import { complexityList } from "../../utils/constants";
+import { complexityList, FAILED_QUESTION_DELETE, SUCCESS_QUESTION_DELETE } from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
 import ServerError from "../../components/ServerError";
-// import { useAuth } from "../../contexts/AuthContext";
+import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 
 const tableHeaders = ["Title", "Complexity", "Categories"];
 const searchCharacterLimit = 255;
@@ -95,11 +96,11 @@ const QuestionList: React.FC = () => {
 
     const result = await deleteQuestionById(targetQuestion);
     if (!result) {
-      // TODO: notif about failed delete
+      toast.error(FAILED_QUESTION_DELETE);
       return;
     }
 
-    // TODO: notif about successful delete
+    toast.success(SUCCESS_QUESTION_DELETE);
     getQuestionCategories(dispatch);
     getQuestionList(
       page + 1, // convert from 0-based indexing
@@ -127,15 +128,12 @@ const QuestionList: React.FC = () => {
   }, [page, searchFilter, complexityFilter, categoryFilter]);
 
   // Check if the user is admin
-  // const auth = useAuth();
-  // if (!auth) {
-  //   throw new Error("useAuth() must be used within AuthProvider");
-  // }
-  // const { user } = auth;
-  // if (!user) {
-  //   return;
-  // }
-  const isAdmin = true; // user.isAdmin;
+  const auth = useAuth();
+  if (!auth) {
+    throw new Error("useAuth() must be used within AuthProvider");
+  }
+  const { user } = auth;
+  const isAdmin = user && user.isAdmin;
 
   if (state.questionCategoriesError || state.selectedQuestionError) {
     return (

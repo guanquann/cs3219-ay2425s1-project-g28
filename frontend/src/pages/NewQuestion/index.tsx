@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Autocomplete,
@@ -8,12 +8,18 @@ import {
   TextField,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import reducer, {
+  createQuestion,
+  initialState,
+} from "../../reducers/questionReducer";
+import { toast } from "react-toastify";
 
-import { questionClient } from "../../utils/api";
-import { complexityList } from "../../utils/constants";
+import {
+  complexityList,
+  FAILED_QUESTION_CREATE,
+  FILL_ALL_FIELDS,
+  SUCCESS_QUESTION_CREATE,
+} from "../../utils/constants";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
 import QuestionImageContainer from "../../components/QuestionImageContainer";
@@ -22,6 +28,8 @@ import QuestionDetail from "../../components/QuestionDetail";
 
 const NewQuestion = () => {
   const navigate = useNavigate();
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
@@ -57,35 +65,25 @@ const NewQuestion = () => {
       !selectedComplexity ||
       selectedCategories.length === 0
     ) {
-      toast.error("Please fill in all fields");
+      toast.error(FILL_ALL_FIELDS);
       return;
     }
 
-    try {
-      await questionClient.post(
-        "/",
-        {
-          title,
-          description: markdownText,
-          complexity: selectedComplexity,
-          category: selectedCategories,
-        },
-        {
-          withCredentials: false,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const result = await createQuestion(
+      {
+        title,
+        description: markdownText,
+        complexity: selectedComplexity,
+        categories: selectedCategories,
+      },
+      dispatch
+    );
+
+    if (result) {
       navigate("/questions");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message =
-          error.response?.data.message || "Failed to create question";
-        toast.error(message);
-      } else {
-        toast.error("Failed to create question");
-      }
+      toast.success(SUCCESS_QUESTION_CREATE);
+    } else {
+      toast.error(state.selectedQuestionError || FAILED_QUESTION_CREATE);
     }
   };
 
@@ -119,7 +117,7 @@ const NewQuestion = () => {
             options={complexityList}
             size="small"
             sx={{ marginTop: 2 }}
-            onChange={(e, newcomplexitySelected) => {
+            onChange={(_e, newcomplexitySelected) => {
               setselectedComplexity(newcomplexitySelected);
             }}
             renderInput={(params) => (
@@ -163,8 +161,6 @@ const NewQuestion = () => {
           {isPreviewQuestion ? "Edit Question" : "Preview Question"}
         </Button>
       </Stack>
-
-      <ToastContainer position="bottom-right" />
     </AppMargin>
   );
 };

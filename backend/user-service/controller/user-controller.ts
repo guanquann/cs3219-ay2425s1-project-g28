@@ -26,15 +26,27 @@ export async function createUser(
   res: Response
 ): Promise<Response> {
   try {
-    const { username, email, password } = req.body;
+    const { firstName, lastName, username, email, password } = req.body;
     const existingUser = await _findUserByUsernameOrEmail(username, email);
     if (existingUser) {
       return res
         .status(409)
-        .json({ message: "username or email already exists" });
+        .json({ message: "Username or email already exists" });
     }
 
-    if (username && email && password) {
+    if (firstName && lastName && username && email && password) {
+      const { isValid: isValidFirstName, message: firstNameMessage } =
+        validateName(firstName, "first name");
+      if (!isValidFirstName) {
+        return res.status(400).json({ message: firstNameMessage });
+      }
+
+      const { isValid: isValidLastName, message: lastNameMessage } =
+        validateName(lastName, "last name");
+      if (!isValidLastName) {
+        return res.status(400).json({ message: lastNameMessage });
+      }
+
       const { isValid: isValidUsername, message: usernameMessage } =
         validateUsername(username);
       if (!isValidUsername) {
@@ -55,15 +67,23 @@ export async function createUser(
 
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const createdUser = await _createUser(username, email, hashedPassword);
+
+      const createdUser = await _createUser(
+        firstName,
+        lastName,
+        username,
+        email,
+        hashedPassword,
+      );
       return res.status(201).json({
         message: `Created new user ${username} successfully`,
         data: formatUserResponse(createdUser),
       });
     } else {
-      return res
-        .status(400)
-        .json({ message: "username and/or email and/or password are missing" });
+      return res.status(400).json({
+        message:
+          "At least one of first name, last name, username, email and password are missing",
+      });
     }
   } catch (err) {
     console.error(err);
@@ -120,18 +140,15 @@ export async function updateUser(
 ): Promise<Response> {
   try {
     const {
-      username,
-      email,
-      password,
+      oldPassword,
+      newPassword,
       profilePictureUrl,
       firstName,
       lastName,
       biography,
     } = req.body;
     if (
-      username ||
-      email ||
-      password ||
+      (oldPassword && newPassword) ||
       profilePictureUrl ||
       firstName ||
       lastName ||
@@ -148,42 +165,23 @@ export async function updateUser(
         return res.status(404).json({ message: `User ${userId} not found` });
       }
 
-      if (username) {
-        const { isValid: isValidUsername, message: usernameMessage } =
-          validateUsername(username);
-        if (!isValidUsername) {
-          return res.status(400).json({ message: usernameMessage });
-        }
-
-        const existingUser = await _findUserByUsername(username);
-        if (existingUser && existingUser.id !== userId) {
-          return res.status(409).json({ message: "username already exists" });
-        }
-      }
-
-      if (email) {
-        const { isValid: isValidEmail, message: emailMessage } =
-          validateEmail(email);
-        if (!isValidEmail) {
-          return res.status(400).json({ message: emailMessage });
-        }
-
-        const existingUser = await _findUserByEmail(email);
-        if (existingUser && existingUser.id !== userId) {
-          return res.status(409).json({ message: "email already exists" });
-        }
-      }
-
       let hashedPassword: string | undefined;
-      if (password) {
+      if (oldPassword && newPassword) {
+        const match = await bcrypt.compare(oldPassword, user.password);
+        if (!match) {
+          return res
+            .status(403)
+            .json({ message: "Wrong current password given" });
+        }
+
         const { isValid: isValidPassword, message: passwordMessage } =
-          validatePassword(password);
+          validatePassword(newPassword);
         if (!isValidPassword) {
           return res.status(400).json({ message: passwordMessage });
         }
 
         const salt = bcrypt.genSaltSync(10);
-        hashedPassword = bcrypt.hashSync(password, salt);
+        hashedPassword = bcrypt.hashSync(newPassword, salt);
       }
 
       if (firstName) {
@@ -212,8 +210,6 @@ export async function updateUser(
 
       const updatedUser = await _updateUserById(
         userId,
-        username,
-        email,
         hashedPassword,
         profilePictureUrl,
         firstName,

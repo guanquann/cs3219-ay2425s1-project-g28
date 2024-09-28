@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import NewQuestion from "./pages/NewQuestion";
 import QuestionDetail from "./pages/QuestionDetail";
@@ -7,24 +7,29 @@ import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/Profile";
 import AuthProvider from "./contexts/AuthContext";
 import QuestionList from "./pages/QuestionList";
+import SignUp from "./pages/SignUp";
+import LogIn from "./pages/LogIn";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route path="questions">
-              <Route index element={<QuestionList />} />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route path="questions">
+            <Route index element={<QuestionList />} />
+            <Route path=":questionId" element={<QuestionDetail />} />
+            <Route element={<ProtectedRoutes adminOnly />}>
               <Route path="new" element={<NewQuestion />} />
-              <Route path=":questionId" element={<QuestionDetail />} />
               <Route path=":questionId/edit" element={<QuestionEdit />} />
             </Route>
-            <Route path="profile/:userId" element={<ProfilePage />} />
-            <Route path="*" element={<PageNotFound />} />
           </Route>
-        </Routes>
-      </BrowserRouter>
+          <Route path="profile/:userId" element={<ProfilePage />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Route>
+        <Route path="/signup" element={<SignUp />}></Route>
+        <Route path="/login" element={<LogIn />}></Route>
+      </Routes>
     </AuthProvider>
   );
 }

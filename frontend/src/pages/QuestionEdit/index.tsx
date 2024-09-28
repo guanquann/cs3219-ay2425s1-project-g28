@@ -8,14 +8,12 @@ import {
   TextField,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 
-import { questionClient } from "../../utils/api";
-import { complexityList } from "../../utils/constants";
+import { complexityList, FAILED_QUESTION_UPDATE, FILL_ALL_FIELDS, NO_QUESTION_CHANGES, SUCCESS_QUESTION_UPDATE } from "../../utils/constants";
 import reducer, {
   getQuestionById,
+  updateQuestionById,
   initialState,
 } from "../../reducers/questionReducer";
 import AppMargin from "../../components/AppMargin";
@@ -78,36 +76,36 @@ const QuestionEdit = () => {
       selectedComplexity === state.selectedQuestion.complexity &&
       selectedCategories === state.selectedQuestion.categories
     ) {
-      toast.error("You have not made any changes to the question");
+      toast.error(NO_QUESTION_CHANGES);
       return;
     }
 
-    try {
-      await questionClient.put(
-        `/${state.selectedQuestion.id}`,
-        {
-          title,
-          description: markdownText,
-          complexity: selectedComplexity,
-          category: selectedCategories,
-        },
-        {
-          withCredentials: false,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    if (
+      !title ||
+      !markdownText ||
+      !selectedComplexity ||
+      selectedCategories.length === 0
+    ) {
+      toast.error(FILL_ALL_FIELDS);
+      return;
+    }
 
+    const result = await updateQuestionById(
+      state.selectedQuestion.id,
+      {
+        title,
+        description: markdownText,
+        complexity: selectedComplexity,
+        categories: selectedCategories,
+      },
+      dispatch
+    );
+
+    if (result) {
       navigate("/questions");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message =
-          error.response?.data.message || "Failed to update question";
-        toast.error(message);
-      } else {
-        toast.error("Failed to update question");
-      }
+      toast.success(SUCCESS_QUESTION_UPDATE);
+    } else {
+      toast.error(state.selectedQuestionError || FAILED_QUESTION_UPDATE);
     }
   };
 
@@ -142,7 +140,7 @@ const QuestionEdit = () => {
             size="small"
             sx={{ marginTop: 2 }}
             value={selectedComplexity}
-            onChange={(e, newcomplexitySelected) => {
+            onChange={(_e, newcomplexitySelected) => {
               setselectedComplexity(newcomplexitySelected);
             }}
             renderInput={(params) => (
@@ -186,8 +184,6 @@ const QuestionEdit = () => {
           {isPreviewQuestion ? "Edit Question" : "Preview Question"}
         </Button>
       </Stack>
-
-      <ToastContainer position="bottom-right" />
     </AppMargin>
   );
 };
