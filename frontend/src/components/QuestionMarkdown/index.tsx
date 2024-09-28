@@ -7,7 +7,10 @@ interface QuestionMarkdownProps {
   setMarkdownText: (value: string) => void;
 }
 
-const QuestionMarkdown: React.FC<QuestionMarkdownProps> = ({ markdownText, setMarkdownText }) => {
+const QuestionMarkdown: React.FC<QuestionMarkdownProps> = ({
+  markdownText,
+  setMarkdownText,
+}) => {
   return (
     <Stack data-color-mode="light" paddingTop={2}>
       <MDEditor

@@ -7,10 +7,9 @@ interface QuestionCategoryAutoCompleteProps {
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> = ({
-  selectedCategories,
-  setSelectedCategories,
-}) => {
+const QuestionCategoryAutoComplete: React.FC<
+  QuestionCategoryAutoCompleteProps
+> = ({ selectedCategories, setSelectedCategories }) => {
   // TODO
   // Fetch category list from the server
 
@@ -25,7 +24,8 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
       sx={{ marginTop: 2 }}
       value={selectedCategories}
       onChange={(e, newCategoriesSelected) => {
-        const newValue = newCategoriesSelected[newCategoriesSelected.length - 1];
+        const newValue =
+          newCategoriesSelected[newCategoriesSelected.length - 1];
         if (typeof newValue === "string" && newValue.startsWith(`Add: "`)) {
           const newCategory = newValue.slice(6, -1);
           categoryList.push(newCategory);
@@ -55,7 +55,8 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
               size="small"
               label={
                 typeof option === "string" && option.startsWith(`Add: "`)
-                  ? option.slice(6, -1)
+                  ? /* c8 ignore next */
+                    option.slice(6, -1)
                   : option
               }
               key={key}

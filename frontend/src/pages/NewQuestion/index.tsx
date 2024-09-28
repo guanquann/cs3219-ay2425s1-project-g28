@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
-import { Autocomplete, Button, IconButton, Stack, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  IconButton,
+  Stack,
+  TextField,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import axios from "axios";
+import reducer, {
+  createQuestion,
+  initialState,
+} from "../../reducers/questionReducer";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { questionClient } from "../../utils/api";
 import { complexityList } from "../../utils/constants";
 import AppMargin from "../../components/AppMargin";
 import QuestionMarkdown from "../../components/QuestionMarkdown";
@@ -17,16 +25,29 @@ import QuestionDetail from "../../components/QuestionDetail";
 const NewQuestion = () => {
   const navigate = useNavigate();
 
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
-  const [selectedComplexity, setselectedComplexity] = useState<string | null>(null);
+  const [selectedComplexity, setselectedComplexity] = useState<string | null>(
+    null
+  );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
   const [isPreviewQuestion, setIsPreviewQuestion] = useState<boolean>(false);
 
   const handleBack = () => {
-    if (title || markdownText || selectedComplexity || selectedCategories.length > 0) {
-      if (!confirm("Are you sure you want to leave this page? All process will be lost.")) {
+    if (
+      title ||
+      markdownText ||
+      selectedComplexity ||
+      selectedCategories.length > 0
+    ) {
+      if (
+        !confirm(
+          "Are you sure you want to leave this page? All process will be lost."
+        )
+      ) {
         return;
       }
     }
@@ -34,35 +55,30 @@ const NewQuestion = () => {
   };
 
   const handleSubmit = async () => {
-    if (!title || !markdownText || !selectedComplexity || selectedCategories.length === 0) {
+    if (
+      !title ||
+      !markdownText ||
+      !selectedComplexity ||
+      selectedCategories.length === 0
+    ) {
       toast.error("Please fill in all fields");
       return;
     }
 
-    try {
-      await questionClient.post(
-        "/",
-        {
-          title,
-          description: markdownText,
-          complexity: selectedComplexity,
-          category: selectedCategories,
-        },
-        {
-          withCredentials: false,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const result = await createQuestion(
+      {
+        title,
+        description: markdownText,
+        complexity: selectedComplexity,
+        categories: selectedCategories,
+      },
+      dispatch
+    );
+
+    if (result) {
       navigate("/questions");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data.message || "Failed to create question";
-        toast.error(message);
-      } else {
-        toast.error("Failed to create question");
-      }
+    } else {
+      toast.error(state.selectedQuestionError || "Failed to create question");
     }
   };
 
@@ -99,7 +115,9 @@ const NewQuestion = () => {
             onChange={(e, newcomplexitySelected) => {
               setselectedComplexity(newcomplexitySelected);
             }}
-            renderInput={(params) => <TextField {...params} label="Complexity" />}
+            renderInput={(params) => (
+              <TextField {...params} label="Complexity" />
+            )}
           />
 
           <QuestionCategoryAutoComplete
@@ -112,7 +130,10 @@ const NewQuestion = () => {
             setUploadedImagesUrl={setUploadedImagesUrl}
           />
 
-          <QuestionMarkdown markdownText={markdownText} setMarkdownText={setMarkdownText} />
+          <QuestionMarkdown
+            markdownText={markdownText}
+            setMarkdownText={setMarkdownText}
+          />
         </>
       )}
 
@@ -125,7 +146,10 @@ const NewQuestion = () => {
           color="secondary"
           fullWidth
           disabled={
-            !title && !markdownText && !selectedComplexity && selectedCategories.length === 0
+            !title &&
+            !markdownText &&
+            !selectedComplexity &&
+            selectedCategories.length === 0
           }
           onClick={() => setIsPreviewQuestion((prev) => !prev)}
         >

@@ -8,14 +8,13 @@ import {
   TextField,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { questionClient } from "../../utils/api";
 import { complexityList } from "../../utils/constants";
 import reducer, {
   getQuestionById,
+  updateQuestionById,
   initialState,
 } from "../../reducers/questionReducer";
 import AppMargin from "../../components/AppMargin";
@@ -82,32 +81,31 @@ const QuestionEdit = () => {
       return;
     }
 
-    try {
-      await questionClient.put(
-        `/${state.selectedQuestion.id}`,
-        {
-          title,
-          description: markdownText,
-          complexity: selectedComplexity,
-          category: selectedCategories,
-        },
-        {
-          withCredentials: false,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    if (
+      !title ||
+      !markdownText ||
+      !selectedComplexity ||
+      selectedCategories.length === 0
+    ) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
+    const result = await updateQuestionById(
+      state.selectedQuestion.id,
+      {
+        title,
+        description: markdownText,
+        complexity: selectedComplexity,
+        categories: selectedCategories,
+      },
+      dispatch
+    );
+
+    if (result) {
       navigate("/questions");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message =
-          error.response?.data.message || "Failed to update question";
-        toast.error(message);
-      } else {
-        toast.error("Failed to update question");
-      }
+    } else {
+      toast.error(state.selectedQuestionError || "Failed to update question");
     }
   };
 
