@@ -8,7 +8,7 @@ import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils
 interface ChangePasswordModalProps {
   handleClose: () => void;
   userId: string;
-  onUpdate: (message: string, isSuccess: boolean) => void;
+  onUpdate: (isProfileEdit: boolean, message: string, isSuccess: boolean) => void;
 }
 
 const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>((props, ref) => {
@@ -40,14 +40,14 @@ const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>
           },
         });
       handleClose();
-      onUpdate(SUCCESS_PW_UPDATE_MESSAGE, true);
+      onUpdate(false, SUCCESS_PW_UPDATE_MESSAGE, true);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const message =
           error.response?.data.message || FAILED_PW_UPDATE_MESSAGE;
-        onUpdate(message, false);
+        onUpdate(false, message, false);
       } else {
-        onUpdate(FAILED_PW_UPDATE_MESSAGE, false);
+        onUpdate(false, FAILED_PW_UPDATE_MESSAGE, false);
       }
     }
   };

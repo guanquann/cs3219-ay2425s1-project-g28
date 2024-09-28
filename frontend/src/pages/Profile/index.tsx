@@ -30,6 +30,7 @@ const ProfilePage: React.FC = () => {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const handleChangePasswordOpen = () => setChangePasswordOpen(true);
   const handleChangePasswordClose = () => setChangePasswordOpen(false);
+  const [isProfileChanged, setIsProfileChanged] = useState(false);
 
   const { userId } = useParams<{ userId: string }>();
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -49,7 +50,7 @@ const ProfilePage: React.FC = () => {
       })
       .catch(() => setUserProfile(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isProfileChanged]);
 
   if (!userProfile) {
     return (
@@ -60,9 +61,12 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  const notify = (message: string, isSuccess: boolean) => {
+  const notify = (isProfileEdit: boolean, message: string, isSuccess: boolean) => {
     if (isSuccess) {
       toast.success(message);
+      if (isProfileEdit) {
+        setIsProfileChanged(true);
+      }
     } else {
       toast.error(message);
     }

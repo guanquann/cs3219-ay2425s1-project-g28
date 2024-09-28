@@ -10,7 +10,7 @@ interface EditProfileModalProps {
   currLastName: string;
   currBiography?: string;
   userId: string;
-  onUpdate: (message: string, isSuccess: boolean) => void;
+  onUpdate: (isProfileEdit: boolean, message: string, isSuccess: boolean) => void;
 }
 
 const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>((props, ref) => {
@@ -54,15 +54,15 @@ const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>((prop
             },
         });
         handleClose();
-        onUpdate(SUCCESS_PROFILE_UPDATE_MESSAGE, true);
+        onUpdate(true, SUCCESS_PROFILE_UPDATE_MESSAGE, true);
     } catch (error) {
         console.error('Error:', error);
         if (axios.isAxiosError(error)) {
           const message =
             error.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
-          onUpdate(message, false);
+          onUpdate(true, message, false);
         } else {
-          onUpdate(FAILED_PROFILE_UPDATE_MESSAGE, false);
+          onUpdate(true, FAILED_PROFILE_UPDATE_MESSAGE, false);
         }
     }
   };
