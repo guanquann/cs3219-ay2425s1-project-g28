@@ -1,5 +1,6 @@
 /* Dropdowns */
 export const complexityList: string[] = ["Easy", "Medium", "Hard"];
+export const languageList = ["Python", "Java"];
 
 /* Toast Messages */
 // Authentication
@@ -7,6 +8,9 @@ export const SUCCESS_LOG_OUT = "Logged out successfully!";
 
 // Field Validation
 export const FILL_ALL_FIELDS = "Please fill in all fields";
+
+export const minMatchTimeout = 30;
+export const maxMatchTimeout = 300;
 
 // Question
 export const SUCCESS_QUESTION_CREATE = "Question created successfully";
