@@ -1,8 +1,8 @@
 import { forwardRef, useState } from 'react';
 import { Box, Button, FormControl, FormHelperText, Stack, TextField, Typography } from '@mui/material';
-//import { userClient } from '../../utils/api';
-//import axios from 'axios';
-//import { FAILED_PROFILE_UPDATE_MESSAGE, SUCCESS_PROFILE_UPDATE_MESSAGE } from '../../utils/constants';
+import { userClient } from '../../utils/api';
+import axios from 'axios';
+import { FAILED_PROFILE_UPDATE_MESSAGE, SUCCESS_PROFILE_UPDATE_MESSAGE } from '../../utils/constants';
 
 interface EditProfileModalProps {
   handleClose: () => void;
@@ -10,12 +10,11 @@ interface EditProfileModalProps {
   currLastName: string;
   currBiography?: string;
   userId: string;
-  onUpdate: (message: string, isSuccess: boolean) => void;
+  onUpdate: (isProfileEdit: boolean, message: string, isSuccess: boolean) => void;
 }
 
 const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>((props, ref) => {
-  const { handleClose, currFirstName, currLastName, currBiography } = props;
-  //const { handleClose, currFirstName, currLastName, currBiography, userId, onUpdate } = props;
+  const { handleClose, currFirstName, currLastName, currBiography, userId, onUpdate } = props;
   const nameCharLimit = 50;
   const bioCharLimit = 255;
   const [newFirstName, setNewFirstName] = useState<string>(currFirstName);
@@ -38,8 +37,7 @@ const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>((prop
   const isUpdateDisabled = firstNameError || lastNameError || !checkForChanges();
 
   const handleSubmit = async () => {
-    // TODO: test with token (only tested without)
-    /*const accessToken = localStorage.getItem("token");
+    const accessToken = localStorage.getItem("token");
 
     try {
       await userClient.patch(
@@ -56,17 +54,17 @@ const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>((prop
             },
         });
         handleClose();
-        onUpdate(SUCCESS_PROFILE_UPDATE_MESSAGE, true);
+        onUpdate(true, SUCCESS_PROFILE_UPDATE_MESSAGE, true);
     } catch (error) {
         console.error('Error:', error);
         if (axios.isAxiosError(error)) {
           const message =
             error.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
-          onUpdate(message, false);
+          onUpdate(true, message, false);
         } else {
-          onUpdate(FAILED_PROFILE_UPDATE_MESSAGE, false);
+          onUpdate(true, FAILED_PROFILE_UPDATE_MESSAGE, false);
         }
-    }*/
+    }
   };
 
   return (
