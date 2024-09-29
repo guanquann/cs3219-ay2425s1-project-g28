@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Button,
   Card,
   Checkbox,
@@ -26,6 +27,7 @@ import reducer, {
   getQuestionCategories,
   initialState,
 } from "../../reducers/questionReducer";
+import CustomChip from "../../components/CustomChip";
 // import homepageImage from "/homepage_image.svg";
 
 const Home: React.FC = () => {
@@ -69,7 +71,7 @@ const Home: React.FC = () => {
         Your ultimate technical interview preparation platform to practice
         whiteboard style interview questions with a peer.
       </Typography>
-{/* 
+      {/* 
       <Box
         component="img"
         src={homepageImage}
@@ -102,52 +104,33 @@ const Home: React.FC = () => {
           </Grid2>
 
           <Grid2 size={10}>
-            <FormControl fullWidth sx={{ backgroundColor: "white" }}>
-              <Select
+            <FormControl
+              fullWidth
+              required={true}
+              sx={{ backgroundColor: "white" }}
+            >
+              <Autocomplete
                 multiple
-                value={complexity}
-                onChange={(event) =>
-                  setComplexity(event.target.value as string[])
-                }
-                renderValue={(selected) =>
-                  selected.map((value) => {
+                disableCloseOnSelect
+                options={complexityList}
+                onChange={(_, selectedOptions) => {
+                  setComplexity(selectedOptions);
+                }}
+                renderInput={(params) => <TextField {...params} />}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => {
+                    const tagProps = getTagProps({ index });
+
                     return (
-                      <Chip
-                        size="medium"
-                        label={value}
-                        key={value}
-                        deleteIcon={
-                          <CloseIcon
-                            onMouseDown={(event) =>
-                              event.stopPropagation()
-                            }
-                          />
-                        }
-                        onDelete={() => {
-                          setComplexity((prev) =>
-                            prev.filter((v) => v != value)
-                          );
-                        }}
-                        sx={(theme) => ({
-                          backgroundColor: "primary.main",
-                          color: "primary.contrastText",
-                          marginRight: theme.spacing(1),
-                          "& .MuiChip-deleteIcon": {
-                            color: "primary.contrastText",
-                          },
-                        })}
+                      <CustomChip
+                        label={option}
+                        key={option}
+                        onDelete={tagProps.onDelete}
                       />
                     );
                   })
                 }
-              >
-                {complexityList.map((comp) => (
-                  <MenuItem key={comp} value={comp}>
-                    <Checkbox checked={complexity.indexOf(comp) > -1} />
-                    <ListItemText primary={comp} />
-                  </MenuItem>
-                ))}
-              </Select>
+              />
             </FormControl>
           </Grid2>
 
@@ -161,54 +144,33 @@ const Home: React.FC = () => {
           </Grid2>
 
           <Grid2 size={10}>
-            <FormControl fullWidth sx={{ backgroundColor: "white" }}>
-              <Select
+            <FormControl
+              fullWidth
+              required={true}
+              sx={{ backgroundColor: "white" }}
+            >
+              <Autocomplete
                 multiple
-                value={selectedCategories}
-                onChange={(event) => {
-                  setSelectedCategories(event.target.value as string[]);
+                disableCloseOnSelect
+                options={state.questionCategories}
+                onChange={(_, selectedOptions) => {
+                  setSelectedCategories(selectedOptions);
                 }}
-                renderValue={(selected) =>
-                  selected.map((value) => {
+                renderInput={(params) => <TextField {...params} />}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => {
+                    const tagProps = getTagProps({ index });
+
                     return (
-                      <Chip
-                        size="medium"
-                        label={value}
-                        key={value}
-                        deleteIcon={
-                          <CloseIcon
-                            onMouseDown={(event) =>
-                              event.stopPropagation()
-                            }
-                          />
-                        }
-                        onDelete={() => {
-                          setSelectedCategories((prev) =>
-                            prev.filter((v) => v != value)
-                          );
-                        }}
-                        sx={(theme) => ({
-                          backgroundColor: "primary.main",
-                          color: "primary.contrastText",
-                          marginRight: theme.spacing(1),
-                          "& .MuiChip-deleteIcon": {
-                            color: "primary.contrastText",
-                          },
-                        })}
+                      <CustomChip
+                        label={option}
+                        key={option}
+                        onDelete={tagProps.onDelete}
                       />
                     );
                   })
                 }
-              >
-                {state.questionCategories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    <Checkbox
-                      checked={selectedCategories.indexOf(category) > -1}
-                    />
-                    <ListItemText primary={category} />
-                  </MenuItem>
-                ))}
-              </Select>
+              />
             </FormControl>
           </Grid2>
 
@@ -222,50 +184,33 @@ const Home: React.FC = () => {
           </Grid2>
 
           <Grid2 size={10}>
-            <FormControl fullWidth sx={{ backgroundColor: "white" }}>
-              <Select
+            <FormControl
+              fullWidth
+              required={true}
+              sx={{ backgroundColor: "white" }}
+            >
+              <Autocomplete
                 multiple
-                value={language}
-                onChange={(event) =>
-                  setLanguage(event.target.value as string[])
-                }
-                renderValue={(selected) =>
-                  selected.map((value) => {
+                disableCloseOnSelect
+                options={languageList}
+                onChange={(_, selectedOptions) => {
+                  setLanguage(selectedOptions);
+                }}
+                renderInput={(params) => <TextField {...params} />}
+                renderTags={(tagValue, getTagProps) =>
+                  tagValue.map((option, index) => {
+                    const tagProps = getTagProps({ index });
+
                     return (
-                      <Chip
-                        size="medium"
-                        label={value}
-                        key={value}
-                        deleteIcon={
-                          <CloseIcon
-                            onMouseDown={(event) =>
-                              event.stopPropagation()
-                            }
-                          />
-                        }
-                        onDelete={() => {
-                          setLanguage((prev) => prev.filter((v) => v != value));
-                        }}
-                        sx={(theme) => ({
-                          backgroundColor: "primary.main",
-                          color: "primary.contrastText",
-                          marginRight: theme.spacing(1),
-                          "& .MuiChip-deleteIcon": {
-                            color: "primary.contrastText",
-                          },
-                        })}
+                      <CustomChip
+                        label={option}
+                        key={option}
+                        onDelete={tagProps.onDelete}
                       />
                     );
                   })
                 }
-              >
-                {languageList.map((lang) => (
-                  <MenuItem key={lang} value={lang}>
-                    <Checkbox checked={language.indexOf(lang) > -1} />
-                    <ListItemText primary={lang} />
-                  </MenuItem>
-                ))}
-              </Select>
+              />
             </FormControl>
           </Grid2>
 
@@ -280,6 +225,7 @@ const Home: React.FC = () => {
 
           <Grid2 size={10}>
             <TextField
+              required
               fullWidth
               type="number"
               value={timeout}
