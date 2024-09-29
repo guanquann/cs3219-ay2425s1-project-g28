@@ -1,7 +1,10 @@
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import { useEffect, useReducer } from "react";
-import reducer, { getQuestionCategories, initialState } from "../../reducers/questionReducer";
+import reducer, {
+  getQuestionCategories,
+  initialState,
+} from "../../reducers/questionReducer";
 
 interface QuestionCategoryAutoCompleteProps {
   selectedCategories: string[];
@@ -13,7 +16,7 @@ const QuestionCategoryAutoComplete: React.FC<
 > = ({ selectedCategories, setSelectedCategories }) => {
   const filter = createFilterOptions<string>();
   const [state, dispatch] = useReducer(reducer, initialState);
-  
+
   useEffect(() => {
     getQuestionCategories(dispatch);
   }, []);
@@ -27,7 +30,8 @@ const QuestionCategoryAutoComplete: React.FC<
       sx={{ marginTop: 2 }}
       value={selectedCategories}
       onChange={(_e, newCategoriesSelected) => {
-        const newValue = newCategoriesSelected[newCategoriesSelected.length - 1];
+        const newValue =
+          newCategoriesSelected[newCategoriesSelected.length - 1];
         if (typeof newValue === "string" && newValue.startsWith(`Add: "`)) {
           const newCategory = newValue.slice(6, -1);
           state.questionCategories.push(newCategory);

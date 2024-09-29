@@ -29,7 +29,11 @@ import reducer, {
   getQuestionList,
   initialState,
 } from "../../reducers/questionReducer";
-import { complexityList, FAILED_QUESTION_DELETE, SUCCESS_QUESTION_DELETE } from "../../utils/constants";
+import {
+  complexityList,
+  FAILED_QUESTION_DELETE,
+  SUCCESS_QUESTION_DELETE,
+} from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
@@ -49,13 +53,13 @@ const QuestionList: React.FC = () => {
   const [searchFilter, setSearchFilter] = useDebounce<string>("", 1000);
   const [complexityFilter, setComplexityFilter] = useDebounce<string[]>(
     [],
-    1000
+    1000,
   );
   const [categoryFilter, setCategoryFilter] = useDebounce<string[]>([], 1000);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const navigate = useNavigate();
-  
+
   const areQuestionsFiltered = () => {
     return (
       searchFilter || complexityFilter.length > 0 || categoryFilter.length > 0
@@ -68,7 +72,7 @@ const QuestionList: React.FC = () => {
   const menuOpen = Boolean(menuAnchor);
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    questionId: string
+    questionId: string,
   ) => {
     setMenuAnchor(event.currentTarget);
     setTargetQuestion(questionId);
@@ -108,7 +112,7 @@ const QuestionList: React.FC = () => {
       searchFilter,
       complexityFilter,
       categoryFilter,
-      dispatch
+      dispatch,
     );
   };
 
@@ -123,7 +127,7 @@ const QuestionList: React.FC = () => {
       searchFilter,
       complexityFilter,
       categoryFilter,
-      dispatch
+      dispatch,
     );
   }, [page, searchFilter, complexityFilter, categoryFilter]);
 
@@ -308,10 +312,10 @@ const QuestionList: React.FC = () => {
                           question.complexity === "Easy"
                             ? "success.main"
                             : question.complexity === "Medium"
-                            ? "#D2C350"
-                            : question.complexity === "Hard"
-                            ? "error.main"
-                            : grey[500],
+                              ? "#D2C350"
+                              : question.complexity === "Hard"
+                                ? "error.main"
+                                : grey[500],
                       }}
                     >
                       {question.complexity}

@@ -1,6 +1,5 @@
-import { Box, Chip, List, ListItem, Stack, Typography, useTheme } from "@mui/material";
-import Markdown from "markdown-to-jsx";
-import { grey } from "@mui/material/colors";
+import { Box, Chip, List, ListItem, Stack, Typography } from "@mui/material";
+import MDEditor from "@uiw/react-md-editor";
 
 interface QuestionDetailProps {
   title: string;
@@ -15,8 +14,6 @@ const QuestionDetail: React.FC<QuestionDetailProps> = ({
   categories,
   description,
 }) => {
-  const theme = useTheme();
-
   return (
     <Box
       sx={(theme) => ({
@@ -33,7 +30,10 @@ const QuestionDetail: React.FC<QuestionDetailProps> = ({
         <Typography component={"h1"} variant="h3">
           {title}
         </Typography>
-        <Stack direction={"row"} sx={(theme) => ({ marginTop: theme.spacing(2) })}>
+        <Stack
+          direction={"row"}
+          sx={(theme) => ({ marginTop: theme.spacing(2) })}
+        >
           {complexity && (
             <Chip
               key={complexity}
@@ -57,68 +57,56 @@ const QuestionDetail: React.FC<QuestionDetailProps> = ({
           ))}
         </Stack>
       </Box>
-      <Markdown
-        options={{
-          overrides: {
-            h1: {
-              component: Typography,
-              props: { component: "h1", variant: "h4" },
+      <Stack data-color-mode="light" paddingTop={2}>
+        <MDEditor.Markdown
+          source={description}
+          components={{
+            h1({ children }) {
+              return (
+                <Typography component={"h1"} variant="h4">
+                  {children}
+                </Typography>
+              );
             },
-            h2: {
-              component: Typography,
-              props: { component: "h2", variant: "h5" },
+            h2({ children }) {
+              return (
+                <Typography component={"h2"} variant="h5">
+                  {children}
+                </Typography>
+              );
             },
-            h3: {
-              component: Typography,
-              props: { component: "h3", variant: "h6" },
+            h3({ children }) {
+              return (
+                <Typography component={"h3"} variant="h6">
+                  {children}
+                </Typography>
+              );
             },
-            p: {
-              component: Typography,
+            p({ children }) {
+              return <Typography>{children}</Typography>;
             },
-            ol: {
-              component: List,
-              props: {
-                component: "ol",
-                sx: {
-                  paddingLeft: theme.spacing(4),
-                  listStyleType: "decimal",
-                },
-              },
+            ol({ children }) {
+              return (
+                <List component={"ol"} sx={{ listStyleType: "decimal" }}>
+                  {children}
+                </List>
+              );
             },
-            ul: {
-              component: List,
-              props: {
-                component: "ul",
-                sx: {
-                  paddingLeft: theme.spacing(4),
-                  listStyleType: "disc",
-                },
-              },
+            ul({ children }) {
+              return (
+                <List component={"ul"} sx={{ listStyleType: "disc" }}>
+                  {children}
+                </List>
+              );
             },
-            li: {
-              component: ListItem,
-              props: { sx: { display: "list-item" } },
+            li({ children }) {
+              return (
+                <ListItem sx={{ display: "list-item" }}>{children}</ListItem>
+              );
             },
-            code: {
-              props: {
-                style: {
-                  backgroundColor: grey[200],
-                  padding: "0.2em",
-                  borderRadius: "0.4em",
-                },
-              },
-            },
-            img: {
-              component: "img",
-              props: {
-                style: { height: "300px", width: "auto", objectFit: "contain" },
-              },
-            },
-          },
-        }}
-      >
-        {description}
-      </Markdown>
+          }}
+        />
+      </Stack>
     </Box>
   );
 };

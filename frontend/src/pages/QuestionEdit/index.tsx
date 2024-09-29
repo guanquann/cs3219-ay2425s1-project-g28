@@ -10,7 +10,13 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { toast } from "react-toastify";
 
-import { complexityList, FAILED_QUESTION_UPDATE, FILL_ALL_FIELDS, NO_QUESTION_CHANGES, SUCCESS_QUESTION_UPDATE } from "../../utils/constants";
+import {
+  complexityList,
+  FAILED_QUESTION_UPDATE,
+  FILL_ALL_FIELDS,
+  NO_QUESTION_CHANGES,
+  SUCCESS_QUESTION_UPDATE,
+} from "../../utils/constants";
 import reducer, {
   getQuestionById,
   updateQuestionById,
@@ -31,7 +37,7 @@ const QuestionEdit = () => {
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
   const [selectedComplexity, setselectedComplexity] = useState<string | null>(
-    null
+    null,
   );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
@@ -57,7 +63,7 @@ const QuestionEdit = () => {
   const handleBack = () => {
     if (
       !confirm(
-        "Are you sure you want to leave this page? All process will be lost."
+        "Are you sure you want to leave this page? All process will be lost.",
       )
     ) {
       return;
@@ -98,7 +104,7 @@ const QuestionEdit = () => {
         complexity: selectedComplexity,
         categories: selectedCategories,
       },
-      dispatch
+      dispatch,
     );
 
     if (result) {

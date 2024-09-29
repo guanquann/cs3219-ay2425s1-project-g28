@@ -2,7 +2,7 @@
 
 export const nameValidator = (value: string) => {
   if (value.length === 0) {
-    return "Name must not be empty"
+    return "Name must not be empty";
   }
 
   if (value.length > 50) {

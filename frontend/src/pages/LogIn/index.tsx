@@ -6,7 +6,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import CustomTextField from "../../components/CustomTextField";
 import { emailValidator } from "../../utils/validators";
 import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +23,11 @@ const LogIn: React.FC = () => {
     password: false,
   });
 
-  const handleInputChange = (field: keyof typeof formValues.current, value: string, isValid: boolean) => {
+  const handleInputChange = (
+    field: keyof typeof formValues.current,
+    value: string,
+    isValid: boolean,
+  ) => {
     formValues.current[field] = value;
     formValidity.current[field] = isValid;
     setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
@@ -57,22 +61,22 @@ const LogIn: React.FC = () => {
         <Stack
           height="100%"
           direction="column"
-          sx={(theme) => ({ 
+          sx={(theme) => ({
             backgroundColor: "secondary.main",
             padding: theme.spacing(2, 10),
             justifyContent: "center",
           })}
         >
-          <Typography 
-            component="h1" 
+          <Typography
+            component="h1"
             variant="h1"
             sx={{ color: "primary.main", textAlign: "center" }}
           >
             PeerPrep
           </Typography>
-          <Stack 
+          <Stack
             component="form"
-            direction="column" 
+            direction="column"
             spacing={1.5}
             sx={(theme) => ({
               marginTop: theme.spacing(2),
@@ -87,14 +91,18 @@ const LogIn: React.FC = () => {
               required
               emptyField={emptyFields.email}
               validator={emailValidator}
-              onChange={(value, isValid) => handleInputChange("email", value, isValid)}
+              onChange={(value, isValid) =>
+                handleInputChange("email", value, isValid)
+              }
             />
             <CustomTextField
               label="Password"
               size="small"
               required
               emptyField={emptyFields.password}
-              onChange={(value, isValid) => handleInputChange("password", value, isValid)}
+              onChange={(value, isValid) =>
+                handleInputChange("password", value, isValid)
+              }
               isPasswordField
             />
             <Button
@@ -105,18 +113,15 @@ const LogIn: React.FC = () => {
               Log in
             </Button>
           </Stack>
-          <Stack 
-            direction="row" 
+          <Stack
+            direction="row"
             spacing={0.5}
             sx={{ justifyContent: "flex-end" }}
           >
-            <Typography 
-              component="span"
-              sx={{ fontSize: 14 }}
-            >
+            <Typography component="span" sx={{ fontSize: 14 }}>
               Don't have an account?
             </Typography>
-            <Typography 
+            <Typography
               component="span"
               role="button"
               tabIndex={0}
@@ -135,7 +140,7 @@ const LogIn: React.FC = () => {
         </Stack>
       </Box>
       <Box
-        flex={1} 
+        flex={1}
         sx={{
           display: "flex",
           justifyContent: "center",

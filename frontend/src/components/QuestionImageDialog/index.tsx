@@ -7,7 +7,11 @@ interface QuestionImageDialog {
   handleClose: () => void;
 }
 
-const QuestionImageDialog: React.FC<QuestionImageDialog> = ({ value, open, handleClose }) => {
+const QuestionImageDialog: React.FC<QuestionImageDialog> = ({
+  value,
+  open,
+  handleClose,
+}) => {
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogContent>
@@ -23,7 +27,12 @@ const QuestionImageDialog: React.FC<QuestionImageDialog> = ({ value, open, handl
         >
           <CloseIcon />
         </IconButton>
-        <img src={value} loading="lazy" alt="question image enlarged" style={{ width: "550px" }} />
+        <img
+          src={value}
+          loading="lazy"
+          alt="question image enlarged"
+          style={{ width: "550px" }}
+        />
       </DialogContent>
     </Dialog>
   );
