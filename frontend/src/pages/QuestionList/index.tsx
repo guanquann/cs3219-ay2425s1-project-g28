@@ -347,6 +347,7 @@ const QuestionList: React.FC = () => {
                   {isAdmin && (
                     <TableCell sx={{ borderTop: "1px solid #E0E0E0" }}>
                       <IconButton
+                        data-testid="edit-delete-menu"
                         type="button"
                         onClick={(event) => handleMenuOpen(event, question.id)}
                       >
