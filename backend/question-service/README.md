@@ -58,12 +58,14 @@
 
 ## Running Question Service
 
-1. Open Command Line/Terminal and navigate into the `question-service` directory.
+1. Follow the instructions [here](https://nodejs.org/en/download/package-manager) to set up Node v20.
 
-2. Run the command: `npm install`. This will install all the necessary dependencies.
+2. Open Command Line/Terminal and navigate into the `question-service` directory.
 
-3. Run the command `npm start` to start the Question Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
+3. Run the command: `npm install`. This will install all the necessary dependencies.
 
-4. To view Question Service documentation, go to http://localhost:3000/docs.
+4. Run the command `npm start` to start the Question Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
 
-5. Using applications like Postman, you can interact with the Question Service on port 3000. If you wish to change this, please update the `.env` file.
+5. To view Question Service documentation, go to http://localhost:3000/docs.
+
+6. Using applications like Postman, you can interact with the Question Service on port 3000. If you wish to change this, please update the `.env` file.
