@@ -32,7 +32,7 @@
 
 3. Run the command: `npm install`. This will install all the necessary dependencies.
 
-4. If you are running the user service for the first time, run `npm run seed`, to seed the database with a default admin account. If you wish to change the default, please update the `.env` file. Alternatively, you can also edit your credentials and user profile after you have created the default account.
+4. If you are running the user service for the first time with your own database, run `npm run seed`, to seed the database with a default admin account. If you wish to change the default, please update the `.env` file. Alternatively, you can also edit your credentials and user profile after you have created the default account. If you are using the .env file provided by us, the default admin account already exists in the database and you can skip this step.
 
 5. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
 
