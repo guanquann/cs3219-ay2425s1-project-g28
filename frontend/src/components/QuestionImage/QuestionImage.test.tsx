@@ -27,7 +27,7 @@ describe("Question Image", () => {
     fireEvent.click(copyButton);
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      `![image](${url})`
+      `![image](${url})`,
     );
   });
 

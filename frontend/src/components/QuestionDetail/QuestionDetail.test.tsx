@@ -25,7 +25,7 @@ describe("Question details", () => {
         complexity={complexity}
         categories={categories}
         description={description}
-      />
+      />,
     );
     expect(screen.getByText(title)).toBeInTheDocument();
   });
@@ -41,7 +41,7 @@ describe("Question details", () => {
         complexity={complexity}
         categories={categories}
         description={description}
-      />
+      />,
     );
     expect(screen.getByText(complexity)).toBeInTheDocument();
   });
@@ -57,7 +57,7 @@ describe("Question details", () => {
         complexity={complexity}
         categories={categories}
         description={description}
-      />
+      />,
     );
     expect(screen.getByText(categories[0])).toBeInTheDocument();
     expect(screen.getByText(categories[1])).toBeInTheDocument();

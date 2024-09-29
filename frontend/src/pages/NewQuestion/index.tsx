@@ -34,7 +34,7 @@ const NewQuestion = () => {
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
   const [selectedComplexity, setselectedComplexity] = useState<string | null>(
-    null
+    null,
   );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
@@ -49,7 +49,7 @@ const NewQuestion = () => {
     ) {
       if (
         !confirm(
-          "Are you sure you want to leave this page? All process will be lost."
+          "Are you sure you want to leave this page? All process will be lost.",
         )
       ) {
         return;
@@ -76,7 +76,7 @@ const NewQuestion = () => {
         complexity: selectedComplexity,
         categories: selectedCategories,
       },
-      dispatch
+      dispatch,
     );
 
     if (result) {

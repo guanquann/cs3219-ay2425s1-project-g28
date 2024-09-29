@@ -37,7 +37,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const { children } = props;
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true); 
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       .then((res) => setUser(res.data.data))
       .catch(() => setUser(null))
       .finally(() => {
-        setTimeout(() => setLoading(false), 1000)
+        setTimeout(() => setLoading(false), 1000);
       });
   }, []);
 
@@ -58,7 +58,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     lastName: string,
     username: string,
     email: string,
-    password: string
+    password: string,
   ) => {
     userClient
       .post("/users", {

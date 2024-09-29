@@ -11,7 +11,7 @@ describe("Question Category Auto Complete", () => {
       <QuestionCategoryAutoComplete
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
-      />
+      />,
     );
 
     const category = screen.getByText("DFS");
@@ -24,7 +24,7 @@ describe("Question Category Auto Complete", () => {
       <QuestionCategoryAutoComplete
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
-      />
+      />,
     );
 
     const input = screen.getByLabelText("Category");
@@ -38,7 +38,7 @@ describe("Question Category Auto Complete", () => {
       <QuestionCategoryAutoComplete
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
-      />
+      />,
     );
 
     const input = screen.getByLabelText("Category");
@@ -55,7 +55,7 @@ describe("Question Category Auto Complete", () => {
       <QuestionCategoryAutoComplete
         selectedCategories={updatedCategories}
         setSelectedCategories={setSelectedCategories}
-      />
+      />,
     );
 
     expect(screen.getByText("New Category")).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe("Question Category Auto Complete", () => {
       <QuestionCategoryAutoComplete
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
-      />
+      />,
     );
 
     const deleteButton = screen.getByTestId("CancelIcon");

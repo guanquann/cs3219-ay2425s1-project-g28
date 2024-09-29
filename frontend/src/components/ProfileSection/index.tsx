@@ -12,7 +12,15 @@ type ProfileSectionProps = {
 };
 
 const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
-  const { firstName, lastName, username, biography, isCurrentUser, handleEditProfileOpen, handleChangePasswordOpen } = props;
+  const {
+    firstName,
+    lastName,
+    username,
+    biography,
+    isCurrentUser,
+    handleEditProfileOpen,
+    handleChangePasswordOpen,
+  } = props;
 
   return (
     <Box>
@@ -53,8 +61,14 @@ const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
               marginBottom: theme.spacing(4),
             })}
           >
-            <Button variant="contained" onClick={handleEditProfileOpen}>Edit profile</Button>
-            <Button variant="contained" color="secondary" onClick={handleChangePasswordOpen}>
+            <Button variant="contained" onClick={handleEditProfileOpen}>
+              Edit profile
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleChangePasswordOpen}
+            >
               Change password
             </Button>
           </Stack>

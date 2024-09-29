@@ -1,6 +1,13 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { IconButton, InputAdornment, TextField, TextFieldPropsSizeOverrides, TextFieldVariants, Tooltip } from "@mui/material";
-import { OverridableStringUnion } from '@mui/types';
+import {
+  IconButton,
+  InputAdornment,
+  TextField,
+  TextFieldPropsSizeOverrides,
+  TextFieldVariants,
+  Tooltip,
+} from "@mui/material";
+import { OverridableStringUnion } from "@mui/types";
 import { useState } from "react";
 
 const passwordRequirements = (
@@ -16,8 +23,11 @@ const passwordRequirements = (
 // Adapted from https://muhimasri.com/blogs/mui-validation/
 type CustomTextFieldProps = {
   label: string;
-  variant?: TextFieldVariants; 
-  size?: OverridableStringUnion<"small" | "medium", TextFieldPropsSizeOverrides>;
+  variant?: TextFieldVariants;
+  size?: OverridableStringUnion<
+    "small" | "medium",
+    TextFieldPropsSizeOverrides
+  >;
   required?: boolean;
   emptyField?: boolean;
   validator?: (value: string) => string;
@@ -40,7 +50,7 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const input = event.target.value;
-    
+
     let errorMessage = "";
     if (validator) {
       errorMessage = validator(input);
@@ -51,7 +61,11 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
   };
 
   return (
-    <Tooltip title={isPasswordField && passwordRequirements} placement="right" arrow>
+    <Tooltip
+      title={isPasswordField && passwordRequirements}
+      placement="right"
+      arrow
+    >
       <TextField
         label={label}
         variant={variant}
@@ -66,12 +80,15 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
           input: {
             endAdornment: isPasswordField && (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
               </InputAdornment>
             ),
-          }
+          },
         }}
       />
     </Tooltip>

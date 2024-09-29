@@ -24,7 +24,7 @@ describe("Profile section", () => {
         isCurrentUser={isCurrentUser}
         handleEditProfileOpen={handleEditProfileOpen}
         handleChangePasswordOpen={handleChangePasswordOpen}
-      />
+      />,
     );
     expect(screen.getByText(`${firstName} ${lastName}`)).toBeInTheDocument();
   });
@@ -46,7 +46,7 @@ describe("Profile section", () => {
         isCurrentUser={isCurrentUser}
         handleEditProfileOpen={handleEditProfileOpen}
         handleChangePasswordOpen={handleChangePasswordOpen}
-      />
+      />,
     );
     expect(screen.getByText(`@${username}`)).toBeInTheDocument();
   });
@@ -70,7 +70,7 @@ describe("Profiles that don't belong to the current authenticated user", () => {
         isCurrentUser={isCurrentUser}
         handleEditProfileOpen={handleEditProfileOpen}
         handleChangePasswordOpen={handleChangePasswordOpen}
-      />
+      />,
     );
     const editProfileButton = screen.queryByRole("button", {
       name: "Edit profile",
@@ -95,7 +95,7 @@ describe("Profiles that don't belong to the current authenticated user", () => {
         isCurrentUser={isCurrentUser}
         handleEditProfileOpen={handleEditProfileOpen}
         handleChangePasswordOpen={handleChangePasswordOpen}
-      />
+      />,
     );
     const editProfileButton = screen.queryByRole("button", {
       name: "Edit password",
@@ -122,7 +122,7 @@ describe("Profiles that belong to the current authenticated user", () => {
         isCurrentUser={isCurrentUser}
         handleEditProfileOpen={handleEditProfileOpen}
         handleChangePasswordOpen={handleChangePasswordOpen}
-      />
+      />,
     );
     const editProfileButton = screen.queryByRole("button", {
       name: "Edit profile",
@@ -147,7 +147,7 @@ describe("Profiles that belong to the current authenticated user", () => {
         isCurrentUser={isCurrentUser}
         handleEditProfileOpen={handleEditProfileOpen}
         handleChangePasswordOpen={handleChangePasswordOpen}
-      />
+      />,
     );
     const editProfileButton = screen.getByRole("button", {
       name: "Change password",
