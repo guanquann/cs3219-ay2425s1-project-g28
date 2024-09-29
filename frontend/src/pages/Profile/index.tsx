@@ -61,7 +61,11 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  const notify = (isProfileEdit: boolean, message: string, isSuccess: boolean) => {
+  const notify = (
+    isProfileEdit: boolean,
+    message: string,
+    isSuccess: boolean,
+  ) => {
     if (isSuccess) {
       toast.success(message);
       if (isProfileEdit) {
@@ -70,62 +74,67 @@ const ProfilePage: React.FC = () => {
     } else {
       toast.error(message);
     }
-  }
+  };
 
   return (
-    userId &&
-    (<AppMargin classname={classes.fullheight}>
-      <Box
-        sx={(theme) => ({
-          marginTop: theme.spacing(4),
-          display: "flex",
-        })}
-      >
-        <Box sx={(theme) => ({ flex: 1, paddingRight: theme.spacing(4) })}>
-          <ProfileSection
-            firstName={userProfile.firstName}
-            lastName={userProfile.lastName}
-            username={userProfile.username}
-            biography={userProfile.biography}
-            isCurrentUser={user?.id === userId}
-            handleEditProfileOpen={handleEditProfileOpen}
-            handleChangePasswordOpen={handleChangePasswordOpen}
-          />
-        </Box>
-        <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>
-          <Typography variant="h4">Questions attempted</Typography>
-        </Box>
-        <Modal
-          open={editProfileOpen}
-          onClose={handleEditProfileClose}
-          sx={{
+    userId && (
+      <AppMargin classname={classes.fullheight}>
+        <Box
+          sx={(theme) => ({
+            marginTop: theme.spacing(4),
             display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <EditProfileModal 
-            handleClose={handleEditProfileClose} 
-            currFirstName={userProfile.firstName} 
-            currLastName={userProfile.lastName}
-            currBiography={userProfile.biography}
-            userId={userId}
-            onUpdate={notify} />
-        </Modal>
-        <Modal
-          open={changePasswordOpen}
-          onClose={handleChangePasswordClose}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <ChangePasswordModal 
-            handleClose={handleChangePasswordClose}
-            userId={userId}
-            onUpdate={notify} />
-        </Modal>
-      </Box>
-    </AppMargin>)
+          })}
+        >
+          <Box sx={(theme) => ({ flex: 1, paddingRight: theme.spacing(4) })}>
+            <ProfileSection
+              firstName={userProfile.firstName}
+              lastName={userProfile.lastName}
+              username={userProfile.username}
+              biography={userProfile.biography}
+              isCurrentUser={user?.id === userId}
+              handleEditProfileOpen={handleEditProfileOpen}
+              handleChangePasswordOpen={handleChangePasswordOpen}
+            />
+          </Box>
+          <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>
+            <Typography variant="h4">Questions attempted</Typography>
+          </Box>
+          <Modal
+            open={editProfileOpen}
+            onClose={handleEditProfileClose}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <EditProfileModal
+              handleClose={handleEditProfileClose}
+              currFirstName={userProfile.firstName}
+              currLastName={userProfile.lastName}
+              currBiography={userProfile.biography}
+              userId={userId}
+              onUpdate={notify}
+            />
+          </Modal>
+          <Modal
+            open={changePasswordOpen}
+            onClose={handleChangePasswordClose}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ChangePasswordModal
+              handleClose={handleChangePasswordClose}
+              userId={userId}
+              onUpdate={notify}
+            />
+          </Modal>
+        </Box>
+      </AppMargin>
+    )
   );
 };
 

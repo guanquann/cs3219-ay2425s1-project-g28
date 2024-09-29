@@ -78,7 +78,7 @@ describe("Profiles that don't belong to the current authenticated user", () => {
     expect(editProfileButton).not.toBeInTheDocument();
   });
 
-  it("Edit password button is absent", () => {
+  it("Change password button is absent", () => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const username = faker.internet.userName();
@@ -98,7 +98,7 @@ describe("Profiles that don't belong to the current authenticated user", () => {
       />
     );
     const editProfileButton = screen.queryByRole("button", {
-      name: "Edit password",
+      name: "Change password",
     });
     expect(editProfileButton).not.toBeInTheDocument();
   });
@@ -130,7 +130,7 @@ describe("Profiles that belong to the current authenticated user", () => {
     expect(editProfileButton).toBeInTheDocument();
   });
 
-  it("Edit password button is present", () => {
+  it("Change password button is present", () => {
     const firstName = faker.person.firstName();
     const lastName = faker.person.lastName();
     const username = faker.internet.userName();
@@ -149,8 +149,8 @@ describe("Profiles that belong to the current authenticated user", () => {
         handleChangePasswordOpen={handleChangePasswordOpen}
       />
     );
-    const editProfileButton = screen.queryByRole("button", {
-      name: "Edit password",
+    const editProfileButton = screen.getByRole("button", {
+      name: "Change password",
     });
     expect(editProfileButton).toBeInTheDocument();
   });

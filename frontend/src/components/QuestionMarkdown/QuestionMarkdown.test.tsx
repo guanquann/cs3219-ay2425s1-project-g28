@@ -29,7 +29,7 @@ describe("Question Markdown", () => {
       <QuestionMarkdown
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-      />
+      />,
     );
 
     const textarea = screen.getByPlaceholderText("Description");
@@ -44,7 +44,7 @@ describe("Question Markdown", () => {
       <QuestionMarkdown
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-      />
+      />,
     );
 
     const textarea = screen.getByPlaceholderText("Description");
@@ -58,7 +58,7 @@ describe("Question Markdown", () => {
       <QuestionMarkdown
         markdownText={markdownText}
         setMarkdownText={setMarkdownText}
-      />
+      />,
     );
 
     const textarea = screen.getByPlaceholderText("Description");
