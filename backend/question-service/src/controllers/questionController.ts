@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import Question, { IQuestion } from "../models/Question.ts";
 import { checkIsExistingQuestion } from "../utils/utils.ts";
 import {
-  DUPLICATE_QUESTION_RESPONSE_MESSAGE,
-  QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
+  DUPLICATE_QUESTION_MESSAGE,
+  QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE,
   QN_DESC_CHAR_LIMIT,
   QN_CREATED_MESSAGE,
   QN_NOT_FOUND_MESSAGE,
@@ -13,6 +13,8 @@ import {
   PAGE_LIMIT_REQUIRED_MESSAGE,
   PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE,
   CATEGORIES_RETRIEVED_MESSAGE,
+  MONGO_OBJ_ID_FORMAT,
+  MONGO_OBJ_ID_MALFORMED_MESSAGE,
 } from "../utils/constants.ts";
 
 import { upload } from "../../config/multer";
@@ -28,14 +30,14 @@ export const createQuestion = async (
     const existingQuestion = await checkIsExistingQuestion(title);
     if (existingQuestion) {
       res.status(400).json({
-        message: DUPLICATE_QUESTION_RESPONSE_MESSAGE,
+        message: DUPLICATE_QUESTION_MESSAGE,
       });
       return;
     }
 
     if (description.length > QN_DESC_CHAR_LIMIT) {
       res.status(400).json({
-        message: QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
+        message: QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE,
       });
       return;
     }
@@ -78,6 +80,7 @@ export const createImageLink = async (
 
       const uploadPromises = files.map((file) => uploadFileToFirebase(file));
       const imageUrls = await Promise.all(uploadPromises);
+      console.log(imageUrls);
       res
         .status(200)
         .json({ message: "Images uploaded successfully", imageUrls });
@@ -95,7 +98,13 @@ export const updateQuestion = async (
     const { id } = req.params;
     const { title, description } = req.body;
 
+    if (!id.match(MONGO_OBJ_ID_FORMAT)) {
+      res.status(400).json({ message: MONGO_OBJ_ID_MALFORMED_MESSAGE });
+      return;
+    }
+
     const currentQuestion = await Question.findById(id);
+
     if (!currentQuestion) {
       res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
@@ -104,14 +113,14 @@ export const updateQuestion = async (
     const existingQuestion = await checkIsExistingQuestion(title, id);
     if (existingQuestion) {
       res.status(400).json({
-        message: DUPLICATE_QUESTION_RESPONSE_MESSAGE,
+        message: DUPLICATE_QUESTION_MESSAGE,
       });
       return;
     }
 
     if (description && description.length > QN_DESC_CHAR_LIMIT) {
       res.status(400).json({
-        message: QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
+        message: QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE,
       });
       return;
     }

@@ -22,7 +22,7 @@
 
 5. In the `question-service` directory, create a copy of the `.env.sample` file and name it `.env`.
 
-6. Update the `MONGO_URI` of the `.env` file, and paste the string we copied earlier in step 4. 
+6. Update the `MONGO_URI` of the `.env` file, and paste the string we copied earlier in step 4.
 
 ## Setting-up Firebase
 
@@ -30,21 +30,23 @@
 
 2. Create a project and choose a project name. Navigate to `Storage` and click on it to activate it.
 
-3. Select `Start in production mode` and your preferred cloud storage region. 
+3. Select `Start in production mode` and your preferred cloud storage region.
 
 4. After Storage is created, go to `Rules` section and set rule to:
-    ```
-    rules_version = '2';
-    service firebase.storage {
-      match /b/{bucket}/o {
-        match /{allPaths=**} {
-          allow read: if true;
-          allow write: if request.auth != null;
-        }
-      }
-    }
-    ```
-    This rule ensures that only verified users can upload images while ensuring that URLs of images are public. Remember to click `Publish` to save changes.
+
+   ```
+   rules_version = '2';
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /{allPaths=**} {
+         allow read: if true;
+         allow write: if request.auth != null;
+       }
+     }
+   }
+   ```
+
+   This rule ensures that only verified users can upload images while ensuring that URLs of images are public. Remember to click `Publish` to save changes.
 
 5. Go to `Settings`, `Project settings`, `Service accounts` and click `Generate new private key`. This will download a `.json` file, which will contain your credentials.
 
@@ -54,7 +56,6 @@
    - `FIREBASE_CLIENT_EMAIL` with `client_email` found in the downloaded json file.
    - `FIREBASE_STORAGE_BUCKET` with the folder path of the Storage. It should look something like `gs://<appname>.appspot.com`.
 
-
 ## Running Question Service
 
 1. Open Command Line/Terminal and navigate into the `question-service` directory.
@@ -63,6 +64,6 @@
 
 3. Run the command `npm start` to start the Question Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
 
-4. To view Question Service documentation, go to http://localhost:3001/docs.
+4. To view Question Service documentation, go to http://localhost:3000/docs.
 
 5. Using applications like Postman, you can interact with the Question Service on port 3000. If you wish to change this, please update the `.env` file.

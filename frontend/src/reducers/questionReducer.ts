@@ -84,7 +84,7 @@ export const initialState: QuestionsState = {
 
 export const createQuestion = async (
   question: Omit<QuestionDetail, "id">,
-  dispatch: Dispatch<QuestionActions>,
+  dispatch: Dispatch<QuestionActions>
 ): Promise<boolean> => {
   const accessToken = localStorage.getItem("token");
   return questionClient
@@ -100,7 +100,7 @@ export const createQuestion = async (
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      },
+      }
     )
     .then((res) => {
       dispatch({
@@ -125,13 +125,13 @@ export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
       dispatch({
         type: QuestionActionTypes.VIEW_QUESTION_CATEGORIES,
         payload: res.data.categories,
-      }),
+      })
     )
     .catch((err) =>
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_QUESTION_CATEGORIES,
         payload: err.response.data.message,
-      }),
+      })
     );
 };
 
@@ -141,7 +141,7 @@ export const getQuestionList = (
   title: string,
   complexities: string[],
   categories: string[],
-  dispatch: Dispatch<QuestionActions>,
+  dispatch: Dispatch<QuestionActions>
 ) => {
   questionClient
     .get("", {
@@ -157,19 +157,19 @@ export const getQuestionList = (
       dispatch({
         type: QuestionActionTypes.VIEW_QUESTION_LIST,
         payload: res.data,
-      }),
+      })
     )
     .catch((err) =>
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_QUESTION_LIST,
         payload: err.response.data.message,
-      }),
+      })
     );
 };
 
 export const getQuestionById = (
   questionId: string,
-  dispatch: Dispatch<QuestionActions>,
+  dispatch: Dispatch<QuestionActions>
 ) => {
   questionClient
     .get(`/${questionId}`)
@@ -183,14 +183,14 @@ export const getQuestionById = (
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_SELECTED_QN,
         payload: err.response.data.message,
-      }),
+      })
     );
 };
 
 export const updateQuestionById = async (
   questionId: string,
   question: Omit<QuestionDetail, "id">,
-  dispatch: Dispatch<QuestionActions>,
+  dispatch: Dispatch<QuestionActions>
 ): Promise<boolean> => {
   const accessToken = localStorage.getItem("token");
   return questionClient
@@ -206,7 +206,7 @@ export const updateQuestionById = async (
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      },
+      }
     )
     .then((res) => {
       dispatch({
@@ -240,7 +240,7 @@ export const deleteQuestionById = async (questionId: string) => {
 
 export const setSelectedQuestionError = (
   error: string,
-  dispatch: React.Dispatch<QuestionActions>,
+  dispatch: React.Dispatch<QuestionActions>
 ) => {
   dispatch({
     type: QuestionActionTypes.ERROR_FETCHING_SELECTED_QN,
@@ -249,7 +249,7 @@ export const setSelectedQuestionError = (
 };
 
 export const createImageUrls = async (
-  formData: FormData,
+  formData: FormData
 ): Promise<{ imageUrls: string[]; message: string } | null> => {
   try {
     const accessToken = localStorage.getItem("token");
@@ -267,7 +267,7 @@ export const createImageUrls = async (
 
 const reducer = (
   state: QuestionsState,
-  action: QuestionActions,
+  action: QuestionActions
 ): QuestionsState => {
   const { type } = action;
 
@@ -312,7 +312,7 @@ const reducer = (
       return {
         ...state,
         questions: state.questions.map((question) =>
-          question.id === payload.id ? payload : question,
+          question.id === payload.id ? payload : question
         ),
       };
     }
