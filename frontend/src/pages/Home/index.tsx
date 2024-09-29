@@ -79,7 +79,7 @@ const Home: React.FC = () => {
           objectFit: "contain",
         }}
       /> */}
-      <Card
+      {/* <Card
         sx={{
           padding: 4,
           width: "100%",
@@ -269,7 +269,7 @@ const Home: React.FC = () => {
         >
           Find my match!
         </Button>
-      </Card>
+      </Card> */}
     </AppMargin>
   );
 };

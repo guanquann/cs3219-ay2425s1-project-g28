@@ -80,6 +80,7 @@ export const createImageLink = async (
 
       const uploadPromises = files.map((file) => uploadFileToFirebase(file));
       const imageUrls = await Promise.all(uploadPromises);
+      console.log(imageUrls);
       res
         .status(200)
         .json({ message: "Images uploaded successfully", imageUrls });
