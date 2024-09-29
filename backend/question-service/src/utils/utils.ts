@@ -48,3 +48,7 @@ export const uploadFileToFirebase = async (
     blobStream.end(file.buffer);
   });
 };
+
+export const sortAlphabetically = (arr: string[]) => {
+  return [...arr].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+};

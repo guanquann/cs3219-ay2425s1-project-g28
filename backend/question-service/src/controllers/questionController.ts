@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Question, { IQuestion } from "../models/Question.ts";
-import { checkIsExistingQuestion } from "../utils/utils.ts";
+import { checkIsExistingQuestion, sortAlphabetically } from "../utils/utils.ts";
 import {
   DUPLICATE_QUESTION_RESPONSE_MESSAGE,
   QN_DESC_EXCEED_CHAR_LIMIT_RESPONSE_MESSAGE,
@@ -203,7 +203,12 @@ export const readQuestionsList = async (
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
       questionCount: filteredQuestionCount,
-      questions: filteredQuestions.map(formatQuestionResponse),
+      questions: filteredQuestions
+        .map(formatQuestionResponse)
+        .map((question) => ({
+          ...question,
+          categories: sortAlphabetically(question.categories),
+        })),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
@@ -241,7 +246,7 @@ export const readCategories = async (
 
     res.status(200).json({
       message: CATEGORIES_RETRIEVED_MESSAGE,
-      categories: uniqueCats,
+      categories: sortAlphabetically(uniqueCats),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
