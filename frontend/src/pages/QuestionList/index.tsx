@@ -19,28 +19,33 @@ import {
   TableRow,
   TextField,
   Typography,
-  useTheme,
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 import AppMargin from "../../components/AppMargin";
 import { useNavigate } from "react-router-dom";
 import reducer, {
   deleteQuestionById,
+  getQuestionCategories,
   getQuestionList,
   initialState,
 } from "../../reducers/questionReducer";
-import { categoryList, complexityList } from "../../utils/constants";
+import {
+  complexityList,
+  FAILED_QUESTION_DELETE,
+  SUCCESS_QUESTION_DELETE,
+} from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
-
-// TODO: get dynamic category list from DB
+import ConfirmationDialog from "../../components/ConfirmationDialog";
+import ServerError from "../../components/ServerError";
+import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 
 const tableHeaders = ["Title", "Complexity", "Categories"];
 const searchCharacterLimit = 255;
 const categorySelectionLimit = 10;
 const rowsPerPage = 10;
-const isAdmin = false; // TODO: check using auth context
 
 const QuestionList: React.FC = () => {
   const [page, setPage] = useState<number>(0);
@@ -48,43 +53,109 @@ const QuestionList: React.FC = () => {
   const [searchFilter, setSearchFilter] = useDebounce<string>("", 1000);
   const [complexityFilter, setComplexityFilter] = useDebounce<string[]>(
     [],
-    1000
+    1000,
   );
   const [categoryFilter, setCategoryFilter] = useDebounce<string[]>([], 1000);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const navigate = useNavigate();
-  const theme = useTheme();
 
-  // For handling edit / delete question for the admin user
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const menuOpen = Boolean(anchorEl);
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  const areQuestionsFiltered = () => {
+    return (
+      searchFilter || complexityFilter.length > 0 || categoryFilter.length > 0
+    );
+  };
+
+  // For handling edit / delete menu
+  const [targetQuestion, setTargetQuestion] = useState<string | null>(null);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const menuOpen = Boolean(menuAnchor);
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    questionId: string,
+  ) => {
+    setMenuAnchor(event.currentTarget);
+    setTargetQuestion(questionId);
   };
   const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-  const handleQuestionDelete = (questionId: string) => {
-    // TODO
-    // handleMenuClose();
-    deleteQuestionById(questionId, dispatch);
+    setMenuAnchor(null);
+    setTargetQuestion(null);
   };
 
-  useEffect(() => {
+  // For handling question delete
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const handleQuestionDelete = () => {
+    setMenuAnchor(null);
+    setDialogOpen(true);
+  };
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };
+  const deleteQuestion = async () => {
+    handleDialogClose();
+
+    if (!targetQuestion) {
+      return;
+    }
+
+    const result = await deleteQuestionById(targetQuestion);
+    if (!result) {
+      toast.error(FAILED_QUESTION_DELETE);
+      return;
+    }
+
+    toast.success(SUCCESS_QUESTION_DELETE);
+    getQuestionCategories(dispatch);
     getQuestionList(
-      page,
+      page + 1, // convert from 0-based indexing
       rowsPerPage,
       searchFilter,
       complexityFilter,
       categoryFilter,
-      dispatch
+      dispatch,
+    );
+  };
+
+  useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
+
+  useEffect(() => {
+    getQuestionList(
+      page + 1, // convert from 0-based indexing
+      rowsPerPage,
+      searchFilter,
+      complexityFilter,
+      categoryFilter,
+      dispatch,
     );
   }, [page, searchFilter, complexityFilter, categoryFilter]);
 
+  // Check if the user is admin
+  const auth = useAuth();
+  if (!auth) {
+    throw new Error("useAuth() must be used within AuthProvider");
+  }
+  const { user } = auth;
+  const isAdmin = user && user.isAdmin;
+
+  if (state.questionCategoriesError || state.selectedQuestionError) {
+    return (
+      <ServerError
+        title="Sorry, something went wrong..."
+        subtitle="Please refresh the page or try again later!"
+      />
+    );
+  }
+
   return (
     <AppMargin>
-      <Box sx={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+      <Box
+        sx={(theme) => ({
+          marginTop: theme.spacing(4),
+          marginBottom: theme.spacing(4),
+        })}
+      >
         <Stack
           direction="row"
           sx={{ justifyContent: "space-between", alignItems: "center" }}
@@ -108,11 +179,10 @@ const QuestionList: React.FC = () => {
           container
           rowSpacing={1}
           columnSpacing={2}
-          sx={{
+          sx={(theme) => ({
             marginTop: theme.spacing(2),
-            "& fieldset": { borderRadius: theme.spacing(2.5) },
             "& .MuiTextField-root": { width: "100%" },
-          }}
+          })}
         >
           <Grid2 size={12}>
             <TextField
@@ -136,12 +206,12 @@ const QuestionList: React.FC = () => {
               label="Title"
               onChange={(input) => {
                 setSearchInput(input.target.value);
-                setSearchFilter(input.target.value);
+                setSearchFilter(input.target.value.toLowerCase().trim());
               }}
               helperText={
                 searchInput.length + ` / ${searchCharacterLimit} characters`
               }
-              disabled={state.questions.length === 0}
+              disabled={state.questions.length === 0 && !areQuestionsFiltered()}
             />
           </Grid2>
           <Grid2 size={4}>
@@ -155,14 +225,14 @@ const QuestionList: React.FC = () => {
               renderInput={(params) => (
                 <TextField {...params} label="Complexity" />
               )}
-              disabled={state.questions.length === 0}
+              disabled={state.questions.length === 0 && !areQuestionsFiltered()}
             />
           </Grid2>
           <Grid2 size={8}>
             <Autocomplete
               multiple
               disableCloseOnSelect
-              options={categoryList}
+              options={state.questionCategories}
               getOptionDisabled={(option) =>
                 selectedCategories.length > categorySelectionLimit &&
                 !selectedCategories.includes(option as string)
@@ -186,16 +256,16 @@ const QuestionList: React.FC = () => {
                   }}
                 />
               )}
-              disabled={state.questions.length === 0}
+              disabled={state.questions.length === 0 && !areQuestionsFiltered()}
             />
           </Grid2>
         </Grid2>
         <TableContainer>
           <Table
-            sx={{
+            sx={(theme) => ({
               "& .MuiTableCell-root": { padding: theme.spacing(1.2) },
               whiteSpace: "nowrap",
-            }}
+            })}
           >
             <TableHead>
               <TableRow>
@@ -242,10 +312,10 @@ const QuestionList: React.FC = () => {
                           question.complexity === "Easy"
                             ? "success.main"
                             : question.complexity === "Medium"
-                            ? "#D2C350"
-                            : question.complexity === "Hard"
-                            ? "error.main"
-                            : grey[500],
+                              ? "#D2C350"
+                              : question.complexity === "Hard"
+                                ? "error.main"
+                                : grey[500],
                       }}
                     >
                       {question.complexity}
@@ -264,29 +334,40 @@ const QuestionList: React.FC = () => {
                           key={category}
                           label={category}
                           color="primary"
-                          sx={{
+                          sx={(theme) => ({
                             marginLeft: theme.spacing(0.5),
                             marginRight: theme.spacing(0.5),
-                          }}
+                          })}
                         />
                       ))}
                       <Chip
-                        sx={{ visibility: "hidden", width: theme.spacing(0.5) }}
+                        sx={(theme) => ({
+                          visibility: "hidden",
+                          width: theme.spacing(0.5),
+                        })}
                       />
                     </Stack>
                   </TableCell>
                   {isAdmin && (
                     <TableCell sx={{ borderTop: "1px solid #E0E0E0" }}>
-                      <IconButton type="button" onClick={handleMenuOpen}>
+                      <IconButton
+                        type="button"
+                        onClick={(event) => handleMenuOpen(event, question.id)}
+                      >
                         <MoreVert />
                       </IconButton>
                       <Menu
-                        anchorEl={anchorEl}
+                        anchorEl={menuAnchor}
                         open={menuOpen}
                         onClose={handleMenuClose}
+                        sx={{
+                          "& .MuiPaper-root": {
+                            boxShadow: "0px 3px 5px rgba(0, 0, 0, 0.2)",
+                          },
+                        }}
                       >
                         <MenuItem
-                          onClick={() => navigate(`${question.id}/edit`)}
+                          onClick={() => navigate(`${targetQuestion}/edit`)}
                         >
                           <ListItemIcon>
                             <Edit
@@ -295,9 +376,7 @@ const QuestionList: React.FC = () => {
                           </ListItemIcon>
                           Edit
                         </MenuItem>
-                        <MenuItem
-                          onClick={() => handleQuestionDelete(question.id)}
-                        >
+                        <MenuItem onClick={handleQuestionDelete}>
                           <ListItemIcon>
                             <Delete
                               sx={{ fontSize: "large", color: "error.main" }}
@@ -310,6 +389,14 @@ const QuestionList: React.FC = () => {
                   )}
                 </TableRow>
               ))}
+              <ConfirmationDialog
+                titleText="Delete question?"
+                bodyText="This question will be permanently deleted from the repository."
+                primaryAction="Delete"
+                handlePrimaryAction={() => deleteQuestion()}
+                open={dialogOpen}
+                handleClose={handleDialogClose}
+              />
             </TableBody>
           </Table>
         </TableContainer>
@@ -321,7 +408,7 @@ const QuestionList: React.FC = () => {
           page={page}
           onPageChange={(_, page) => setPage(page)}
         />
-        {state.questions.length === 0 && (
+        {state.questions.length === 0 && !areQuestionsFiltered() && (
           <Stack
             direction="column"
             spacing={1}

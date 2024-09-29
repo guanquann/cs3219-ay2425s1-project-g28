@@ -8,14 +8,15 @@ import {
   readQuestionIndiv,
   readCategories,
 } from "../controllers/questionController.ts";
+import { verifyAdminToken } from "../middlewares/basicAccessControl.ts";
 
 const router = express.Router();
 
-router.post("/", createQuestion);
+router.post("/", verifyAdminToken, createQuestion);
 
-router.post("/images", createImageLink);
+router.post("/images", verifyAdminToken, createImageLink);
 
-router.put("/:id", updateQuestion);
+router.put("/:id", verifyAdminToken, updateQuestion);
 
 router.get("/categories", readCategories);
 
@@ -23,6 +24,6 @@ router.get("/", readQuestionsList);
 
 router.get("/:id", readQuestionIndiv);
 
-router.delete("/:id", deleteQuestion);
+router.delete("/:id", verifyAdminToken, deleteQuestion);
 
 export default router;

@@ -68,7 +68,7 @@ export function validateUsername(username: string): {
     return {
       isValid: false,
       message:
-        "Username must only contain alphanumeric characters, underscores, and full stops",
+        "Username must only contain alphanumeric characters, underscores and full stops",
     };
   }
 
@@ -86,10 +86,10 @@ export function validateName(
     };
   }
 
-  if (!/^[a-zA-Z0-9\s]+$/.test(name)) {
+  if (!/^[a-zA-Z\s-]*$/.test(name)) {
     return {
       isValid: false,
-      message: `${type} must only contain alphanumeric characters and white spaces`,
+      message: `${type} must only contain alphabetical, hypen and white space characters`,
     };
   }
 

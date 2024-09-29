@@ -5,6 +5,12 @@ info:
   version: 1.0.0
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Question:
       properties:
@@ -93,6 +99,8 @@ paths:
         - questions
       summary: Creates a question
       description: Creates a question
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -134,11 +142,13 @@ paths:
           name: page
           type: integer
           required: true
+          default: 1
           description: Page of questions to return
         - in: query
           name: qnLimit
           type: integer
           required: true
+          default: 10
           description: Limit on number of questions to return
         - in: query
           name: title
@@ -176,7 +186,7 @@ paths:
                   message:
                     type: string
                     description: Message
-                  totalQns:
+                  questionCount:
                     type: integer
                     description: Total number of questions
                   questions:
@@ -185,12 +195,6 @@ paths:
                       $ref: "#/definitions/Question"
         400:
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/definitions/Error"
-        404:
-          description: Question Not Found
           content:
             application/json:
               schema:
@@ -207,6 +211,8 @@ paths:
         - questions
       summary: Updates a question
       description: Updates a question
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -248,6 +254,8 @@ paths:
       tags:
         - questions
       summary: Deletes a question
+      security:
+        - bearerAuth: []
       description: Deletes a question
       parameters:
         - in: path
@@ -290,7 +298,7 @@ paths:
           required: true
           description: Question id
       responses:
-        200: 
+        200:
           description: Successful Response
           content:
             application/json:
@@ -302,7 +310,7 @@ paths:
                     description: Message
                   question:
                     $ref: "#/definitions/Question"
-        404: 
+        404:
           description: Question Not Found
           content:
             application/json:
@@ -321,7 +329,7 @@ paths:
       summary: Returns question categories
       description: Returns list of unique question categories
       responses:
-        200: 
+        200:
           description: Successful Response
           content:
             application/json:
@@ -336,12 +344,6 @@ paths:
                     items:
                       type: string
                     description: Categories
-        404:
-          description: Categories Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/definitions/Error"
         500:
           description: Internal Server Error
           content:

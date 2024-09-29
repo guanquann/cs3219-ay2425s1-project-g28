@@ -200,7 +200,7 @@ const Home: React.FC = () => {
                   })
                 }
               >
-                {state.categories.map((category) => (
+                {state.questionCategories.map((category) => (
                   <MenuItem key={category} value={category}>
                     <Checkbox
                       checked={selectedCategories.indexOf(category) > -1}

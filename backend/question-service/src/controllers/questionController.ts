@@ -12,7 +12,6 @@ import {
   QN_RETRIEVED_MESSAGE,
   PAGE_LIMIT_REQUIRED_MESSAGE,
   PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE,
-  CATEGORIES_NOT_FOUND_MESSAGE,
   CATEGORIES_RETRIEVED_MESSAGE,
   MONGO_OBJ_ID_FORMAT,
   MONGO_OBJ_ID_MALFORMED_MESSAGE,
@@ -204,19 +203,14 @@ export const readQuestionsList = async (
       };
     }
 
-    const filteredTotalQuestions = await Question.countDocuments(query);
-    if (filteredTotalQuestions == 0) {
-      res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
-      return;
-    }
-
+    const filteredQuestionCount = await Question.countDocuments(query);
     const filteredQuestions = await Question.find(query)
       .skip((pageInt - 1) * qnLimitInt)
       .limit(qnLimitInt);
 
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
-      totalQns: filteredTotalQuestions,
+      questionCount: filteredQuestionCount,
       questions: filteredQuestions.map(formatQuestionResponse),
     });
   } catch (error) {
@@ -247,14 +241,11 @@ export const readQuestionIndiv = async (
 };
 
 export const readCategories = async (
-  req: Request,
+  _req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const uniqueCats = await Question.distinct("category");
-    if (!uniqueCats || uniqueCats.length == 0) {
-      res.status(404).json({ message: CATEGORIES_NOT_FOUND_MESSAGE });
-    }
 
     res.status(200).json({
       message: CATEGORIES_RETRIEVED_MESSAGE,

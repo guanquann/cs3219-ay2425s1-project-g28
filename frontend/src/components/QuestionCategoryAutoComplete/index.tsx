@@ -1,34 +1,40 @@
 import { Autocomplete, Chip, TextField } from "@mui/material";
 import { createFilterOptions } from "@mui/material/Autocomplete";
-import { categoryList } from "../../utils/constants";
+import { useEffect, useReducer } from "react";
+import reducer, {
+  getQuestionCategories,
+  initialState,
+} from "../../reducers/questionReducer";
 
 interface QuestionCategoryAutoCompleteProps {
   selectedCategories: string[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> = ({
-  selectedCategories,
-  setSelectedCategories,
-}) => {
-  // TODO
-  // Fetch category list from the server
-
+const QuestionCategoryAutoComplete: React.FC<
+  QuestionCategoryAutoCompleteProps
+> = ({ selectedCategories, setSelectedCategories }) => {
   const filter = createFilterOptions<string>();
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
 
   return (
     <Autocomplete
       multiple
       freeSolo
-      options={categoryList}
+      options={state.questionCategories}
       size="small"
       sx={{ marginTop: 2 }}
       value={selectedCategories}
-      onChange={(e, newCategoriesSelected) => {
-        const newValue = newCategoriesSelected[newCategoriesSelected.length - 1];
+      onChange={(_e, newCategoriesSelected) => {
+        const newValue =
+          newCategoriesSelected[newCategoriesSelected.length - 1];
         if (typeof newValue === "string" && newValue.startsWith(`Add: "`)) {
           const newCategory = newValue.slice(6, -1);
-          categoryList.push(newCategory);
+          state.questionCategories.push(newCategory);
           setSelectedCategories((prev) => [...prev, newCategory]);
         } else {
           setSelectedCategories(newCategoriesSelected);
@@ -55,7 +61,8 @@ const QuestionCategoryAutoComplete: React.FC<QuestionCategoryAutoCompleteProps> 
               size="small"
               label={
                 typeof option === "string" && option.startsWith(`Add: "`)
-                  ? option.slice(6, -1)
+                  ? /* c8 ignore next */
+                    option.slice(6, -1)
                   : option
               }
               key={key}

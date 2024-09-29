@@ -1,5 +1,6 @@
 import { Dispatch } from "react";
 import { questionClient } from "../utils/api";
+import { isString, isStringArray } from "../utils/typeChecker";
 
 type QuestionDetail = {
   id: string;
@@ -14,31 +15,32 @@ type QuestionList = {
   questionCount: number;
 };
 
-type CategoryList = {
-  categories: Array<string>;
-};
-
 enum QuestionActionTypes {
-  ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
-  ERROR_FETCHING_CATEGORY_LIST = "error_fetching_category_list",
-  VIEW_QUESTION = "view_question",
+  CREATE_QUESTION = "create_question",
+  VIEW_QUESTION_CATEGORIES = "view_question_categories",
   VIEW_QUESTION_LIST = "view_question_list",
-  VIEW_CATEGORY_LIST = "view_category_list",
-  DELETE_QUESTION = "delete_question",
+  VIEW_QUESTION = "view_question",
+  UPDATE_QUESTION = "update_question",
+  ERROR_CREATING_QUESTION = "error_creating_question",
+  ERROR_FETCHING_QUESTION_CATEGORIES = "error_fetching_question_categories",
+  ERROR_FETCHING_QUESTION_LIST = "error_fetching_question_list",
+  ERROR_FETCHING_SELECTED_QN = "error_fetching_selected_qn",
+  ERROR_UPDATING_QUESTION = "error_updating_question",
 }
 
 type QuestionActions = {
   type: QuestionActionTypes;
-  payload: QuestionList | QuestionDetail | CategoryList | string;
+  payload: QuestionList | QuestionDetail | string[] | string;
 };
 
 type QuestionsState = {
-  categories: Array<string>;
+  questionCategories: Array<string>;
   questions: Array<QuestionDetail>;
   questionCount: number;
   selectedQuestion: QuestionDetail | null;
+  questionCategoriesError: string | null;
+  questionListError: string | null;
   selectedQuestionError: string | null;
-  categoryListError: string | null;
 };
 
 // eslint-disable-next-line  @typescript-eslint/no-explicit-any
@@ -48,15 +50,11 @@ const isQuestion = (question: any): question is QuestionDetail => {
   }
 
   return (
-    typeof question.id === "string" &&
-    typeof question.title === "string" &&
-    typeof question.description === "string" &&
-    typeof question.complexity === "string" &&
-    Array.isArray(question.categories) &&
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    (question.categories as Array<any>).every(
-      (value) => typeof value === "string"
-    )
+    isString(question.id) &&
+    isString(question.title) &&
+    isString(question.description) &&
+    isString(question.complexity) &&
+    isStringArray(question.categories)
   );
 };
 
@@ -74,28 +72,99 @@ const isQuestionList = (questionList: any): questionList is QuestionList => {
   );
 };
 
-// eslint-disable-next-line  @typescript-eslint/no-explicit-any
-const isCategoryList = (categoryList: any): categoryList is CategoryList => {
-  if (!categoryList || typeof categoryList !== "object") {
-    return false;
-  }
-
-  return (
-    Array.isArray(categoryList.categories) &&
-    // eslint-disable-next-line  @typescript-eslint/no-explicit-any
-    (categoryList.categories as Array<any>).every(
-      (value) => typeof value === "string"
-    )
-  );
-};
-
 export const initialState: QuestionsState = {
-  categories: [],
+  questionCategories: [],
   questions: [],
   questionCount: 0,
   selectedQuestion: null,
+  questionCategoriesError: null,
+  questionListError: null,
   selectedQuestionError: null,
-  categoryListError: null,
+};
+
+export const createQuestion = async (
+  question: Omit<QuestionDetail, "id">,
+  dispatch: Dispatch<QuestionActions>
+): Promise<boolean> => {
+  const accessToken = localStorage.getItem("token");
+  return questionClient
+    .post(
+      "/",
+      {
+        title: question.title,
+        description: question.description,
+        complexity: question.complexity,
+        category: question.categories,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
+    .then((res) => {
+      dispatch({
+        type: QuestionActionTypes.CREATE_QUESTION,
+        payload: res.data,
+      });
+      return true;
+    })
+    .catch((err) => {
+      dispatch({
+        type: QuestionActionTypes.ERROR_CREATING_QUESTION,
+        payload: err.response.data.message,
+      });
+      return false;
+    });
+};
+
+export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
+  questionClient
+    .get("/categories")
+    .then((res) =>
+      dispatch({
+        type: QuestionActionTypes.VIEW_QUESTION_CATEGORIES,
+        payload: res.data.categories,
+      })
+    )
+    .catch((err) =>
+      dispatch({
+        type: QuestionActionTypes.ERROR_FETCHING_QUESTION_CATEGORIES,
+        payload: err.response.data.message,
+      })
+    );
+};
+
+export const getQuestionList = (
+  page: number,
+  qnLimit: number,
+  title: string,
+  complexities: string[],
+  categories: string[],
+  dispatch: Dispatch<QuestionActions>
+) => {
+  questionClient
+    .get("", {
+      params: {
+        page: page,
+        qnLimit: qnLimit,
+        title: title,
+        complexities: complexities,
+        categories: categories,
+      },
+    })
+    .then((res) =>
+      dispatch({
+        type: QuestionActionTypes.VIEW_QUESTION_LIST,
+        payload: res.data,
+      })
+    )
+    .catch((err) =>
+      dispatch({
+        type: QuestionActionTypes.ERROR_FETCHING_QUESTION_LIST,
+        payload: err.response.data.message,
+      })
+    );
 };
 
 export const getQuestionById = (
@@ -118,21 +187,55 @@ export const getQuestionById = (
     );
 };
 
-export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
-  questionClient
-    .get(`/categories`)
+export const updateQuestionById = async (
+  questionId: string,
+  question: Omit<QuestionDetail, "id">,
+  dispatch: Dispatch<QuestionActions>
+): Promise<boolean> => {
+  const accessToken = localStorage.getItem("token");
+  return questionClient
+    .put(
+      `/${questionId}`,
+      {
+        title: question.title,
+        description: question.description,
+        complexity: question.complexity,
+        category: question.categories,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
     .then((res) => {
       dispatch({
-        type: QuestionActionTypes.VIEW_CATEGORY_LIST,
+        type: QuestionActionTypes.UPDATE_QUESTION,
         payload: res.data,
       });
+      return true;
     })
-    .catch((err) =>
+    .catch((err) => {
       dispatch({
-        type: QuestionActionTypes.ERROR_FETCHING_CATEGORY_LIST,
+        type: QuestionActionTypes.ERROR_UPDATING_QUESTION,
         payload: err.response.data.message,
-      })
-    );
+      });
+      return false;
+    });
+};
+
+export const deleteQuestionById = async (questionId: string) => {
+  try {
+    const accessToken = localStorage.getItem("token");
+    await questionClient.delete(`/${questionId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const setSelectedQuestionError = (
@@ -145,84 +248,21 @@ export const setSelectedQuestionError = (
   });
 };
 
-export const getQuestionList = (
-  page: number,
-  qnLimit: number,
-  title: string,
-  complexities: string[],
-  categories: string[],
-  dispatch: Dispatch<QuestionActions>
-) => {
-  // let queryUrl = `/questions?page=${page}&qnLimit=${qnLimit}&title=${title}`;
-  // complexities.map((complexity) => {
-  //   queryUrl += `&complexities=${complexity}`
-  // });
-  // categories.map((category) => {
-  //   queryUrl += `&categories=${category}`
-  // });
-  // questionClient
-  //   .get(queryUrl)
-  //   .then((res) =>
-  //     dispatch({ type: QuestionActionTypes.VIEW_QUESTION_LIST, payload: res.data })
-  //   );
-  // // OR
-  // questionClient
-  //   .get("/questions", {params: {
-  //     page: page,
-  //     qnLimit: qnLimit,
-  //     title: title,
-  //     complexities: complexities,
-  //     categories: categories,
-  //   }})
-  //   .then((res) =>
-  //     dispatch({ type: QuestionActionTypes.VIEW_QUESTION_LIST, payload: res.data })
-  //   );
-  const md =
-    "# Sample header 1\n" +
-    "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<br /><br />" +
-    "**Example ordered list:**\n" +
-    "1. Item 1\n" +
-    "2. `Item 2`\n\n" +
-    "*Example unordered list:*\n" +
-    "- Item 1\n" +
-    "- Item 2";
-  dispatch({
-    type: QuestionActionTypes.VIEW_QUESTION_LIST,
-    payload: {
-      questions: [
-        {
-          id: "1",
-          title: "Test Question 1",
-          description: md,
-          complexity: "Easy",
-          categories: ["Databases", "Strings"],
-        },
-        {
-          id: "2",
-          title: "Test Question 2",
-          description: md,
-          complexity: "Medium",
-          categories: ["Arrays", "Bit Manipulation"],
-        },
-      ],
-      questionCount: 2,
-    },
-  });
-};
-
-export const deleteQuestionById = (
-  questionId: string,
-  dispatch: Dispatch<QuestionActions>
-) => {
-  // questionClient
-  //   .delete(`/questions/${questionId}`)
-  //   .then((res) =>
-  //     dispatch({ type: QuestionActionTypes.DELETE_QUESTION, payload: res.data })
-  //   );
-  dispatch({
-    type: QuestionActionTypes.DELETE_QUESTION,
-    payload: "",
-  });
+export const createImageUrls = async (
+  formData: FormData
+): Promise<{ imageUrls: string[]; message: string } | null> => {
+  try {
+    const accessToken = localStorage.getItem("token");
+    const response = await questionClient.post("/images", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch {
+    return null;
+  }
 };
 
 const reducer = (
@@ -232,26 +272,19 @@ const reducer = (
   const { type } = action;
 
   switch (type) {
-    case QuestionActionTypes.ERROR_FETCHING_SELECTED_QN: {
-      const { payload } = action;
-      if (typeof payload !== "string") {
-        return state;
-      }
-      return { ...state, selectedQuestionError: payload };
-    }
-    case QuestionActionTypes.ERROR_FETCHING_CATEGORY_LIST: {
-      const { payload } = action;
-      if (typeof payload !== "string") {
-        return state;
-      }
-      return { ...state, categoryListError: payload };
-    }
-    case QuestionActionTypes.VIEW_QUESTION: {
+    case QuestionActionTypes.CREATE_QUESTION: {
       const { payload } = action;
       if (!isQuestion(payload)) {
         return state;
       }
-      return { ...state, selectedQuestion: payload };
+      return { ...state, questions: [payload, ...state.questions] };
+    }
+    case QuestionActionTypes.VIEW_QUESTION_CATEGORIES: {
+      const { payload } = action;
+      if (!isStringArray(payload)) {
+        return state;
+      }
+      return { ...state, questionCategories: payload };
     }
     case QuestionActionTypes.VIEW_QUESTION_LIST: {
       const { payload } = action;
@@ -264,21 +297,62 @@ const reducer = (
         questionCount: payload.questionCount,
       };
     }
-    case QuestionActionTypes.VIEW_CATEGORY_LIST: {
+    case QuestionActionTypes.VIEW_QUESTION: {
       const { payload } = action;
-      if (!isCategoryList(payload)) {
+      if (!isQuestion(payload)) {
+        return state;
+      }
+      return { ...state, selectedQuestion: payload };
+    }
+    case QuestionActionTypes.UPDATE_QUESTION: {
+      const { payload } = action;
+      if (!isQuestion(payload)) {
         return state;
       }
       return {
         ...state,
-        categories: payload.categories,
+        questions: state.questions.map((question) =>
+          question.id === payload.id ? payload : question
+        ),
       };
     }
-    case QuestionActionTypes.DELETE_QUESTION: {
-      // TODO
-      // const { payload } = action;
-      return state;
+    case QuestionActionTypes.ERROR_CREATING_QUESTION: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, selectedQuestionError: payload };
     }
+    case QuestionActionTypes.ERROR_FETCHING_QUESTION_CATEGORIES: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, questionCategoriesError: payload };
+    }
+    case QuestionActionTypes.ERROR_FETCHING_QUESTION_LIST: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, questionListError: payload };
+    }
+    case QuestionActionTypes.ERROR_FETCHING_SELECTED_QN: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, selectedQuestionError: payload };
+    }
+    case QuestionActionTypes.ERROR_UPDATING_QUESTION: {
+      const { payload } = action;
+      if (!isString(payload)) {
+        return state;
+      }
+      return { ...state, selectedQuestionError: payload };
+    }
+    default:
+      return state;
   }
 };
 

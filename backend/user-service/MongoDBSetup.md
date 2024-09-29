@@ -1,4 +1,4 @@
-# Setting up MongoDB Instance for User Service
+# Setting up MongoDB Instance
 
 1. Visit the MongoDB Atlas Site [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas) and click on "Try Free"
 
@@ -33,11 +33,10 @@
 
 ![alt text](./GuideAssets/Selection4.png)
 
-6. You will be prompted to set up Security for the database by providing `Username and Password`. Select that option and enter `Username` and `Password`. Please keep this safe as it will be used in User Service later on.
 
 ![alt text](./GuideAssets/Security.png)
 
-7. Next, click on `Add my Current IP Address`. This will whiteliste your IP address and allow you to connect to the MongoDB Database.
+7. Next, click on `Add my Current IP Address`. This will whitelist your IP address and allow you to connect to the MongoDB Database.
 
 ![alt text](./GuideAssets/Network.png)
 

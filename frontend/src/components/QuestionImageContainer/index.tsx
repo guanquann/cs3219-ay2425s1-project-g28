@@ -1,13 +1,14 @@
 import { useState } from "react";
+/* c8 ignore next */
 import { styled } from "@mui/material/styles";
 import { Button, ImageList, ImageListItem } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { toast } from "react-toastify";
-import axios from "axios";
 
-import { questionClient } from "../../utils/api";
+import { createImageUrls } from "../../reducers/questionReducer";
 import QuestionImage from "../QuestionImage";
 import QuestionImageDialog from "../QuestionImageDialog";
+import { FAILED_FILE_UPLOAD, SUCCESS_FILE_UPLOAD } from "../../utils/constants";
 
 interface QuestionImageContainerProps {
   uploadedImagesUrl: string[];
@@ -39,7 +40,9 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
     setOpen(false);
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (!event.target.files) {
       return;
     }
@@ -58,28 +61,20 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
       formData.append("images[]", file);
     }
 
-    try {
-      const response = await questionClient.post("/images", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: false,
-      });
-
-      const data = response.data;
-      for (const imageUrl of data.imageUrls) {
-        setUploadedImagesUrl((prev) => [...prev, imageUrl]);
-      }
-
-      toast.success("File uploaded successfully");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message || "Error uploading file");
-      } else {
-        console.error(error);
-        toast.error("Error uploading file");
-      }
+    if (formData.getAll("images[]").length === 0) {
+      return;
     }
+
+    createImageUrls(formData).then((res) => {
+      if (res) {
+        for (const imageUrl of res.imageUrls) {
+          setUploadedImagesUrl((prev) => [...prev, imageUrl]);
+        }
+        toast.success(SUCCESS_FILE_UPLOAD);
+      } else {
+        toast.error(FAILED_FILE_UPLOAD);
+      }
+    });
   };
 
   if (uploadedImagesUrl.length === 0) {
@@ -102,6 +97,7 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
         <FileUploadIcon />
         Click to upload images. The maximum image size accepted is 5MB.
         <FileUploadInput
+          data-testid="file-input"
           type="file"
           accept="image/png,image/jpeg"
           onChange={(event) => handleImageUpload(event)}
@@ -115,7 +111,11 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
     <>
       <ImageList cols={7} rowHeight={128} sx={{ paddingTop: 2 }}>
         {uploadedImagesUrl.map((image) => (
-          <QuestionImage key={image} url={image} handleClickOpen={handleClickOpen} />
+          <QuestionImage
+            key={image}
+            url={image}
+            handleClickOpen={handleClickOpen}
+          />
         ))}
 
         <ImageListItem sx={{ width: 128, height: 128 }}>
@@ -137,6 +137,7 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
             <FileUploadIcon />
             Upload images
             <FileUploadInput
+              data-testid="file-input"
               type="file"
               accept="image/png,image/jpeg"
               onChange={(event) => handleImageUpload(event)}
@@ -146,7 +147,11 @@ const QuestionImageContainer: React.FC<QuestionImageContainerProps> = ({
         </ImageListItem>
       </ImageList>
 
-      <QuestionImageDialog value={selectedValue} open={open} handleClose={handleClose} />
+      <QuestionImageDialog
+        value={selectedValue}
+        open={open}
+        handleClose={handleClose}
+      />
     </>
   );
 };
