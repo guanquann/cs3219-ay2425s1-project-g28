@@ -29,7 +29,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
 }) => {
   const validatePasswordError = (
     passwordVal: boolean,
-    password: string,
+    password: string
   ): boolean => {
     return passwordVal
       ? password.length < 8 ||
@@ -44,7 +44,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
   const comparePasswordError = (
     isMatch: boolean,
     password: string,
-    passwordToMatch: string | undefined,
+    passwordToMatch: string | undefined
   ): boolean => {
     return isMatch ? password != passwordToMatch : false;
   };
@@ -65,7 +65,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
         validatePasswordError(passwordVal, password) ||
         comparePasswordError(isMatch, password, passwordToMatch) ||
         checkEmptyError(password)
-      ),
+      )
     );
   }, [passwordVal, isMatch, password, passwordToMatch, setValidity]);
 
@@ -74,13 +74,13 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
   };
 
   const handleMouseUpPassword = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
   };
@@ -93,7 +93,7 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
         validatePasswordError(passwordVal, val) ||
         comparePasswordError(isMatch, val, passwordToMatch) ||
         checkEmptyError(val)
-      ),
+      )
     );
   };
 
@@ -156,9 +156,9 @@ const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
           >
             Password must contain at least 1 digit
           </FormHelperText>
-          {/*eslint-disable-next-line no-useless-escape*/}
           <FormHelperText
             sx={(theme) => ({ color: theme.palette.success.main })}
+            // eslint-disable-next-line no-useless-escape
             error={!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)}
           >
             Password must contain at least 1 special character
