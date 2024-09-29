@@ -77,6 +77,9 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
         helperText={error}
         type={showPassword ? "text" : "password"}
         slotProps={{
+          htmlInput: {
+            "data-testid": label
+          },
           input: {
             endAdornment: isPasswordField && (
               <InputAdornment position="end">
@@ -84,7 +87,11 @@ const CustomTextField: React.FC<CustomTextFieldProps> = ({
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                 >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                  {showPassword ? (
+                    <VisibilityOff sx={(theme) => ({ fontSize: theme.spacing(2.5) })} />
+                  ) : (
+                    <Visibility sx={(theme) => ({ fontSize: theme.spacing(2.5) })} />
+                  )}
                 </IconButton>
               </InputAdornment>
             ),
