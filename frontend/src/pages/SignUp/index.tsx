@@ -146,6 +146,8 @@ const SignUp: React.FC = () => {
             </Typography>
             <Typography 
               component="span"
+              role="button"
+              tabIndex={0}
               sx={{
                 fontSize: 14,
                 cursor: "pointer",
