@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const CustomChip: React.FC<{
   label: string;
+  // eslint-disable-next-line  @typescript-eslint/no-explicit-any
   onDelete: (event: any) => void;
 }> = ({ label, onDelete }) => {
   return (

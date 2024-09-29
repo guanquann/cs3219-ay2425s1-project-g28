@@ -2,17 +2,11 @@ import {
   Autocomplete,
   Button,
   Card,
-  Checkbox,
-  Chip,
   FormControl,
   Grid2,
-  ListItemText,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useEffect, useReducer, useState } from "react";
 
 import classes from "./index.module.css";
