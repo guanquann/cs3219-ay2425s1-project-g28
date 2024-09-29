@@ -1,19 +1,18 @@
 import { forwardRef, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import PasswordTextField from '../PasswordTextField';
-//import { userClient } from '../../utils/api';
-//import axios from 'axios';
-//import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils/constants';
+import { userClient } from '../../utils/api';
+import axios from 'axios';
+import { FAILED_PW_UPDATE_MESSAGE, SUCCESS_PW_UPDATE_MESSAGE } from '../../utils/constants';
 
 interface ChangePasswordModalProps {
   handleClose: () => void;
   userId: string;
-  onUpdate: (message: string, isSuccess: boolean) => void;
+  onUpdate: (isProfileEdit: boolean, message: string, isSuccess: boolean) => void;
 }
 
 const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>((props, ref) => {
-  const { handleClose } = props;
-  //const { handleClose, userId, onUpdate } = props;
+  const { handleClose, userId, onUpdate } = props;
   const [currPassword, setCurrPassword] = useState<string>('');
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -25,8 +24,7 @@ const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>
   const isUpdateDisabled = !(isCurrPasswordValid && isNewPasswordValid && isConfirmPasswordValid);
 
   const handleSubmit = async () => {
-    //TODO: test with token (only tested without)
-    /*const accessToken = localStorage.getItem("token");
+    const accessToken = localStorage.getItem("token");
 
     try {
       await userClient.patch(
@@ -42,16 +40,16 @@ const ChangePasswordModal = forwardRef<HTMLDivElement, ChangePasswordModalProps>
           },
         });
       handleClose();
-      onUpdate(SUCCESS_PW_UPDATE_MESSAGE, true);
+      onUpdate(false, SUCCESS_PW_UPDATE_MESSAGE, true);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const message =
           error.response?.data.message || FAILED_PW_UPDATE_MESSAGE;
-        onUpdate(message, false);
+        onUpdate(false, message, false);
       } else {
-        onUpdate(FAILED_PW_UPDATE_MESSAGE, false);
+        onUpdate(false, FAILED_PW_UPDATE_MESSAGE, false);
       }
-    }*/
+    }
   };
 
   return (
