@@ -53,7 +53,7 @@ const QuestionList: React.FC = () => {
   const [searchFilter, setSearchFilter] = useDebounce<string>("", 1000);
   const [complexityFilter, setComplexityFilter] = useDebounce<string[]>(
     [],
-    1000,
+    1000
   );
   const [categoryFilter, setCategoryFilter] = useDebounce<string[]>([], 1000);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -72,7 +72,7 @@ const QuestionList: React.FC = () => {
   const menuOpen = Boolean(menuAnchor);
   const handleMenuOpen = (
     event: React.MouseEvent<HTMLElement>,
-    questionId: string,
+    questionId: string
   ) => {
     setMenuAnchor(event.currentTarget);
     setTargetQuestion(questionId);
@@ -112,7 +112,18 @@ const QuestionList: React.FC = () => {
       searchFilter,
       complexityFilter,
       categoryFilter,
-      dispatch,
+      dispatch
+    );
+  };
+
+  const updateQuestionList = () => {
+    getQuestionList(
+      page + 1, // convert from 0-based indexing
+      rowsPerPage,
+      searchFilter,
+      complexityFilter,
+      categoryFilter,
+      dispatch
     );
   };
 
@@ -121,15 +132,14 @@ const QuestionList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    getQuestionList(
-      page + 1, // convert from 0-based indexing
-      rowsPerPage,
-      searchFilter,
-      complexityFilter,
-      categoryFilter,
-      dispatch,
-    );
-  }, [page, searchFilter, complexityFilter, categoryFilter]);
+    if (page !== 0) {
+      setPage(0);
+    } else {
+      updateQuestionList();
+    }
+  }, [searchFilter, complexityFilter, categoryFilter]);
+
+  useEffect(() => updateQuestionList(), [page]);
 
   // Check if the user is admin
   const auth = useAuth();
@@ -312,10 +322,10 @@ const QuestionList: React.FC = () => {
                           question.complexity === "Easy"
                             ? "success.main"
                             : question.complexity === "Medium"
-                              ? "#D2C350"
-                              : question.complexity === "Hard"
-                                ? "error.main"
-                                : grey[500],
+                            ? "#D2C350"
+                            : question.complexity === "Hard"
+                            ? "error.main"
+                            : grey[500],
                       }}
                     >
                       {question.complexity}
