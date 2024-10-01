@@ -1,8 +1,5 @@
 import admin from "firebase-admin";
 
-console.log(process.env.FIREBASE_PROJECT_ID);
-console.log(process.env);
-
 admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
