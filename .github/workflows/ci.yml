@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - "*"
-  pull_request:
-    branches:
-      - "*"
 
 env:
   NODE_VERSION: 20
@@ -43,10 +40,6 @@ jobs:
           echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
           echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
           echo "FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET }}" >> .env
-      - name: Debug
-        working-directory: ${{ matrix.service }}
-        run: |
-          echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}"
       - name: Tests
         working-directory: ${{ matrix.service }}
         run: npm test
