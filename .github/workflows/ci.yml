@@ -33,6 +33,13 @@ jobs:
       - name: Linting
         working-directory: ${{ matrix.service }}
         run: npm run lint
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo TEST_VAR=blah >> .env
+          echo FIREBASE_PROJECT_ID="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
+          echo API_KEY=${{ secrets.API_KEY }} >> .env
+          cat .env
       - name: Tests
         working-directory: ${{ matrix.service }}
         env:
