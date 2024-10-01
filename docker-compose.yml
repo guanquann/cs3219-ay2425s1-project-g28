@@ -7,7 +7,6 @@ services:
       - 3001:3001
     networks:
       - peerprep-network
-    restart: always
   question-service:
     image: peerprep/question-service
     build: ./backend/question-service
@@ -16,7 +15,6 @@ services:
       - 3000:3000
     networks:
       - peerprep-network
-    restart: always
 
 networks:
   peerprep-network:
