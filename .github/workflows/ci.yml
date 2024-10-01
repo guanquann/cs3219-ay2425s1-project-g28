@@ -49,9 +49,4 @@ jobs:
           echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}"
       - name: Tests
         working-directory: ${{ matrix.service }}
-        run: |
-          FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }} \
-          FIREBASE_PRIVATE_KEY=${{ env.FIREBASE_PRIVATE_KEY }} \
-          FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }} \
-          FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET }} \
-          npm test
+        run: npm test
