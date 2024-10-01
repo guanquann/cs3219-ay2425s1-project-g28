@@ -66,6 +66,17 @@ const QuestionList: React.FC = () => {
     );
   };
 
+  const updateQuestionList = () => {
+    getQuestionList(
+      page + 1, // convert from 0-based indexing
+      rowsPerPage,
+      searchFilter,
+      complexityFilter,
+      categoryFilter,
+      dispatch
+    );
+  };
+
   // For handling edit / delete menu
   const [targetQuestion, setTargetQuestion] = useState<string | null>(null);
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
@@ -106,25 +117,11 @@ const QuestionList: React.FC = () => {
 
     toast.success(SUCCESS_QUESTION_DELETE);
     getQuestionCategories(dispatch);
-    getQuestionList(
-      page + 1, // convert from 0-based indexing
-      rowsPerPage,
-      searchFilter,
-      complexityFilter,
-      categoryFilter,
-      dispatch
-    );
-  };
-
-  const updateQuestionList = () => {
-    getQuestionList(
-      page + 1, // convert from 0-based indexing
-      rowsPerPage,
-      searchFilter,
-      complexityFilter,
-      categoryFilter,
-      dispatch
-    );
+    if (state.questionCount % 10 !== 1 || page === 0) {
+      updateQuestionList();
+    } else {
+      setPage(page - 1);
+    }
   };
 
   useEffect(() => {
