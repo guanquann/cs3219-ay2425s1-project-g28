@@ -1,0 +1,14 @@
+services:
+  user-service:
+    image: peerprep/user-service
+    build: ./backend/user-service
+    env_file: ./backend/user-service/.env
+    ports:
+      - 3001:3001
+    networks:
+      - peerprep-network
+    restart: always
+
+networks:
+  peerprep-network:
+    driver: bridge
