@@ -11,6 +11,10 @@ env:
   FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
   FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
   FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+permissions:
+  contents: read
 
 jobs:
   ci:
@@ -40,6 +44,7 @@ jobs:
           echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
           echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
           echo "FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET }}" >> .env
+          echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> .env
       - name: Tests
         working-directory: ${{ matrix.service }}
         run: npm test
