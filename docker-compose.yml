@@ -8,6 +8,15 @@ services:
     networks:
       - peerprep-network
     restart: always
+  question-service:
+    image: peerprep/question-service
+    build: ./backend/question-service
+    env_file: ./backend/question-service/.env
+    ports:
+      - 3000:3000
+    networks:
+      - peerprep-network
+    restart: always
 
 networks:
   peerprep-network:
