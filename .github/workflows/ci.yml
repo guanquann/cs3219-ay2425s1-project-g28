@@ -33,13 +33,16 @@ jobs:
       - name: Linting
         working-directory: ${{ matrix.service }}
         run: npm run lint
-      - name: Set .env
+      - name: Set .env variables
         working-directory: ${{ matrix.service }}
         run: |
           touch .env
           echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}" >> .env
           echo "FIREBASE_PRIVATE_KEY=${{ env.FIREBASE_PRIVATE_KEY }}" >> .env
           echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
+      - name: Debug
+        working-directory: ${{ matrix.service }}
+        run: cat .env
       - name: Tests
         working-directory: ${{ matrix.service }}
         run: npm test
