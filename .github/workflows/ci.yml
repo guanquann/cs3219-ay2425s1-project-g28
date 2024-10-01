@@ -10,6 +10,8 @@ on:
 
 env:
   NODE_VERSION: 20
+  FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_TEST_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
 
 jobs:
   ci:
@@ -33,8 +35,8 @@ jobs:
       - name: Tests
         working-directory: ${{ matrix.service }}
         run: |
-          FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }} \
-          FIREBASE_PRIVATE_KEY=${{ vars.FIREBASE_PRIVATE_KEY }} \
-          FIREBASE_CLIENT_EMAIL=${{ vars.FIREBASE_CLIENT_EMAIL }} \
-          FIREBASE_DATABASE_URL=${{ vars.FIREBASE_DATABASE_URL }} \
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
+          FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }} \
+          FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }} \
+          FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }} \
           npm test
