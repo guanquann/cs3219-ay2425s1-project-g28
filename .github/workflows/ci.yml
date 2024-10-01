@@ -39,7 +39,8 @@ jobs:
           echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> .env
       - name: Debug
         working-directory: ${{ matrix.service }}
-        run: cat .env
+        run: |
+          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}"
       - name: Tests
         working-directory: ${{ matrix.service }}
         run: npm test
