@@ -38,7 +38,9 @@ jobs:
           touch .env
           echo TEST_VAR=blah >> .env
           echo FIREBASE_PROJECT_ID="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
-          echo API_KEY=${{ secrets.API_KEY }} >> .env
+          echo API_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }} >> .env
+          echo API_KEY=${{ env.FIREBASE_PRIVATE_KEY }} >> .env
+          echo API_KEY=${{ vars.FIREBASE_PRIVATE_KEY }} >> .env
           cat .env
       - name: Tests
         working-directory: ${{ matrix.service }}
