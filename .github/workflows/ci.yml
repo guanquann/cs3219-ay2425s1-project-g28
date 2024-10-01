@@ -10,6 +10,9 @@ on:
 
 env:
   NODE_VERSION: 20
+  FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+  FIREBASE_PRIVATE_KEY: ${{ vars.FIREBASE_PRIVATE_KEY }}
+  FIREBASE_CLIENT_EMAIL: ${{ vars.FIREBASE_CLIENT_EMAIL }}
 
 jobs:
   ci:
@@ -30,6 +33,13 @@ jobs:
       - name: Linting
         working-directory: ${{ matrix.service }}
         run: npm run lint
-      # - name: Tests
-      #   working-directory: ${{ matrix.service }}
-      #   run: npm test
+      - name: Set .env
+        working-directory: ${{ matrix.service }}
+        run: |
+          touch .env
+          echo "FIREBASE_FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}" >> .env
+          echo "FIREBASE_PRIVATE_KEY=${{ env.FIREBASE_PRIVATE_KEY }}" >> .env
+          echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
+      - name: Tests
+        working-directory: ${{ matrix.service }}
+        run: npm test
