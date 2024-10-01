@@ -117,7 +117,7 @@ const QuestionList: React.FC = () => {
 
     toast.success(SUCCESS_QUESTION_DELETE);
     getQuestionCategories(dispatch);
-    if (state.questionCount % 10 !== 1 || page === 0) {
+    if (state.questionCount % rowsPerPage !== 1 || page === 0) {
       updateQuestionList();
     } else {
       setPage(page - 1);
@@ -134,8 +134,10 @@ const QuestionList: React.FC = () => {
     } else {
       updateQuestionList();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchFilter, complexityFilter, categoryFilter]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => updateQuestionList(), [page]);
 
   // Check if the user is admin
