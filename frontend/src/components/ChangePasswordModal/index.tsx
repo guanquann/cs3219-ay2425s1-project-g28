@@ -1,136 +1,199 @@
-import { forwardRef, useState } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import PasswordTextField from "../PasswordTextField";
-import { userClient } from "../../utils/api";
-import axios from "axios";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
-  FAILED_PW_UPDATE_MESSAGE,
-  SUCCESS_PW_UPDATE_MESSAGE,
-} from "../../utils/constants";
+  Button,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  InputAdornment,
+  Stack,
+  styled,
+  TextField,
+} from "@mui/material";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 interface ChangePasswordModalProps {
-  handleClose: () => void;
-  userId: string;
-  onUpdate: (
-    isProfileEdit: boolean,
-    message: string,
-    isSuccess: boolean,
-  ) => void;
+  open: boolean;
+  onClose: () => void;
+  onUpdate: ({
+    oldPassword,
+    newPassword,
+  }: {
+    oldPassword: string;
+    newPassword: string;
+  }) => void;
 }
 
-const ChangePasswordModal = forwardRef<
-  HTMLDivElement,
-  ChangePasswordModalProps
->((props, ref) => {
-  const { handleClose, userId, onUpdate } = props;
-  const [currPassword, setCurrPassword] = useState<string>("");
-  const [newPassword, setNewPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+const StyledForm = styled("form")(({ theme }) => ({
+  marginTop: theme.spacing(1),
+}));
 
-  const [isCurrPasswordValid, setIsCurrPasswordValid] =
-    useState<boolean>(false);
-  const [isNewPasswordValid, setIsNewPasswordValid] = useState<boolean>(false);
-  const [isConfirmPasswordValid, setIsConfirmPasswordValid] =
-    useState<boolean>(false);
-
-  const isUpdateDisabled = !(
-    isCurrPasswordValid &&
-    isNewPasswordValid &&
-    isConfirmPasswordValid
-  );
-
-  const handleSubmit = async () => {
-    const accessToken = localStorage.getItem("token");
-
-    try {
-      await userClient.patch(
-        `/users/${userId}`,
-        {
-          oldPassword: currPassword,
-          newPassword: newPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      handleClose();
-      onUpdate(false, SUCCESS_PW_UPDATE_MESSAGE, true);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message =
-          error.response?.data.message || FAILED_PW_UPDATE_MESSAGE;
-        onUpdate(false, message, false);
-      } else {
-        onUpdate(false, FAILED_PW_UPDATE_MESSAGE, false);
-      }
-    }
-  };
+const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
+  const { open, onClose, onUpdate } = props;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, isValid },
+    watch,
+  } = useForm<{
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }>({
+    mode: "all",
+  });
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <Box
-      ref={ref}
-      sx={(theme) => ({
-        backgroundColor: theme.palette.common.white,
-        display: "flex",
-        width: 600,
-        flexDirection: "column",
-        alignItems: "center",
-        borderRadius: "16px",
-        padding: "40px",
-      })}
-    >
-      <Typography component="h1" variant="h3">
-        Change Password
-      </Typography>
-      <PasswordTextField
-        label="Current password"
-        passwordVal={false}
-        password={currPassword}
-        setPassword={setCurrPassword}
-        isMatch={false}
-        setValidity={setIsCurrPasswordValid}
-      />
-      <PasswordTextField
-        label="New password"
-        passwordVal={true}
-        password={newPassword}
-        setPassword={setNewPassword}
-        isMatch={true}
-        passwordToMatch={confirmPassword}
-        setValidity={setIsNewPasswordValid}
-      />
-      <PasswordTextField
-        label="Confirm new password"
-        passwordVal={false}
-        password={confirmPassword}
-        setPassword={setConfirmPassword}
-        isMatch={true}
-        passwordToMatch={newPassword}
-        setValidity={setIsConfirmPasswordValid}
-      />
-      <Stack direction="row" spacing={2} sx={{ marginTop: 2, width: "100%" }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleClose}
-          sx={{ flexGrow: 1 }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          disabled={isUpdateDisabled}
-          onClick={handleSubmit}
-          sx={{ flexGrow: 1 }}
-        >
-          Update
-        </Button>
-      </Stack>
-    </Box>
+    <Dialog fullWidth open={open} onClose={onClose}>
+      <DialogTitle fontSize={24}>Change password</DialogTitle>
+      <DialogContent>
+        <Container maxWidth="sm">
+          <StyledForm
+            onSubmit={handleSubmit((data) => {
+              onUpdate({
+                oldPassword: data.oldPassword,
+                newPassword: data.newPassword,
+              });
+              onClose();
+            })}
+          >
+            <TextField
+              label="Current password"
+              required
+              fullWidth
+              margin="normal"
+              type={showOldPassword ? "text" : "password"}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowOldPassword((prev) => !prev)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onMouseUp={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showOldPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              {...register("oldPassword")}
+            />
+            <TextField
+              label="New password"
+              required
+              fullWidth
+              margin="normal"
+              type={showNewPassword ? "text" : "password"}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowNewPassword((prev) => !prev)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onMouseUp={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              {...register("newPassword", {
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters long",
+                },
+                validate: {
+                  atLeastOneLowercase: (value) =>
+                    /[a-z]/.test(value) ||
+                    "Password must contain at least 1 lowercase letter",
+                  atLeastOneUppercase: (value) =>
+                    /[A-Z]/.test(value) ||
+                    "Password must contain at least 1 uppercase letter",
+                  atLeastOneDigit: (value) =>
+                    /\d/.test(value) ||
+                    "Password must contain at least 1 digit",
+                  atLeastOneSpecialCharacter: (value) =>
+                    // eslint-disable-next-line no-useless-escape
+                    /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value) ||
+                    "Password must contain at least 1 special character",
+                },
+              })}
+              error={!!errors.newPassword}
+              helperText={errors.newPassword?.message}
+            />
+            <TextField
+              label="Confirm password"
+              required
+              fullWidth
+              margin="normal"
+              type={showConfirmPassword ? "text" : "password"}
+              slotProps={{
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onMouseUp={(e) => e.preventDefault()}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+              {...register("confirmPassword", {
+                validate: {
+                  matchPassword: (value) =>
+                    watch("newPassword") === value || "Password does not match",
+                },
+              })}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
+            />
+            <Stack
+              direction={"row"}
+              spacing={2}
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+            >
+              <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                disabled={!isDirty || !isValid}
+                type="submit"
+              >
+                Update
+              </Button>
+            </Stack>
+          </StyledForm>
+        </Container>
+      </DialogContent>
+    </Dialog>
   );
-});
+};
 
 export default ChangePasswordModal;
