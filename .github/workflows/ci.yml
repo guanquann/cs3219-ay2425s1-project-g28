@@ -8,6 +8,9 @@ on:
     branches:
       - "*"
 
+permissions:
+  secrets: write
+
 env:
   NODE_VERSION: 20
 
@@ -32,9 +35,9 @@ jobs:
         run: npm run lint
       - name: Tests
         working-directory: ${{ matrix.service }}
-        run: |
-          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }} \
-          FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }} \
-          FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }} \
-          FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }} \
-          npm test
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_DATABASE_URL: ${{ secrets.FIREBASE_DATABASE_URL }}
+        run: npm test
