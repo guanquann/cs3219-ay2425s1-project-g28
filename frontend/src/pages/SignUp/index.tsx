@@ -1,8 +1,8 @@
 import {
   Box,
   Button,
-  IconButton,
-  InputAdornment,
+  // IconButton,
+  // InputAdornment,
   Stack,
   TextField,
   Typography,
@@ -16,16 +16,17 @@ import {
   passwordValidator,
   usernameValidator,
 } from "../../utils/validators";
-import { useState } from "react";
+// import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+// import { Visibility, VisibilityOff } from "@mui/icons-material";
+import PasswordTextField from "../../components/PasswordTextField";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
   }
@@ -72,6 +73,7 @@ const SignUp: React.FC = () => {
           <Stack
             component="form"
             direction="column"
+            noValidate
             sx={(theme) => ({
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
@@ -123,38 +125,14 @@ const SignUp: React.FC = () => {
               error={!!errors.email}
               helperText={errors.email?.message}
             />
-            <TextField
+            <PasswordTextField
               label="Password"
               required
               fullWidth
               margin="normal"
-              type="password"
               {...register("password", { validate: { passwordValidator } })}
               error={!!errors.password}
               helperText={errors.password?.message}
-              typeof={showPassword ? "text" : "password"}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword(!showPassword)}
-                        edge="end"
-                      >
-                        {showPassword ? (
-                          <VisibilityOff
-                            sx={(theme) => ({ fontSize: theme.spacing(2.5) })}
-                          />
-                        ) : (
-                          <Visibility
-                            sx={(theme) => ({ fontSize: theme.spacing(2.5) })}
-                          />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
             />
             <Button
               type="submit"

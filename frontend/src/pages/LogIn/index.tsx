@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import PasswordTextField from "../../components/PasswordTextField";
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
@@ -78,31 +79,14 @@ const LogIn: React.FC = () => {
               error={!!errors.email}
               helperText={errors.email?.message}
             />
-            <TextField
+            <PasswordTextField
               label="Password"
               required
               fullWidth
               margin="normal"
-              {...register("password", { validate: { passwordValidator } })}
+              {...register("password", { required: "Password is required" })}
               error={!!errors.password}
               helperText={errors.password?.message}
-              type={showPassword ? "text" : "password"}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onMouseUp={(e) => e.preventDefault()}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
             />
             <Button
               type="submit"
