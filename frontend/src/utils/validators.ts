@@ -13,7 +13,7 @@ export const nameValidator = (value: string) => {
     return "Name must contain only alphabetical, hyphen and white space characters";
   }
 
-  return "";
+  return true;
 };
 
 export const usernameValidator = (value: string) => {
@@ -25,7 +25,7 @@ export const usernameValidator = (value: string) => {
     return "Username must contain only alphanumeric, underscore and full stop characters";
   }
 
-  return "";
+  return true;
 };
 
 export const emailValidator = (value: string) => {
@@ -33,7 +33,7 @@ export const emailValidator = (value: string) => {
     return "Email is invalid";
   }
 
-  return "";
+  return true;
 };
 
 export const passwordValidator = (value: string) => {
@@ -57,5 +57,5 @@ export const passwordValidator = (value: string) => {
     return "Password must contain at least 1 special character";
   }
 
-  return "";
+  return true;
 };

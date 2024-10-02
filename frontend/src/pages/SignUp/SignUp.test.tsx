@@ -17,7 +17,9 @@ jest.mock("../../utils/api", () => ({
     post: jest.fn(),
   },
 }));
-const mockedPost = userClient.post as jest.MockedFunction<typeof userClient.post>;
+const mockedPost = userClient.post as jest.MockedFunction<
+  typeof userClient.post
+>;
 
 describe("Sign Up Components", () => {
   beforeEach(() => {
@@ -36,27 +38,27 @@ describe("Sign Up Components", () => {
 
   it("First name field is rendered", () => {
     render(<SignUp />);
-    expect(screen.getByTestId("First Name")).toBeInTheDocument();
+    expect(screen.getByLabelText(/First name/)).toBeInTheDocument();
   });
 
   it("Last name field is rendered", () => {
     render(<SignUp />);
-    expect(screen.getByTestId("Last Name")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Last name/)).toBeInTheDocument();
   });
 
   it("Username field is rendered", () => {
     render(<SignUp />);
-    expect(screen.getByTestId("Username")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Username/)).toBeInTheDocument();
   });
 
   it("Email field is rendered", () => {
     render(<SignUp />);
-    expect(screen.getByTestId("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Email/)).toBeInTheDocument();
   });
 
   it("Password field is rendered", () => {
     render(<SignUp />);
-    expect(screen.getByTestId("Password")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/)).toBeInTheDocument();
   });
 
   it("Sign up button is rendered", () => {
@@ -104,11 +106,21 @@ describe("Sign Up Events", () => {
 
     render(<SignUp />);
 
-    fireEvent.change(screen.getByTestId("First Name"), { target: { value: firstName } });
-    fireEvent.change(screen.getByTestId("Last Name"), { target: { value: lastName } });
-    fireEvent.change(screen.getByTestId("Username"), { target: { value: username } });
-    fireEvent.change(screen.getByTestId("Email"), { target: { value: email } });
-    fireEvent.change(screen.getByTestId("Password"), { target: { value: password } });
+    fireEvent.change(screen.getByLabelText(/First name/), {
+      target: { value: firstName },
+    });
+    fireEvent.change(screen.getByLabelText(/Last name/), {
+      target: { value: lastName },
+    });
+    fireEvent.change(screen.getByLabelText(/Username/), {
+      target: { value: username },
+    });
+    fireEvent.change(screen.getByLabelText(/Email/), {
+      target: { value: email },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/), {
+      target: { value: password },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
 
     await waitFor(() => {
@@ -127,11 +139,21 @@ describe("Sign Up Events", () => {
 
     render(<SignUp />);
 
-    fireEvent.change(screen.getByTestId("First Name"), { target: { value: firstName } });
-    fireEvent.change(screen.getByTestId("Last Name"), { target: { value: lastName } });
-    fireEvent.change(screen.getByTestId("Username"), { target: { value: invalidUsername } });
-    fireEvent.change(screen.getByTestId("Email"), { target: { value: email } });
-    fireEvent.change(screen.getByTestId("Password"), { target: { value: password } });
+    fireEvent.change(screen.getByLabelText(/First name/), {
+      target: { value: firstName },
+    });
+    fireEvent.change(screen.getByLabelText(/Last name/), {
+      target: { value: lastName },
+    });
+    fireEvent.change(screen.getByLabelText(/Username/), {
+      target: { value: invalidUsername },
+    });
+    fireEvent.change(screen.getByLabelText(/Email/), {
+      target: { value: email },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/), {
+      target: { value: password },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
 
     await waitFor(() => {
@@ -144,11 +166,21 @@ describe("Sign Up Events", () => {
 
     render(<SignUp />);
 
-    fireEvent.change(screen.getByTestId("First Name"), { target: { value: firstName } });
-    fireEvent.change(screen.getByTestId("Last Name"), { target: { value: lastName } });
-    fireEvent.change(screen.getByTestId("Username"), { target: { value: username } });
-    fireEvent.change(screen.getByTestId("Email"), { target: { value: invalidEmail } });
-    fireEvent.change(screen.getByTestId("Password"), { target: { value: password } });
+    fireEvent.change(screen.getByLabelText(/First name/), {
+      target: { value: firstName },
+    });
+    fireEvent.change(screen.getByLabelText(/Last name/), {
+      target: { value: lastName },
+    });
+    fireEvent.change(screen.getByLabelText(/Username/), {
+      target: { value: username },
+    });
+    fireEvent.change(screen.getByLabelText(/Email/), {
+      target: { value: invalidEmail },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/), {
+      target: { value: password },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
 
     await waitFor(() => {
@@ -161,11 +193,21 @@ describe("Sign Up Events", () => {
 
     render(<SignUp />);
 
-    fireEvent.change(screen.getByTestId("First Name"), { target: { value: firstName } });
-    fireEvent.change(screen.getByTestId("Last Name"), { target: { value: lastName } });
-    fireEvent.change(screen.getByTestId("Username"), { target: { value: username } });
-    fireEvent.change(screen.getByTestId("Email"), { target: { value: email } });
-    fireEvent.change(screen.getByTestId("Password"), { target: { value: invalidPassword } });
+    fireEvent.change(screen.getByLabelText(/First name/), {
+      target: { value: firstName },
+    });
+    fireEvent.change(screen.getByLabelText(/Last name/), {
+      target: { value: lastName },
+    });
+    fireEvent.change(screen.getByLabelText(/Username/), {
+      target: { value: username },
+    });
+    fireEvent.change(screen.getByLabelText(/Email/), {
+      target: { value: email },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/), {
+      target: { value: invalidPassword },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Sign up" }));
 
     await waitFor(() => {
