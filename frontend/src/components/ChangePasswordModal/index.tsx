@@ -1,20 +1,16 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
   Button,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
-  IconButton,
-  InputAdornment,
   Stack,
   styled,
-  TextField,
 } from "@mui/material";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useProfile } from "../../contexts/ProfileContext";
 import { passwordValidator } from "../../utils/validators";
+import PasswordTextField from "../PasswordTextField";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -39,9 +35,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
   }>({
     mode: "all",
   });
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const profile = useProfile();
 
@@ -65,84 +58,30 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               onClose();
             })}
           >
-            <TextField
+            <PasswordTextField
               label="Current password"
               required
               fullWidth
               margin="normal"
-              type={showOldPassword ? "text" : "password"}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowOldPassword((prev) => !prev)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onMouseUp={(e) => e.preventDefault()}
-                        edge="end"
-                      >
-                        {showOldPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
               {...register("oldPassword")}
             />
-            <TextField
+            <PasswordTextField
+              displayTooltip
               label="New password"
               required
               fullWidth
               margin="normal"
-              type={showNewPassword ? "text" : "password"}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowNewPassword((prev) => !prev)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onMouseUp={(e) => e.preventDefault()}
-                        edge="end"
-                      >
-                        {showNewPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
               {...register("newPassword", {
                 validate: { passwordValidator },
               })}
               error={!!errors.newPassword}
               helperText={errors.newPassword?.message}
             />
-            <TextField
+            <PasswordTextField
               label="Confirm password"
               required
               fullWidth
               margin="normal"
-              type={showConfirmPassword ? "text" : "password"}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => setShowConfirmPassword((prev) => !prev)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        onMouseUp={(e) => e.preventDefault()}
-                        edge="end"
-                      >
-                        {showConfirmPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
               {...register("confirmPassword", {
                 validate: {
                   matchPassword: (value) =>
