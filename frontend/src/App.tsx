@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import Matching from "./pages/Matching";
 
 function App() {
   return (
@@ -27,10 +28,13 @@ function App() {
             </Route>
           </Route>
           <Route path="profile/:userId" element={<ProfilePage />} />
+          <Route path="match">
+            <Route index element={<Matching />} />
+          </Route>
           <Route path="*" element={<PageNotFound />} />
         </Route>
-        <Route path="/signup" element={<SignUp />}></Route>
-        <Route path="/login" element={<LogIn />}></Route>
+        <Route path="signup" element={<SignUp />}></Route>
+        <Route path="login" element={<LogIn />}></Route>
       </Routes>
     </AuthProvider>
   );
