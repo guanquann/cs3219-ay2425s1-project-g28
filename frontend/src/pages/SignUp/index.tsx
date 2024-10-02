@@ -63,6 +63,7 @@ const SignUp: React.FC = () => {
             component="form"
             direction="column"
             noValidate
+            spacing={1.5}
             sx={(theme) => ({
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),

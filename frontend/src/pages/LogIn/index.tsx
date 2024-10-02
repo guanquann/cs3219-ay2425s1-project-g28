@@ -51,6 +51,7 @@ const LogIn: React.FC = () => {
           <Stack
             component="form"
             direction="column"
+            spacing={1.5}
             sx={(theme) => ({
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
@@ -75,6 +76,7 @@ const LogIn: React.FC = () => {
               margin="normal"
               {...register("password", { required: "Password is required" })}
               error={!!errors.password}
+              helperText={errors.password?.message}
             />
             <Button
               type="submit"
