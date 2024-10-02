@@ -31,8 +31,6 @@ const ProfilePage: React.FC = () => {
     fetchUser,
     setEditProfileModalOpen,
     setPasswordModalOpen,
-    updateProfile,
-    updatePassword,
   } = profile;
 
   useEffect(() => {
