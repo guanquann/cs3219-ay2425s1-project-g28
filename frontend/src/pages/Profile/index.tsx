@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import AppMargin from "../../components/AppMargin";
-import ProfileDetails from "../../components/ProfileSection";
+import ProfileDetails from "../../components/ProfileDetails";
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import classes from "./index.module.css";
 import { useEffect } from "react";
@@ -10,27 +10,7 @@ import EditProfileModal from "../../components/EditProfileModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
 import { useProfile } from "../../contexts/ProfileContext";
 
-// type UserProfile = {
-//   id: string;
-//   username: string;
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   isAdmin: boolean;
-//   biography?: string;
-//   profilePictureUrl?: string;
-//   createdAt: string;
-// };
-
 const ProfilePage: React.FC = () => {
-  // const [editProfileOpen, setEditProfileOpen] = useState(false);
-  // const handleEditProfileOpen = () => setEditProfileOpen(true);
-  // const handleEditProfileClose = () => setEditProfileOpen(false);
-  // const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  // const handleChangePasswordOpen = () => setChangePasswordOpen(true);
-  // const handleChangePasswordClose = () => setChangePasswordOpen(false);
-  // const [isProfileChanged, setIsProfileChanged] = useState(false);
-
   const { userId } = useParams<{ userId: string }>();
   const auth = useAuth();
 
