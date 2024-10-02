@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useProfile } from "../../contexts/ProfileContext";
+import { bioValidator, nameValidator } from "../../utils/validators";
 
 interface EditProfileModalProps {
   onClose: () => void;
@@ -25,8 +26,6 @@ const StyledForm = styled("form")(({ theme }) => ({
 
 const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
   const { open, onClose, currFirstName, currLastName, currBiography } = props;
-  const nameCharLimit = 50;
-  const bioCharLimit = 255;
 
   const {
     register,
@@ -70,20 +69,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               label="First name"
               margin="normal"
               {...register("firstName", {
-                required: true,
-                minLength: { value: 1, message: "Required field" },
-                maxLength: {
-                  value: nameCharLimit,
-                  message: "Max length exceeded",
-                },
-                pattern: {
-                  value: /^[a-zA-Z\s-]*$/,
-                  message:
-                    "Only alphabetical, hyphen and white space characters allowed",
-                },
+                validate: { nameValidator },
               })}
               error={!!errors.firstName}
-              helperText={errors.firstName && errors.firstName.message}
+              helperText={errors.firstName?.message}
             />
             <TextField
               fullWidth
@@ -91,20 +80,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               label="Last name"
               margin="normal"
               {...register("lastName", {
-                required: true,
-                minLength: { value: 1, message: "Required field" },
-                maxLength: {
-                  value: nameCharLimit,
-                  message: "Max length exceeded",
-                },
-                pattern: {
-                  value: /^[a-zA-Z\s-]*$/,
-                  message:
-                    "Only alphabetical, hyphen and white space characters allowed",
-                },
+                validate: { nameValidator },
               })}
               error={!!errors.lastName}
-              helperText={errors.lastName && errors.lastName.message}
+              helperText={errors.lastName?.message}
             />
             <TextField
               fullWidth
@@ -112,10 +91,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               label="Biography"
               margin="normal"
               {...register("biography", {
-                maxLength: {
-                  value: bioCharLimit,
-                  message: "Max length exceeded",
-                },
+                validate: { bioValidator },
               })}
             />
             <Stack

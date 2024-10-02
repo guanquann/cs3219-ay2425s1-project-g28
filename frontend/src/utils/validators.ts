@@ -36,6 +36,14 @@ export const emailValidator = (value: string) => {
   return true;
 };
 
+export const bioValidator = (value: string) => {
+  if (value.length > 255) {
+    return "Biography must be at most 255 characters long";
+  }
+
+  return true;
+};
+
 export const passwordValidator = (value: string) => {
   if (value.length < 8) {
     return "Password must be at least 8 characters long";
