@@ -109,12 +109,10 @@ const ProfilePage: React.FC = () => {
           currFirstName={user.firstName}
           currLastName={user.lastName}
           currBiography={user.biography}
-          onUpdate={updateProfile}
         />
         <ChangePasswordModal
           open={passwordModalOpen}
           onClose={() => setPasswordModalOpen(false)}
-          onUpdate={updatePassword}
         />
       </Box>
     </AppMargin>

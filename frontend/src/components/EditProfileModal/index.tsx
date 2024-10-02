@@ -9,6 +9,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
+import { useProfile } from "../../contexts/ProfileContext";
 
 interface EditProfileModalProps {
   onClose: () => void;
@@ -16,15 +17,6 @@ interface EditProfileModalProps {
   currFirstName: string;
   currLastName: string;
   currBiography?: string;
-  onUpdate: ({
-    firstName,
-    lastName,
-    biography,
-  }: {
-    firstName: string;
-    lastName: string;
-    biography: string;
-  }) => void;
 }
 
 const StyledForm = styled("form")(({ theme }) => ({
@@ -32,14 +24,7 @@ const StyledForm = styled("form")(({ theme }) => ({
 }));
 
 const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
-  const {
-    open,
-    onClose,
-    currFirstName,
-    currLastName,
-    currBiography,
-    onUpdate,
-  } = props;
+  const { open, onClose, currFirstName, currLastName, currBiography } = props;
   const nameCharLimit = 50;
   const bioCharLimit = 255;
 
@@ -60,6 +45,14 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
     mode: "all",
   });
 
+  const profile = useProfile();
+
+  if (!profile) {
+    throw new Error("useProfile() must be used within ProfileContextProvider");
+  }
+
+  const { updateProfile } = profile;
+
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle fontSize={24}>Edit profile</DialogTitle>
@@ -67,7 +60,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
         <Container maxWidth="sm">
           <StyledForm
             onSubmit={handleSubmit((data) => {
-              onUpdate(data);
+              updateProfile(data);
               onClose();
             })}
           >

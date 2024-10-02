@@ -13,17 +13,11 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useProfile } from "../../contexts/ProfileContext";
 
 interface ChangePasswordModalProps {
   open: boolean;
   onClose: () => void;
-  onUpdate: ({
-    oldPassword,
-    newPassword,
-  }: {
-    oldPassword: string;
-    newPassword: string;
-  }) => void;
 }
 
 const StyledForm = styled("form")(({ theme }) => ({
@@ -31,7 +25,7 @@ const StyledForm = styled("form")(({ theme }) => ({
 }));
 
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
-  const { open, onClose, onUpdate } = props;
+  const { open, onClose } = props;
   const {
     register,
     handleSubmit,
@@ -48,6 +42,14 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const profile = useProfile();
+
+  if (!profile) {
+    throw new Error("useProfile() must be used within ProfileContextProvider");
+  }
+
+  const { updatePassword } = profile;
+
   return (
     <Dialog fullWidth open={open} onClose={onClose}>
       <DialogTitle fontSize={24}>Change password</DialogTitle>
@@ -55,7 +57,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
         <Container maxWidth="sm">
           <StyledForm
             onSubmit={handleSubmit((data) => {
-              onUpdate({
+              updatePassword({
                 oldPassword: data.oldPassword,
                 newPassword: data.newPassword,
               });
