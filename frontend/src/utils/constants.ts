@@ -2,6 +2,18 @@
 export const complexityList: string[] = ["Easy", "Medium", "Hard"];
 export const languageList = ["Python", "Java"];
 
+/* Password Validation */
+export const PASSWORD_MIN_LENGTH_ERROR_MESSAGE =
+  "Password must be at least 8 characters long";
+export const PASSWORD_LOWER_CASE_ERROR_MESSAGE =
+  "Password must contain at least 1 lowercase letter";
+export const PASSWORD_UPPER_CASE_ERROR_MESSAGE =
+  "Password must contain at least 1 uppercase letter";
+export const PASSWORD_DIGIT_ERROR_MESSAGE =
+  "Password must contain at least 1 digit";
+export const PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE =
+  "Password must contain at least 1 special character";
+
 /* Toast Messages */
 // Authentication
 export const SUCCESS_LOG_OUT = "Logged out successfully!";

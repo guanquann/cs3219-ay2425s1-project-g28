@@ -1,27 +1,16 @@
-import {
-  Box,
-  Button,
-  IconButton,
-  InputAdornment,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import LogInSvg from "../../assets/login.svg?react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { emailValidator, passwordValidator } from "../../utils/validators";
+import { emailValidator } from "../../utils/validators";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import PasswordTextField from "../../components/PasswordTextField";
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
   }
@@ -86,7 +75,6 @@ const LogIn: React.FC = () => {
               margin="normal"
               {...register("password", { required: "Password is required" })}
               error={!!errors.password}
-              helperText={errors.password?.message}
             />
             <Button
               type="submit"

@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  // IconButton,
-  // InputAdornment,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import SignUpSvg from "../../assets/signup.svg?react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -16,17 +8,14 @@ import {
   passwordValidator,
   usernameValidator,
 } from "../../utils/validators";
-// import { useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
-// import { Visibility, VisibilityOff } from "@mui/icons-material";
 import PasswordTextField from "../../components/PasswordTextField";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
-  // const [showPassword, setShowPassword] = useState(false);
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
   }
@@ -126,6 +115,7 @@ const SignUp: React.FC = () => {
               helperText={errors.email?.message}
             />
             <PasswordTextField
+              displayTooltip
               label="Password"
               required
               fullWidth

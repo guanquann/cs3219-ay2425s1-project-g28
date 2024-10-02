@@ -1,5 +1,13 @@
 /* eslint-disable */
 
+import {
+  PASSWORD_DIGIT_ERROR_MESSAGE,
+  PASSWORD_LOWER_CASE_ERROR_MESSAGE,
+  PASSWORD_MIN_LENGTH_ERROR_MESSAGE,
+  PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE,
+  PASSWORD_UPPER_CASE_ERROR_MESSAGE,
+} from "./constants";
+
 export const nameValidator = (value: string) => {
   if (value.length === 0) {
     return "Name must not be empty";
@@ -46,23 +54,23 @@ export const bioValidator = (value: string) => {
 
 export const passwordValidator = (value: string) => {
   if (value.length < 8) {
-    return "Password must be at least 8 characters long";
+    return PASSWORD_MIN_LENGTH_ERROR_MESSAGE;
   }
 
   if (!/[a-z]/.test(value)) {
-    return "Password must contain at least 1 lowercase letter";
+    return PASSWORD_LOWER_CASE_ERROR_MESSAGE;
   }
 
   if (!/[A-Z]/.test(value)) {
-    return "Password must contain at least 1 uppercase letter";
+    return PASSWORD_UPPER_CASE_ERROR_MESSAGE;
   }
 
   if (!/\d/.test(value)) {
-    return "Password must contain at least 1 digit";
+    return PASSWORD_DIGIT_ERROR_MESSAGE;
   }
 
   if (!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value)) {
-    return "Password must contain at least 1 special character";
+    return PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE;
   }
 
   return true;
