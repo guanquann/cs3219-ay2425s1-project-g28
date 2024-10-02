@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useProfile } from "../../contexts/ProfileContext";
+import { passwordValidator } from "../../utils/validators";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -111,25 +112,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
                 },
               }}
               {...register("newPassword", {
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters long",
-                },
-                validate: {
-                  atLeastOneLowercase: (value) =>
-                    /[a-z]/.test(value) ||
-                    "Password must contain at least 1 lowercase letter",
-                  atLeastOneUppercase: (value) =>
-                    /[A-Z]/.test(value) ||
-                    "Password must contain at least 1 uppercase letter",
-                  atLeastOneDigit: (value) =>
-                    /\d/.test(value) ||
-                    "Password must contain at least 1 digit",
-                  atLeastOneSpecialCharacter: (value) =>
-                    // eslint-disable-next-line no-useless-escape
-                    /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(value) ||
-                    "Password must contain at least 1 special character",
-                },
+                validate: { passwordValidator },
               })}
               error={!!errors.newPassword}
               helperText={errors.newPassword?.message}
