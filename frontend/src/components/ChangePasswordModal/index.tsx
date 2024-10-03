@@ -63,7 +63,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               required
               fullWidth
               margin="normal"
-              {...register("oldPassword")}
+              {...register("oldPassword", { setValueAs: (value: string) => value.trim() })}
             />
             <PasswordTextField
               displayTooltip
@@ -72,6 +72,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               fullWidth
               margin="normal"
               {...register("newPassword", {
+                setValueAs: (value: string) => value.trim(),
                 validate: { passwordValidator },
               })}
               error={!!errors.newPassword}
@@ -83,6 +84,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               fullWidth
               margin="normal"
               {...register("confirmPassword", {
+                setValueAs: (value: string) => value.trim(),
                 validate: {
                   matchPassword: (value) =>
                     watch("newPassword") === value || "Password does not match",

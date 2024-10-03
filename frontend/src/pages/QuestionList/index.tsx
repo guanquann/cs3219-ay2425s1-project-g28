@@ -33,6 +33,7 @@ import {
   complexityList,
   FAILED_QUESTION_DELETE,
   SUCCESS_QUESTION_DELETE,
+  USE_AUTH_ERROR_MESSAGE,
 } from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
@@ -120,7 +121,7 @@ const QuestionList: React.FC = () => {
     if (state.questionCount % rowsPerPage !== 1 || page === 0) {
       updateQuestionList();
     } else {
-      setPage(page - 1);
+      setPage(page => page - 1);
     }
   };
 
@@ -143,7 +144,7 @@ const QuestionList: React.FC = () => {
   // Check if the user is admin
   const auth = useAuth();
   if (!auth) {
-    throw new Error("useAuth() must be used within AuthProvider");
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
   const { user } = auth;
   const isAdmin = user && user.isAdmin;

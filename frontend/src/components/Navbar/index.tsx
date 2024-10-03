@@ -17,6 +17,7 @@ import AppMargin from "../AppMargin";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
+import { USE_AUTH_ERROR_MESSAGE } from "../../utils/constants";
 
 type NavbarItem = { label: string; link: string };
 
@@ -29,7 +30,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   if (!auth) {
-    throw new Error("useAuth() must be used within AuthProvider");
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
 
   const { logout, user } = auth;

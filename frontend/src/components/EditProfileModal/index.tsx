@@ -69,6 +69,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               label="First name"
               margin="normal"
               {...register("firstName", {
+                setValueAs: (value: string) => value.trim(), 
                 validate: { nameValidator },
               })}
               error={!!errors.firstName}
@@ -80,6 +81,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               label="Last name"
               margin="normal"
               {...register("lastName", {
+                setValueAs: (value: string) => value.trim(), 
                 validate: { nameValidator },
               })}
               error={!!errors.lastName}
@@ -91,6 +93,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               label="Biography"
               margin="normal"
               {...register("biography", {
+                setValueAs: (value: string) => value.trim(), 
                 validate: { bioValidator },
               })}
             />
