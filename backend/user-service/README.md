@@ -1,5 +1,9 @@
 # User Service Guide
 
+> User Service was adapted from [PeerPrep-UserService repository](https://github.com/CS3219-AY2425S1/PeerPrep-UserService)
+
+> This guide references the [user-service README in the PeerPrep-UserService repository](https://github.com/CS3219-AY2425S1/PeerPrep-UserService/blob/main/user-service/README.md)
+
 ## Setting-up MongoDB
 
 > :notebook: If you are familiar to MongoDB and wish to use a local instance, please feel free to do so. This guide utilizes MongoDB Cloud Services.
