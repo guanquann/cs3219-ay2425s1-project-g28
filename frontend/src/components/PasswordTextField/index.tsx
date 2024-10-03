@@ -1,4 +1,10 @@
-import { Check, Clear, Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Check,
+  Circle,
+  Clear,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
 import {
   IconButton,
   InputAdornment,
@@ -37,7 +43,16 @@ const TooltipMessage: React.FC<{
               paddingTop: theme.spacing(0.7),
             })}
           >
-            {validator.validate(input) ? (
+            {!input ? (
+              <Circle
+                sx={(theme) => ({
+                  fontSize: theme.spacing(0.8),
+                  marginTop: theme.spacing(0.8),
+                  marginLeft: theme.spacing(0.8),
+                  color: "white",
+                })}
+              />
+            ) : validator.validate(input) ? (
               <Check
                 sx={(theme) => ({
                   fontSize: theme.spacing(2.5),

@@ -12,7 +12,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import PasswordTextField from "../../components/PasswordTextField";
-import { USE_AUTH_ERROR_MESSAGE } from "../../utils/constants";
+import {
+  PASSWORD_REQUIRED_ERROR_MESSAGE,
+  USE_AUTH_ERROR_MESSAGE,
+} from "../../utils/constants";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -138,6 +141,7 @@ const SignUp: React.FC = () => {
               input={watch("password", "")}
               {...register("password", {
                 setValueAs: (value: string) => value.trim(),
+                required: PASSWORD_REQUIRED_ERROR_MESSAGE,
                 validate: { passwordValidator },
               })}
               error={!!errors.password}
