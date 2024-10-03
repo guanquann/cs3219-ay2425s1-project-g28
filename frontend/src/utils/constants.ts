@@ -2,9 +2,11 @@
 export const complexityList: string[] = ["Easy", "Medium", "Hard"];
 export const languageList = ["Python", "Java"];
 
-/* AuthProvider Error */
+/* Context Provider Errors */
 export const USE_AUTH_ERROR_MESSAGE =
   "useAuth() must be used within AuthProvider";
+export const USE_PROFILE_ERROR_MESSAGE =
+  "useProfile() must be used within ProfileContextProvider";
 
 /* Name Validation */
 export const NAME_REQUIRED_ERROR_MESSAGE = "Name is required";
@@ -39,7 +41,8 @@ export const PASSWORD_DIGIT_ERROR_MESSAGE =
   "Password must contain at least 1 digit";
 export const PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE =
   "Password must contain at least 1 special character";
-export const PASSWORD_WEAK_MESSAGE = "Password is weak";
+export const PASSWORD_WEAK_ERROR_MESSAGE = "Password is weak";
+export const PASSWORD_MISMATCH_ERROR_MESSAGE = "Password does not match";
 
 /* Toast Messages */
 // Authentication

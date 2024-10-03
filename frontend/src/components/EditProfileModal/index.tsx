@@ -11,6 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useProfile } from "../../contexts/ProfileContext";
 import { bioValidator, nameValidator } from "../../utils/validators";
+import { USE_PROFILE_ERROR_MESSAGE } from "../../utils/constants";
 
 interface EditProfileModalProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
     register,
     formState: { errors, isValid, isDirty },
     handleSubmit,
+    reset,
   } = useForm<{
     firstName: string;
     lastName: string;
@@ -47,20 +49,29 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
   const profile = useProfile();
 
   if (!profile) {
-    throw new Error("useProfile() must be used within ProfileContextProvider");
+    throw new Error(USE_PROFILE_ERROR_MESSAGE);
   }
 
   const { updateProfile } = profile;
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle fontSize={24}>Edit profile</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={() => {
+        onClose();
+        reset();
+      }}
+    >
+      <DialogTitle fontSize={24} sx={{ paddingBottom: 0 }}>
+        Edit profile
+      </DialogTitle>
       <DialogContent>
-        <Container maxWidth="sm">
+        <Container maxWidth="sm" disableGutters>
           <StyledForm
             onSubmit={handleSubmit((data) => {
               updateProfile(data);
               onClose();
+              reset();
             })}
           >
             <TextField
@@ -68,8 +79,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               required
               label="First name"
               margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
               {...register("firstName", {
-                setValueAs: (value: string) => value.trim(), 
+                setValueAs: (value: string) => value.trim(),
                 validate: { nameValidator },
               })}
               error={!!errors.firstName}
@@ -80,8 +92,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               required
               label="Last name"
               margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
               {...register("lastName", {
-                setValueAs: (value: string) => value.trim(), 
+                setValueAs: (value: string) => value.trim(),
                 validate: { nameValidator },
               })}
               error={!!errors.lastName}
@@ -92,8 +105,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               multiline
               label="Biography"
               margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
               {...register("biography", {
-                setValueAs: (value: string) => value.trim(), 
+                setValueAs: (value: string) => value.trim(),
                 validate: { bioValidator },
               })}
             />
@@ -106,7 +120,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                 fullWidth
                 variant="contained"
                 color="secondary"
-                onClick={onClose}
+                onClick={() => {
+                  onClose();
+                  reset();
+                }}
               >
                 Cancel
               </Button>

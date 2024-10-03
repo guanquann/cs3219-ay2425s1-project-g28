@@ -12,7 +12,7 @@ import {
   PASSWORD_MIN_LENGTH_ERROR_MESSAGE,
   PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE,
   PASSWORD_UPPER_CASE_ERROR_MESSAGE,
-  PASSWORD_WEAK_MESSAGE,
+  PASSWORD_WEAK_ERROR_MESSAGE,
   USERNAME_ALLOWED_CHAR_ERROR_MESSAGE,
   USERNAME_LENGTH_ERROR_MESSAGE,
 } from "./constants";
@@ -87,13 +87,14 @@ const specialCharValidator = (value: string) => {
 
 export const passwordValidator = (value: string) => {
   if (
-    !minLengthValidator(value) ||
-    !lowerCaseValidator(value) ||
-    !upperCaseValidator(value) ||
-    !digitValidator(value) ||
-    !specialCharValidator(value)
+    value &&
+    (!minLengthValidator(value) ||
+      !lowerCaseValidator(value) ||
+      !upperCaseValidator(value) ||
+      !digitValidator(value) ||
+      !specialCharValidator(value))
   ) {
-    return PASSWORD_WEAK_MESSAGE;
+    return PASSWORD_WEAK_ERROR_MESSAGE;
   }
 
   return true;
