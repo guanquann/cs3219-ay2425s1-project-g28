@@ -101,17 +101,19 @@ const ProfilePage: React.FC = () => {
         <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>
           <Typography variant="h4">Questions attempted</Typography>
         </Box>
-        <EditProfileModal
-          open={editProfileOpen}
-          onClose={() => setEditProfileModalOpen(false)}
-          currFirstName={user.firstName}
-          currLastName={user.lastName}
-          currBiography={user.biography}
-        />
-        <ChangePasswordModal
-          open={passwordModalOpen}
-          onClose={() => setPasswordModalOpen(false)}
-        />
+        {editProfileOpen &&
+          <EditProfileModal
+            open={editProfileOpen}
+            onClose={() => setEditProfileModalOpen(false)}
+            currFirstName={user.firstName}
+            currLastName={user.lastName}
+            currBiography={user.biography}
+          />}
+        {passwordModalOpen && 
+          <ChangePasswordModal
+            open={passwordModalOpen}
+            onClose={() => setPasswordModalOpen(false)}
+          />}
       </Box>
     </AppMargin>
   );

@@ -63,7 +63,11 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               required
               fullWidth
               margin="normal"
-              {...register("oldPassword")}
+              {...register("oldPassword", {
+                required: "Required field",
+              })}
+              error={!!errors.oldPassword}
+              helperText={errors.oldPassword?.message}
             />
             <PasswordTextField
               displayTooltip
