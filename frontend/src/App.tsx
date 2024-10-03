@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import ProfileContextProvider from "./contexts/ProfileContext";
 
 function App() {
   return (
@@ -26,7 +27,14 @@ function App() {
               <Route path=":questionId/edit" element={<QuestionEdit />} />
             </Route>
           </Route>
-          <Route path="profile/:userId" element={<ProfilePage />} />
+          <Route
+            path="profile/:userId"
+            element={
+              <ProfileContextProvider>
+                <ProfilePage />
+              </ProfileContextProvider>
+            }
+          />
           <Route path="*" element={<PageNotFound />} />
         </Route>
         <Route path="/signup" element={<SignUp />}></Route>

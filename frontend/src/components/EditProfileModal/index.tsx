@@ -1,255 +1,126 @@
-import { forwardRef, useState } from "react";
 import {
-  Box,
   Button,
-  FormControl,
-  FormHelperText,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Stack,
+  styled,
   TextField,
-  Typography,
 } from "@mui/material";
-import { userClient } from "../../utils/api";
-import axios from "axios";
-import {
-  FAILED_PROFILE_UPDATE_MESSAGE,
-  SUCCESS_PROFILE_UPDATE_MESSAGE,
-} from "../../utils/constants";
+import { useForm } from "react-hook-form";
+import { useProfile } from "../../contexts/ProfileContext";
+import { bioValidator, nameValidator } from "../../utils/validators";
 
 interface EditProfileModalProps {
-  handleClose: () => void;
+  onClose: () => void;
+  open: boolean;
   currFirstName: string;
   currLastName: string;
   currBiography?: string;
-  userId: string;
-  onUpdate: (
-    isProfileEdit: boolean,
-    message: string,
-    isSuccess: boolean,
-  ) => void;
 }
 
-const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>(
-  (props, ref) => {
-    const {
-      handleClose,
-      currFirstName,
-      currLastName,
-      currBiography,
-      userId,
-      onUpdate,
-    } = props;
-    const nameCharLimit = 50;
-    const bioCharLimit = 255;
-    const [newFirstName, setNewFirstName] = useState<string>(currFirstName);
-    const [newLastName, setNewLastName] = useState<string>(currLastName);
-    const [newBio, setNewBio] = useState<string>(currBiography || "");
+const StyledForm = styled("form")(({ theme }) => ({
+  marginTop: theme.spacing(1),
+}));
 
-    const [firstNameError, setFirstNameError] = useState<boolean>(false);
-    const [lastNameError, setLastNameError] = useState<boolean>(false);
+const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
+  const { open, onClose, currFirstName, currLastName, currBiography } = props;
 
-    const checkForChanges = (): boolean => {
-      if (
-        newFirstName != currFirstName ||
-        newLastName != currLastName ||
-        newBio != currBiography
-      ) {
-        return true;
-      } else {
-        return false;
-      }
-    };
+  const {
+    register,
+    formState: { errors, isValid, isDirty },
+    handleSubmit,
+  } = useForm<{
+    firstName: string;
+    lastName: string;
+    biography: string;
+  }>({
+    defaultValues: {
+      firstName: currFirstName,
+      lastName: currLastName,
+      biography: currBiography,
+    },
+    mode: "all",
+  });
 
-    const isUpdateDisabled =
-      firstNameError || lastNameError || !checkForChanges();
+  const profile = useProfile();
 
-    const handleSubmit = async () => {
-      const accessToken = localStorage.getItem("token");
+  if (!profile) {
+    throw new Error("useProfile() must be used within ProfileContextProvider");
+  }
 
-      try {
-        await userClient.patch(
-          `/users/${userId}`,
-          {
-            firstName: newFirstName,
-            lastName: newLastName,
-            biography: newBio,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        handleClose();
-        onUpdate(true, SUCCESS_PROFILE_UPDATE_MESSAGE, true);
-      } catch (error) {
-        console.error("Error:", error);
-        if (axios.isAxiosError(error)) {
-          const message =
-            error.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
-          onUpdate(true, message, false);
-        } else {
-          onUpdate(true, FAILED_PROFILE_UPDATE_MESSAGE, false);
-        }
-      }
-    };
+  const { updateProfile } = profile;
 
-    return (
-      <Box
-        ref={ref}
-        sx={(theme) => ({
-          backgroundColor: theme.palette.common.white,
-          display: "flex",
-          width: 600,
-          flexDirection: "column",
-          alignItems: "center",
-          borderRadius: "16px",
-          padding: "40px",
-        })}
-      >
-        <Typography component="h1" variant="h3">
-          Edit Profile
-        </Typography>
-        <FormControl fullWidth>
-          <TextField
-            required
-            id="outlined-basic"
-            label="First name"
-            sx={{ marginTop: 2 }}
-            slotProps={{
-              htmlInput: {
-                maxLength: nameCharLimit,
-              },
-            }}
-            defaultValue={currFirstName}
-            onChange={(input) => {
-              const val = input.target.value;
-              if (!/^[a-zA-Z\s-]*$/.test(val) || val.length == 0) {
-                setFirstNameError(true);
-              } else {
-                setFirstNameError(false);
-              }
-              setNewFirstName(val);
-            }}
-            error={firstNameError}
-          />
-          {firstNameError ? (
-            <Stack
-              direction="row"
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              {newFirstName.length == 0 ? (
-                <FormHelperText error={firstNameError}>
-                  Required field
-                </FormHelperText>
-              ) : (
-                <FormHelperText error={firstNameError}>
-                  Only alphabetical, hyphen and white space characters allowed
-                </FormHelperText>
-              )}
-              <FormHelperText>
-                {newFirstName.length} / {nameCharLimit} characters
-              </FormHelperText>
-            </Stack>
-          ) : (
-            <FormHelperText sx={{ textAlign: "right" }}>
-              {newFirstName.length} / {nameCharLimit} characters
-            </FormHelperText>
-          )}
-        </FormControl>
-        <FormControl fullWidth>
-          <TextField
-            required
-            id="outlined-basic"
-            label="Last name"
-            sx={{ marginTop: 2 }}
-            slotProps={{
-              htmlInput: {
-                maxLength: nameCharLimit,
-              },
-            }}
-            defaultValue={currLastName}
-            onChange={(input) => {
-              const val = input.target.value;
-              if (!/^[a-zA-Z\s-]*$/.test(val) || val.length == 0) {
-                setLastNameError(true);
-              } else {
-                setLastNameError(false);
-              }
-              setNewLastName(val);
-            }}
-            error={lastNameError}
-          />
-          {lastNameError ? (
-            <Stack
-              direction="row"
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              {newLastName.length == 0 ? (
-                <FormHelperText error={lastNameError}>
-                  Required field
-                </FormHelperText>
-              ) : (
-                <FormHelperText error={lastNameError}>
-                  Only alphabetical, hyphen and white space characters allowed
-                </FormHelperText>
-              )}
-              <FormHelperText>
-                {newLastName.length} / {nameCharLimit} characters
-              </FormHelperText>
-            </Stack>
-          ) : (
-            <FormHelperText sx={{ textAlign: "right" }}>
-              {newLastName.length} / {nameCharLimit} characters
-            </FormHelperText>
-          )}
-        </FormControl>
-        <TextField
-          fullWidth
-          id="outlined-basic"
-          label="Biography"
-          sx={{ marginTop: 2 }}
-          slotProps={{
-            htmlInput: {
-              maxLength: bioCharLimit,
-            },
-            formHelperText: {
-              sx: { textAlign: "right" },
-            },
-          }}
-          defaultValue={currBiography}
-          onChange={(input) => {
-            setNewBio(input.target.value);
-          }}
-          helperText={newBio.length + ` / ${bioCharLimit} characters`}
-        />
-        <Stack direction="row" spacing={2} sx={{ marginTop: 2, width: "100%" }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleClose}
-            sx={{ flexGrow: 1 }}
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle fontSize={24}>Edit profile</DialogTitle>
+      <DialogContent>
+        <Container maxWidth="sm">
+          <StyledForm
+            onSubmit={handleSubmit((data) => {
+              updateProfile(data);
+              onClose();
+            })}
           >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            disabled={isUpdateDisabled}
-            onClick={handleSubmit}
-            sx={{ flexGrow: 1 }}
-          >
-            Update
-          </Button>
-        </Stack>
-      </Box>
-    );
-  },
-);
+            <TextField
+              fullWidth
+              required
+              label="First name"
+              margin="normal"
+              {...register("firstName", {
+                validate: { nameValidator },
+              })}
+              error={!!errors.firstName}
+              helperText={errors.firstName?.message}
+            />
+            <TextField
+              fullWidth
+              required
+              label="Last name"
+              margin="normal"
+              {...register("lastName", {
+                validate: { nameValidator },
+              })}
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
+            />
+            <TextField
+              fullWidth
+              multiline
+              label="Biography"
+              margin="normal"
+              {...register("biography", {
+                validate: { bioValidator },
+              })}
+            />
+            <Stack
+              direction={"row"}
+              spacing={2}
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+            >
+              <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                disabled={!isDirty || !isValid}
+              >
+                Update
+              </Button>
+            </Stack>
+          </StyledForm>
+        </Container>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export default EditProfileModal;

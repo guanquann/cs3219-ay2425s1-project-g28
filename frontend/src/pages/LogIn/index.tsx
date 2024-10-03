@@ -1,12 +1,12 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import LogInSvg from "../../assets/login.svg?react";
-import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import CustomTextField from "../../components/CustomTextField";
 import { emailValidator } from "../../utils/validators";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useForm } from "react-hook-form";
+import PasswordTextField from "../../components/PasswordTextField";
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
@@ -16,37 +16,11 @@ const LogIn: React.FC = () => {
   }
   const { login } = auth;
 
-  const formValues = useRef({ email: "", password: "" });
-  const formValidity = useRef({ email: false, password: false });
-  const [emptyFields, setEmptyFields] = useState<{ [key: string]: boolean }>({
-    email: false,
-    password: false,
-  });
-
-  const handleInputChange = (
-    field: keyof typeof formValues.current,
-    value: string,
-    isValid: boolean,
-  ) => {
-    formValues.current[field] = value;
-    formValidity.current[field] = isValid;
-    setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
-  };
-
-  const handleLogIn = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!Object.values(formValidity.current).every((isValid) => isValid)) {
-      // Mark untouched required fields red
-      Object.entries(formValues.current).forEach(([field, value]) => {
-        setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
-      });
-      return;
-    }
-
-    const { email, password } = formValues.current;
-    login(email, password);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{ email: string; password: string }>({ mode: "all" });
 
   return (
     <Box
@@ -82,33 +56,32 @@ const LogIn: React.FC = () => {
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
             })}
-            onSubmit={handleLogIn}
+            onSubmit={handleSubmit((data) => login(data.email, data.password))}
             noValidate
           >
-            <CustomTextField
+            <TextField
               label="Email"
-              size="small"
               required
-              emptyField={emptyFields.email}
-              validator={emailValidator}
-              onChange={(value, isValid) =>
-                handleInputChange("email", value, isValid)
-              }
+              fullWidth
+              margin="normal"
+              type="email"
+              {...register("email", { validate: { emailValidator } })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
             />
-            <CustomTextField
+            <PasswordTextField
               label="Password"
-              size="small"
               required
-              emptyField={emptyFields.password}
-              onChange={(value, isValid) =>
-                handleInputChange("password", value, isValid)
-              }
-              isPasswordField
+              fullWidth
+              margin="normal"
+              {...register("password", { required: "Password is required" })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
             />
             <Button
               type="submit"
               variant="contained"
-              sx={(theme) => ({ height: theme.spacing(5) })}
+              sx={(theme) => ({ margin: theme.spacing(2, 0) })}
             >
               Log in
             </Button>
