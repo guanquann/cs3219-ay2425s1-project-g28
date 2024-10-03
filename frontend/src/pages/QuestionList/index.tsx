@@ -29,7 +29,11 @@ import reducer, {
   getQuestionList,
   initialState,
 } from "../../reducers/questionReducer";
-import { complexityList, FAILED_QUESTION_DELETE, SUCCESS_QUESTION_DELETE } from "../../utils/constants";
+import {
+  complexityList,
+  FAILED_QUESTION_DELETE,
+  SUCCESS_QUESTION_DELETE,
+} from "../../utils/constants";
 import useDebounce from "../../utils/debounce";
 import { blue, grey } from "@mui/material/colors";
 import { Add, Delete, Edit, MoreVert, Search } from "@mui/icons-material";
@@ -55,10 +59,21 @@ const QuestionList: React.FC = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   const navigate = useNavigate();
-  
+
   const areQuestionsFiltered = () => {
     return (
       searchFilter || complexityFilter.length > 0 || categoryFilter.length > 0
+    );
+  };
+
+  const updateQuestionList = () => {
+    getQuestionList(
+      page + 1, // convert from 0-based indexing
+      rowsPerPage,
+      searchFilter,
+      complexityFilter,
+      categoryFilter,
+      dispatch
     );
   };
 
@@ -102,14 +117,11 @@ const QuestionList: React.FC = () => {
 
     toast.success(SUCCESS_QUESTION_DELETE);
     getQuestionCategories(dispatch);
-    getQuestionList(
-      page + 1, // convert from 0-based indexing
-      rowsPerPage,
-      searchFilter,
-      complexityFilter,
-      categoryFilter,
-      dispatch
-    );
+    if (state.questionCount % rowsPerPage !== 1 || page === 0) {
+      updateQuestionList();
+    } else {
+      setPage(page - 1);
+    }
   };
 
   useEffect(() => {
@@ -117,15 +129,16 @@ const QuestionList: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    getQuestionList(
-      page + 1, // convert from 0-based indexing
-      rowsPerPage,
-      searchFilter,
-      complexityFilter,
-      categoryFilter,
-      dispatch
-    );
-  }, [page, searchFilter, complexityFilter, categoryFilter]);
+    if (page !== 0) {
+      setPage(0);
+    } else {
+      updateQuestionList();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchFilter, complexityFilter, categoryFilter]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => updateQuestionList(), [page]);
 
   // Check if the user is admin
   const auth = useAuth();
@@ -347,6 +360,7 @@ const QuestionList: React.FC = () => {
                   {isAdmin && (
                     <TableCell sx={{ borderTop: "1px solid #E0E0E0" }}>
                       <IconButton
+                        data-testid="edit-delete-menu"
                         type="button"
                         onClick={(event) => handleMenuOpen(event, question.id)}
                       >

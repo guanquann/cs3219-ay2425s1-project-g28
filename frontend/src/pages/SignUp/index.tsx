@@ -1,12 +1,17 @@
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import SignUpSvg from "../../assets/signup.svg?react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import CustomTextField from "../../components/CustomTextField";
-import { emailValidator, nameValidator, passwordValidator, usernameValidator } from "../../utils/validators";
-import { useRef, useState } from "react";
+import {
+  emailValidator,
+  nameValidator,
+  passwordValidator,
+  usernameValidator,
+} from "../../utils/validators";
 import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
+import { useForm } from "react-hook-form";
+import PasswordTextField from "../../components/PasswordTextField";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -16,36 +21,17 @@ const SignUp: React.FC = () => {
   }
   const { signup } = auth;
 
-  const formValues = useRef({ firstName: "", lastName: "", username: "", email: "", password: "" });
-  const formValidity = useRef({ firstName: false, lastName: false, username: false, email: false, password: false });
-  const [emptyFields, setEmptyFields] = useState<{ [key: string]: boolean }>({
-    firstName: false,
-    lastName: false,
-    username: false,
-    email: false,
-    password: false,
-  });
-
-  const handleInputChange = (field: keyof typeof formValues.current, value: string, isValid: boolean) => {
-    formValues.current[field] = value;
-    formValidity.current[field] = isValid;
-    setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
-  };
-
-  const handleSignUp = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!Object.values(formValidity.current).every((isValid) => isValid)) {
-      // Mark untouched required fields red
-      Object.entries(formValues.current).forEach(([field, value]) => {
-        setEmptyFields((prevState) => ({ ...prevState, [field]: !value }));
-      });
-      return;
-    }
-
-    const { firstName, lastName, username, email, password } = formValues.current;
-    signup(firstName, lastName, username, email, password);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    password: string;
+  }>({ mode: "all" });
 
   return (
     <Box
@@ -60,14 +46,14 @@ const SignUp: React.FC = () => {
         <Stack
           height="100%"
           direction="column"
-          sx={(theme) => ({ 
+          sx={(theme) => ({
             backgroundColor: "secondary.main",
             padding: theme.spacing(2, 10),
             justifyContent: "center",
           })}
         >
-          <Typography 
-            component="h1" 
+          <Typography
+            component="h1"
             variant="h1"
             sx={{ color: "primary.main", textAlign: "center" }}
           >
@@ -75,77 +61,90 @@ const SignUp: React.FC = () => {
           </Typography>
           <Stack
             component="form"
-            direction="column" 
+            direction="column"
+            noValidate
             spacing={1.5}
             sx={(theme) => ({
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
             })}
-            onSubmit={handleSignUp}
-            noValidate
+            onSubmit={handleSubmit((data) =>
+              signup(
+                data.firstName,
+                data.lastName,
+                data.username,
+                data.email,
+                data.password
+              )
+            )}
           >
-            <CustomTextField
-              label="First Name"
-              size="small"
+            <TextField
+              label="First name"
               required
-              emptyField={emptyFields.firstName}
-              validator={nameValidator}
-              onChange={(value, isValid) => handleInputChange("firstName", value, isValid)}
+              fullWidth
+              margin="normal"
+              {...register("firstName", { validate: { nameValidator } })}
+              error={!!errors.firstName}
+              helperText={errors.firstName?.message}
             />
-            <CustomTextField
-              label="Last Name"
-              size="small"
+            <TextField
+              label="Last name"
               required
-              emptyField={emptyFields.lastName}
-              validator={nameValidator}
-              onChange={(value, isValid) => handleInputChange("lastName", value, isValid)}
+              fullWidth
+              margin="normal"
+              {...register("lastName", { validate: { nameValidator } })}
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
             />
-            <CustomTextField
+            <TextField
               label="Username"
-              size="small"
               required
-              emptyField={emptyFields.username}
-              validator={usernameValidator}
-              onChange={(value, isValid) => handleInputChange("username", value, isValid)}
+              fullWidth
+              margin="normal"
+              {...register("username", { validate: { usernameValidator } })}
+              error={!!errors.username}
+              helperText={errors.username?.message}
             />
-            <CustomTextField
+            <TextField
               label="Email"
-              size="small"
               required
-              emptyField={emptyFields.email}
-              validator={emailValidator}
-              onChange={(value, isValid) => handleInputChange("email", value, isValid)}
+              fullWidth
+              margin="normal"
+              type="email"
+              {...register("email", { validate: { emailValidator } })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
             />
-            <CustomTextField
+            <PasswordTextField
+              displayTooltip
               label="Password"
-              size="small"
               required
-              emptyField={emptyFields.password}
-              validator={passwordValidator}
-              onChange={(value, isValid) => handleInputChange("password", value, isValid)}
-              isPasswordField
+              fullWidth
+              margin="normal"
+              {...register("password", { validate: { passwordValidator } })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
             />
             <Button
               type="submit"
               variant="contained"
-              sx={(theme) => ({ height: theme.spacing(5) })}
+              sx={(theme) => ({ margin: theme.spacing(2, 0) })}
             >
               Sign up
             </Button>
           </Stack>
-          <Stack 
-            direction="row" 
+          <Stack
+            direction="row"
             spacing={0.5}
             sx={{ justifyContent: "flex-end" }}
           >
-            <Typography 
-              component="span"
-              sx={{ fontSize: 14 }}
-            >
+            <Typography component="span" sx={{ fontSize: 14 }}>
               Have an account?
             </Typography>
-            <Typography 
+            <Typography
               component="span"
+              role="button"
+              tabIndex={0}
               sx={{
                 fontSize: 14,
                 cursor: "pointer",
@@ -161,7 +160,7 @@ const SignUp: React.FC = () => {
         </Stack>
       </Box>
       <Box
-        flex={1} 
+        flex={1}
         sx={{
           display: "flex",
           justifyContent: "center",

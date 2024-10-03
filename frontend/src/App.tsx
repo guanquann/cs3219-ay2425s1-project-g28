@@ -7,15 +7,18 @@ import PageNotFound from "./pages/PageNotFound";
 import ProfilePage from "./pages/Profile";
 import AuthProvider from "./contexts/AuthContext";
 import QuestionList from "./pages/QuestionList";
+import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import ProfileContextProvider from "./contexts/ProfileContext";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
           <Route path="questions">
             <Route index element={<QuestionList />} />
             <Route path=":questionId" element={<QuestionDetail />} />
@@ -24,7 +27,14 @@ function App() {
               <Route path=":questionId/edit" element={<QuestionEdit />} />
             </Route>
           </Route>
-          <Route path="profile/:userId" element={<ProfilePage />} />
+          <Route
+            path="profile/:userId"
+            element={
+              <ProfileContextProvider>
+                <ProfilePage />
+              </ProfileContextProvider>
+            }
+          />
           <Route path="*" element={<PageNotFound />} />
         </Route>
         <Route path="/signup" element={<SignUp />}></Route>

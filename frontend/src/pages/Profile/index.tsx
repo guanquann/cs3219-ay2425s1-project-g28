@@ -1,57 +1,47 @@
 import { useParams } from "react-router-dom";
 import AppMargin from "../../components/AppMargin";
-import ProfileSection from "../../components/ProfileSection";
-import { Box, Modal, Typography } from "@mui/material";
+import ProfileDetails from "../../components/ProfileDetails";
+import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import classes from "./index.module.css";
-import { useEffect, useState } from "react";
-import { userClient } from "../../utils/api";
+import { useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { toast } from "react-toastify";
 import ServerError from "../../components/ServerError";
 import EditProfileModal from "../../components/EditProfileModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
-
-type UserProfile = {
-  id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  isAdmin: boolean;
-  biography?: string;
-  profilePictureUrl?: string;
-  createdAt: string;
-};
+import { useProfile } from "../../contexts/ProfileContext";
 
 const ProfilePage: React.FC = () => {
-  const [editProfileOpen, setEditProfileOpen] = useState(false);
-  const handleEditProfileOpen = () => setEditProfileOpen(true);
-  const handleEditProfileClose = () => setEditProfileOpen(false);
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  const handleChangePasswordOpen = () => setChangePasswordOpen(true);
-  const handleChangePasswordClose = () => setChangePasswordOpen(false);
-
   const { userId } = useParams<{ userId: string }>();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const auth = useAuth();
+
+  const profile = useProfile();
 
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
   }
 
-  const { user } = auth;
+  if (!profile) {
+    throw new Error("useProfile() must be used within ProfileContextProvider");
+  }
+
+  const {
+    user,
+    editProfileOpen,
+    passwordModalOpen,
+    fetchUser,
+    setEditProfileModalOpen,
+    setPasswordModalOpen,
+  } = profile;
 
   useEffect(() => {
-    userClient
-      .get(`/users/${userId}`)
-      .then((res) => {
-        setUserProfile(res.data.data);
-      })
-      .catch(() => setUserProfile(null));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!userId) {
+      return;
+    }
+
+    fetchUser(userId);
   }, []);
 
-  if (!userProfile) {
+  if (!user) {
     return (
       <ServerError
         title="Oops, user not found..."
@@ -60,17 +50,10 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  const notify = (message: string, isSuccess: boolean) => {
-    if (isSuccess) {
-      toast.success(message);
-    } else {
-      toast.error(message);
-    }
-  }
+  const isCurrentUser = auth.user?.id === userId;
 
   return (
-    userId &&
-    (<AppMargin classname={classes.fullheight}>
+    <AppMargin classname={classes.fullheight}>
       <Box
         sx={(theme) => ({
           marginTop: theme.spacing(4),
@@ -78,50 +61,59 @@ const ProfilePage: React.FC = () => {
         })}
       >
         <Box sx={(theme) => ({ flex: 1, paddingRight: theme.spacing(4) })}>
-          <ProfileSection
-            firstName={userProfile.firstName}
-            lastName={userProfile.lastName}
-            username={userProfile.username}
-            biography={userProfile.biography}
-            isCurrentUser={user?.id === userId}
-            handleEditProfileOpen={handleEditProfileOpen}
-            handleChangePasswordOpen={handleChangePasswordOpen}
-          />
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <ProfileDetails
+              username={user.username}
+              firstName={user.firstName}
+              lastName={user.lastName}
+              biography={user.biography}
+            />
+            {isCurrentUser && (
+              <>
+                <Divider />
+                <Stack
+                  spacing={2}
+                  sx={(theme) => ({
+                    marginTop: theme.spacing(4),
+                    marginBottom: theme.spacing(4),
+                  })}
+                >
+                  <Button
+                    variant="contained"
+                    onClick={() => setEditProfileModalOpen(true)}
+                    sx={{ textTransform: "none" }}
+                  >
+                    Edit profile
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => setPasswordModalOpen(true)}
+                    sx={{ textTransform: "none" }}
+                    color="secondary"
+                  >
+                    Change password
+                  </Button>
+                </Stack>
+              </>
+            )}
+          </Box>
         </Box>
         <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>
           <Typography variant="h4">Questions attempted</Typography>
         </Box>
-        <Modal
+        <EditProfileModal
           open={editProfileOpen}
-          onClose={handleEditProfileClose}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <EditProfileModal 
-            handleClose={handleEditProfileClose} 
-            currFirstName={userProfile.firstName} 
-            currLastName={userProfile.lastName}
-            currBiography={userProfile.biography}
-            userId={userId}
-            onUpdate={notify} />
-        </Modal>
-        <Modal
-          open={changePasswordOpen}
-          onClose={handleChangePasswordClose}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <ChangePasswordModal 
-            handleClose={handleChangePasswordClose}
-            userId={userId}
-            onUpdate={notify} />
-        </Modal>
+          onClose={() => setEditProfileModalOpen(false)}
+          currFirstName={user.firstName}
+          currLastName={user.lastName}
+          currBiography={user.biography}
+        />
+        <ChangePasswordModal
+          open={passwordModalOpen}
+          onClose={() => setPasswordModalOpen(false)}
+        />
       </Box>
-    </AppMargin>)
+    </AppMargin>
   );
 };
 

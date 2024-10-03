@@ -177,7 +177,7 @@ describe("Authenticated user", () => {
     const avatar = screen.getByTestId("profile");
     fireEvent.click(avatar);
     expect(
-      screen.getByRole("menuitem", { name: "Profile" })
+      screen.getByRole("menuitem", { name: "Profile" }),
     ).toBeInTheDocument();
   });
 
@@ -271,7 +271,7 @@ describe("Authenticated user", () => {
     const avatar = screen.getByTestId("profile");
     fireEvent.click(avatar);
     expect(
-      screen.getByRole("menuitem", { name: "Logout" })
+      screen.getByRole("menuitem", { name: "Logout" }),
     ).toBeInTheDocument();
   });
 });

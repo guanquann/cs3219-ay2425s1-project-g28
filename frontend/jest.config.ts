@@ -91,8 +91,10 @@ const config: Config = {
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    '\\.(css)$': '<rootDir>/__mocks__/styleMock.ts',
-    '\\.(svg)$': '<rootDir>/__mocks__/styleMock.ts',
+    "\\.(css)$": "<rootDir>/__mocks__/styleMock.ts",
+    "\\.(svg\\?react)$": "<rootDir>/__mocks__/svgMock.ts",
+    // "@uiw/react-md-editor":
+    //   "<rootDir>/node_modules/@uiw/react-md-editor/esm/index",
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader

@@ -10,7 +10,13 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { toast } from "react-toastify";
 
-import { complexityList, FAILED_QUESTION_UPDATE, FILL_ALL_FIELDS, NO_QUESTION_CHANGES, SUCCESS_QUESTION_UPDATE } from "../../utils/constants";
+import {
+  complexityList,
+  FAILED_QUESTION_UPDATE,
+  FILL_ALL_FIELDS,
+  NO_QUESTION_CHANGES,
+  SUCCESS_QUESTION_UPDATE,
+} from "../../utils/constants";
 import reducer, {
   getQuestionById,
   updateQuestionById,
@@ -127,7 +133,6 @@ const QuestionEdit = () => {
           <TextField
             label="Title"
             variant="outlined"
-            size="small"
             fullWidth
             autoComplete="off"
             value={title}
@@ -137,7 +142,6 @@ const QuestionEdit = () => {
 
           <Autocomplete
             options={complexityList}
-            size="small"
             sx={{ marginTop: 2 }}
             value={selectedComplexity}
             onChange={(_e, newcomplexitySelected) => {

@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Divider, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Typography } from "@mui/material";
 import React from "react";
 
 type ProfileSectionProps = {
@@ -6,13 +6,10 @@ type ProfileSectionProps = {
   lastName: string;
   username: string;
   biography?: string;
-  isCurrentUser: boolean;
-  handleEditProfileOpen: () => void;
-  handleChangePasswordOpen: () => void;
 };
 
-const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
-  const { firstName, lastName, username, biography, isCurrentUser, handleEditProfileOpen, handleChangePasswordOpen } = props;
+const ProfileDetails: React.FC<ProfileSectionProps> = (props) => {
+  const { firstName, lastName, username, biography } = props;
 
   return (
     <Box>
@@ -43,25 +40,8 @@ const ProfileSection: React.FC<ProfileSectionProps> = (props) => {
           {biography}
         </Typography>
       </Box>
-      {isCurrentUser && (
-        <>
-          <Divider />
-          <Stack
-            spacing={2}
-            sx={(theme) => ({
-              marginTop: theme.spacing(4),
-              marginBottom: theme.spacing(4),
-            })}
-          >
-            <Button variant="contained" onClick={handleEditProfileOpen}>Edit profile</Button>
-            <Button variant="contained" color="secondary" onClick={handleChangePasswordOpen}>
-              Change password
-            </Button>
-          </Stack>
-        </>
-      )}
     </Box>
   );
 };
 
-export default ProfileSection;
+export default ProfileDetails;

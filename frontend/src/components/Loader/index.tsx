@@ -16,7 +16,9 @@ const Loader: React.FC = () => {
       <Typography
         variant="h4"
         sx={(theme) => ({ marginTop: theme.spacing(2) })}
-      >Loading...</Typography>
+      >
+        Loading...
+      </Typography>
     </Box>
   );
 };

@@ -73,7 +73,7 @@ export async function createUser(
         lastName,
         username,
         email,
-        hashedPassword,
+        hashedPassword
       );
       return res.status(201).json({
         message: `Created new user ${username} successfully`,
@@ -85,8 +85,7 @@ export async function createUser(
           "At least one of first name, last name, username, email and password are missing",
       });
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "Unknown error when creating new user!" });
@@ -108,8 +107,7 @@ export async function getUser(req: Request, res: Response): Promise<Response> {
         .status(200)
         .json({ message: `Found user`, data: formatUserResponse(user) });
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "Unknown error when getting user!" });
@@ -126,8 +124,7 @@ export async function getAllUsers(
     return res
       .status(200)
       .json({ message: `Found users`, data: users.map(formatUserResponse) });
-  } catch (err) {
-    console.error(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "Unknown error when getting all users!" });
@@ -226,8 +223,7 @@ export async function updateUser(
           "No field to update. Update one of the following fields: username, email, password, profilePictureUrl, firstName, lastName, biography",
       });
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "Unknown error when updating user!" });
@@ -263,8 +259,7 @@ export async function updateUserPrivilege(
     } else {
       return res.status(400).json({ message: "isAdmin is missing!" });
     }
-  } catch (err) {
-    console.error(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "Unknown error when updating user privilege!" });
@@ -289,8 +284,7 @@ export async function deleteUser(
     return res
       .status(200)
       .json({ message: `Deleted user ${userId} successfully` });
-  } catch (err) {
-    console.error(err);
+  } catch {
     return res
       .status(500)
       .json({ message: "Unknown error when deleting user!" });

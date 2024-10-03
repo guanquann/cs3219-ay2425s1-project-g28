@@ -26,21 +26,23 @@ const theme = createTheme({
         },
       },
     },
+    MuiTextField: { defaultProps: { size: "small" } },
+    MuiAutocomplete: { defaultProps: { size: "small" } },
     MuiCssBaseline: {
       styleOverrides: {
         html: {
-          "& ::-webkit-scrollbar": { 
+          "& ::-webkit-scrollbar": {
             height: "6px",
             width: "6px",
           },
           "& ::-webkit-scrollbar-track": {
-            backgroundColor: grey[200]
+            backgroundColor: grey[200],
           },
           "& ::-webkit-scrollbar-thumb": {
-            backgroundColor: grey[400]
+            backgroundColor: grey[400],
           },
           "& ::-webkit-scrollbar-thumb:hover": {
-            backgroundColor: grey[500]
+            backgroundColor: grey[500],
           },
         },
       },

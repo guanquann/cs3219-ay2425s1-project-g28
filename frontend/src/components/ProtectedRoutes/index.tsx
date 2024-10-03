@@ -3,11 +3,13 @@ import { useAuth } from "../../contexts/AuthContext";
 import React from "react";
 import ServerError from "../ServerError";
 
-type ProtectedRoutesProps = { 
+type ProtectedRoutesProps = {
   adminOnly?: boolean;
 };
 
-const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ adminOnly = false }) => {
+const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
+  adminOnly = false,
+}) => {
   const auth = useAuth();
   if (!auth) {
     throw new Error("useAuth() must be used within AuthProvider");
@@ -17,7 +19,7 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ adminOnly = false }) 
   if (!user) {
     return <Navigate to="/" />;
   }
-  
+
   if (adminOnly && !user.isAdmin) {
     return (
       <ServerError
@@ -25,8 +27,8 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({ adminOnly = false }) 
         subtitle="Unfortunately, you do not have the permission to access this page 😥"
       />
     );
-  } 
-  
+  }
+
   return <Outlet />;
 };
 

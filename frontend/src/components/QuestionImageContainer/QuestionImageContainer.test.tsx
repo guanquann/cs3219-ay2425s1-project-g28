@@ -10,6 +10,26 @@ jest.mock("../../utils/api", () => ({
 }));
 
 describe("Question Image Container", () => {
+  const mockLocalStorage = (() => {
+    const store: { [key: string]: string } = { token: "test" };
+
+    return {
+      getItem(key: string) {
+        return store[key];
+      },
+      setItem(key: string, value: string) {
+        store[key] = value;
+      },
+    };
+  })();
+
+  beforeAll(() =>
+    Object.defineProperty(window, "localStorage", {
+      value: mockLocalStorage,
+      writable: true,
+    }),
+  );
+
   it("Question Image Container is rendered with no uploaded images", () => {
     const uploadedImagesUrl: string[] = [];
     const setUploadedImagesUrl = jest.fn();
@@ -18,11 +38,11 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const uploadImageMessage = screen.getByText(
-      "Click to upload images. The maximum image size accepted is 5MB."
+      "Click to upload images. The maximum image size accepted is 5MB.",
     );
     expect(uploadImageMessage).toBeInTheDocument();
   });
@@ -35,7 +55,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const images = screen.getAllByAltText("question image");
@@ -50,7 +70,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const image = screen.getByAltText("question image");
@@ -90,7 +110,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const file = new File(["file"], "file.png", { type: "image/png" });
@@ -102,8 +122,11 @@ describe("Question Image Container", () => {
         "/images",
         expect.any(FormData),
         expect.objectContaining({
-          headers: { "Content-Type": "multipart/form-data" },
-        })
+          headers: {
+            Authorization: `Bearer ${mockLocalStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }),
       );
 
       expect(setUploadedImagesUrl).toHaveBeenCalled();
@@ -118,7 +141,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const file = new File(["file"], "file.txt", { type: "text/plain" });
@@ -136,7 +159,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const input = screen.getByTestId("file-input");
@@ -162,7 +185,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const file = new File(["file"], "file.png", { type: "image/png" });
@@ -182,7 +205,7 @@ describe("Question Image Container", () => {
       <QuestionImageContainer
         uploadedImagesUrl={uploadedImagesUrl}
         setUploadedImagesUrl={setUploadedImagesUrl}
-      />
+      />,
     );
 
     const input = screen.getByTestId("file-input");

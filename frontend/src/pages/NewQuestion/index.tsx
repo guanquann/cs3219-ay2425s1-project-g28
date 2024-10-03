@@ -105,7 +105,6 @@ const NewQuestion = () => {
           <TextField
             label="Title"
             variant="outlined"
-            size="small"
             fullWidth
             autoComplete="off"
             value={title}
@@ -115,7 +114,6 @@ const NewQuestion = () => {
 
           <Autocomplete
             options={complexityList}
-            size="small"
             sx={{ marginTop: 2 }}
             onChange={(_e, newcomplexitySelected) => {
               setselectedComplexity(newcomplexitySelected);
