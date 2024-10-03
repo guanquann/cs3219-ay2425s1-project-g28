@@ -26,6 +26,8 @@ const theme = createTheme({
         },
       },
     },
+    MuiTextField: { defaultProps: { size: "small" } },
+    MuiAutocomplete: { defaultProps: { size: "small" } },
     MuiCssBaseline: {
       styleOverrides: {
         html: {
