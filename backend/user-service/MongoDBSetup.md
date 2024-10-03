@@ -1,3 +1,5 @@
+> This guide is taken from the [user-service MongoDBSetup.md in the PeerPrep-UserService repository](https://github.com/CS3219-AY2425S1/cs3219-ay2425s1-project-g28/blob/main/backend/user-service/MongoDBSetup.md)
+
 # Setting up MongoDB Instance
 
 1. Visit the MongoDB Atlas Site [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas) and click on "Try Free"
