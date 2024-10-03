@@ -23,7 +23,12 @@ const Matching: React.FC = () => {
           Finding your practice partner
         </Typography>
         <img src={matching} style={{ height: 120, width: "auto" }} />
-        <Timer totalTime={totalTime} timeLeft={timeLeft} thickness={4} />
+        <Timer
+          totalTime={totalTime}
+          timeLeft={timeLeft}
+          thickness={4.8}
+          size={120}
+        />
       </Stack>
     </AppMargin>
   );
