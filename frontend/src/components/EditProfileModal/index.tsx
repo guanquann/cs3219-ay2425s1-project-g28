@@ -32,7 +32,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
     register,
     formState: { errors, isValid, isDirty },
     handleSubmit,
-    reset,
   } = useForm<{
     firstName: string;
     lastName: string;
@@ -55,13 +54,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
   const { updateProfile } = profile;
 
   return (
-    <Dialog
-      open={open}
-      onClose={() => {
-        onClose();
-        reset();
-      }}
-    >
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle fontSize={24} sx={{ paddingBottom: 0 }}>
         Edit profile
       </DialogTitle>
@@ -71,7 +64,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
             onSubmit={handleSubmit((data) => {
               updateProfile(data);
               onClose();
-              reset();
             })}
           >
             <TextField
@@ -120,10 +112,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                 fullWidth
                 variant="contained"
                 color="secondary"
-                onClick={() => {
-                  onClose();
-                  reset();
-                }}
+                onClick={onClose}
               >
                 Cancel
               </Button>

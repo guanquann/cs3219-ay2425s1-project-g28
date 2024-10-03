@@ -13,6 +13,7 @@ import { passwordValidator } from "../../utils/validators";
 import PasswordTextField from "../PasswordTextField";
 import {
   PASSWORD_MISMATCH_ERROR_MESSAGE,
+  PASSWORD_REQUIRED_ERROR_MESSAGE,
   USE_PROFILE_ERROR_MESSAGE,
 } from "../../utils/constants";
 
@@ -33,7 +34,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
     formState: { errors, dirtyFields, isDirty, isValid },
     watch,
     trigger,
-    reset,
   } = useForm<{
     oldPassword: string;
     newPassword: string;
@@ -51,14 +51,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
   const { updatePassword } = profile;
 
   return (
-    <Dialog
-      fullWidth
-      open={open}
-      onClose={() => {
-        onClose();
-        reset();
-      }}
-    >
+    <Dialog fullWidth open={open} onClose={onClose}>
       <DialogTitle fontSize={24} sx={{ paddingBottom: 0 }}>
         Change password
       </DialogTitle>
@@ -71,7 +64,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
                 newPassword: data.newPassword,
               });
               onClose();
-              reset();
             })}
           >
             <PasswordTextField
@@ -82,7 +74,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               sx={(theme) => ({ marginTop: theme.spacing(1) })}
               {...register("oldPassword", {
                 setValueAs: (value: string) => value.trim(),
+                required: PASSWORD_REQUIRED_ERROR_MESSAGE,
               })}
+              error={!!errors.oldPassword}
+              helperText={errors.oldPassword?.message}
             />
             <PasswordTextField
               displayTooltip
@@ -133,10 +128,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
                 fullWidth
                 variant="contained"
                 color="secondary"
-                onClick={() => {
-                  onClose();
-                  reset();
-                }}
+                onClick={onClose}
               >
                 Cancel
               </Button>
