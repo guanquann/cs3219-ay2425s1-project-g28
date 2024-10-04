@@ -12,17 +12,22 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import PasswordTextField from "../../components/PasswordTextField";
+import {
+  PASSWORD_REQUIRED_ERROR_MESSAGE,
+  USE_AUTH_ERROR_MESSAGE,
+} from "../../utils/constants";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   if (!auth) {
-    throw new Error("useAuth() must be used within AuthProvider");
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
   const { signup } = auth;
 
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<{
@@ -83,7 +88,10 @@ const SignUp: React.FC = () => {
               required
               fullWidth
               margin="normal"
-              {...register("firstName", { validate: { nameValidator } })}
+              {...register("firstName", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { nameValidator },
+              })}
               error={!!errors.firstName}
               helperText={errors.firstName?.message}
             />
@@ -92,7 +100,10 @@ const SignUp: React.FC = () => {
               required
               fullWidth
               margin="normal"
-              {...register("lastName", { validate: { nameValidator } })}
+              {...register("lastName", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { nameValidator },
+              })}
               error={!!errors.lastName}
               helperText={errors.lastName?.message}
             />
@@ -101,7 +112,10 @@ const SignUp: React.FC = () => {
               required
               fullWidth
               margin="normal"
-              {...register("username", { validate: { usernameValidator } })}
+              {...register("username", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { usernameValidator },
+              })}
               error={!!errors.username}
               helperText={errors.username?.message}
             />
@@ -111,7 +125,10 @@ const SignUp: React.FC = () => {
               fullWidth
               margin="normal"
               type="email"
-              {...register("email", { validate: { emailValidator } })}
+              {...register("email", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { emailValidator },
+              })}
               error={!!errors.email}
               helperText={errors.email?.message}
             />
@@ -121,7 +138,12 @@ const SignUp: React.FC = () => {
               required
               fullWidth
               margin="normal"
-              {...register("password", { validate: { passwordValidator } })}
+              input={watch("password", "")}
+              {...register("password", {
+                setValueAs: (value: string) => value.trim(),
+                required: PASSWORD_REQUIRED_ERROR_MESSAGE,
+                validate: { passwordValidator },
+              })}
               error={!!errors.password}
               helperText={errors.password?.message}
             />

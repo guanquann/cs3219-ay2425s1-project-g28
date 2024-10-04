@@ -7,12 +7,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import PasswordTextField from "../../components/PasswordTextField";
+import {
+  PASSWORD_REQUIRED_ERROR_MESSAGE,
+  USE_AUTH_ERROR_MESSAGE,
+} from "../../utils/constants";
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   if (!auth) {
-    throw new Error("useAuth() must be used within AuthProvider");
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
   const { login } = auth;
 
@@ -65,7 +69,10 @@ const LogIn: React.FC = () => {
               fullWidth
               margin="normal"
               type="email"
-              {...register("email", { validate: { emailValidator } })}
+              {...register("email", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { emailValidator },
+              })}
               error={!!errors.email}
               helperText={errors.email?.message}
             />
@@ -74,7 +81,10 @@ const LogIn: React.FC = () => {
               required
               fullWidth
               margin="normal"
-              {...register("password", { required: "Password is required" })}
+              {...register("password", {
+                setValueAs: (value: string) => value.trim(),
+                required: PASSWORD_REQUIRED_ERROR_MESSAGE,
+              })}
               error={!!errors.password}
               helperText={errors.password?.message}
             />

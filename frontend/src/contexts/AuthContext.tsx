@@ -37,20 +37,25 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const { children } = props;
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("token");
-    userClient
-      .get("/auth/verify-token", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      .then((res) => setUser(res.data.data))
-      .catch(() => setUser(null))
-      .finally(() => {
-        setTimeout(() => setLoading(false), 1000);
-      });
+    if (accessToken) {
+      setLoading(true);
+      userClient
+        .get("/auth/verify-token", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .then((res) => setUser(res.data.data))
+        .catch(() => setUser(null))
+        .finally(() => {
+          setTimeout(() => setLoading(false), 500);
+        });
+    } else {
+      setUser(null);
+    }
   }, []);
 
   const signup = (
@@ -71,7 +76,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       .then(() => login(email, password))
       .catch((err) => {
         setUser(null);
-        toast.error(err.response.data.message);
+        toast.error(err.response?.data.message || err.message);
       });
   };
 
@@ -89,7 +94,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       })
       .catch((err) => {
         setUser(null);
-        toast.error(err.response.data.message);
+        toast.error(err.response?.data.message || err.message);
       });
   };
 
