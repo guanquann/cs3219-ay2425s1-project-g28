@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Question, { IQuestion } from "../models/Question.ts";
-import { checkIsExistingQuestion } from "../utils/utils.ts";
+import { checkIsExistingQuestion, sortAlphabetically } from "../utils/utils.ts";
 import {
   DUPLICATE_QUESTION_MESSAGE,
   QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE,
@@ -13,6 +13,8 @@ import {
   PAGE_LIMIT_REQUIRED_MESSAGE,
   PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE,
   CATEGORIES_RETRIEVED_MESSAGE,
+  MONGO_OBJ_ID_FORMAT,
+  MONGO_OBJ_ID_MALFORMED_MESSAGE,
 } from "../utils/constants.ts";
 
 import { upload } from "../../config/multer";
@@ -78,6 +80,7 @@ export const createImageLink = async (
 
       const uploadPromises = files.map((file) => uploadFileToFirebase(file));
       const imageUrls = await Promise.all(uploadPromises);
+      console.log(imageUrls);
       res
         .status(200)
         .json({ message: "Images uploaded successfully", imageUrls });
@@ -95,7 +98,13 @@ export const updateQuestion = async (
     const { id } = req.params;
     const { title, description } = req.body;
 
+    if (!id.match(MONGO_OBJ_ID_FORMAT)) {
+      res.status(400).json({ message: MONGO_OBJ_ID_MALFORMED_MESSAGE });
+      return;
+    }
+
     const currentQuestion = await Question.findById(id);
+
     if (!currentQuestion) {
       res.status(404).json({ message: QN_NOT_FOUND_MESSAGE });
       return;
@@ -203,7 +212,12 @@ export const readQuestionsList = async (
     res.status(200).json({
       message: QN_RETRIEVED_MESSAGE,
       questionCount: filteredQuestionCount,
-      questions: filteredQuestions.map(formatQuestionResponse),
+      questions: filteredQuestions
+        .map(formatQuestionResponse)
+        .map((question) => ({
+          ...question,
+          categories: sortAlphabetically(question.categories),
+        })),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
@@ -241,7 +255,7 @@ export const readCategories = async (
 
     res.status(200).json({
       message: CATEGORIES_RETRIEVED_MESSAGE,
-      categories: uniqueCats,
+      categories: sortAlphabetically(uniqueCats),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
