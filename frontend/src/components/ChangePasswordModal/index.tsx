@@ -108,12 +108,9 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
               {...register("confirmPassword", {
                 setValueAs: (value: string) => value.trim(),
                 validate: {
-                  matchPassword: (value) => {
-                    return (
-                      watch("newPassword") === value ||
-                      PASSWORD_MISMATCH_ERROR_MESSAGE
-                    );
-                  },
+                  matchPassword: (value) =>
+                    watch("newPassword") === value ||
+                    PASSWORD_MISMATCH_ERROR_MESSAGE,
                 },
               })}
               error={!!errors.confirmPassword}

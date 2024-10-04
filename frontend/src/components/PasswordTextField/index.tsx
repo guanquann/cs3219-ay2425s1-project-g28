@@ -29,10 +29,7 @@ const TooltipMessage: React.FC<{
         <ListItem
           key={index}
           sx={(theme) => ({
-            paddingLeft: theme.spacing(0.2),
-            paddingRight: theme.spacing(0.2),
-            paddingTop: 0,
-            paddingBottom: 0,
+            padding: theme.spacing(0, 0.2),
             alignItems: "flex-start",
           })}
         >
@@ -63,7 +60,7 @@ const TooltipMessage: React.FC<{
               <Clear
                 sx={(theme) => ({
                   fontSize: theme.spacing(2.5),
-                  color: "#9A2A2A",
+                  color: "error.main",
                 })}
               />
             )}
@@ -79,11 +76,31 @@ const PasswordTextField = forwardRef<
   HTMLInputElement,
   TextFieldProps & { displayTooltip?: boolean; input?: string }
 >((props, ref) => {
-  const [showPassword, setShowPassword] = useState<boolean>(false);
   const { displayTooltip = false, input = "", ...rest } = props;
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [openTooltip, setOpenTooltip] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+
+  const handleMouseEnter = () => {
+    setOpenTooltip(true);
+  };
+  const handleMouseLeave = () => {
+    if (!isFocused) {
+      setOpenTooltip(false);
+    }
+  };
+  const handleFocus = () => {
+    setIsFocused(true);
+    setOpenTooltip(true);
+  };
+  const handleBlur = () => {
+    setIsFocused(false);
+    setOpenTooltip(false);
+  };
 
   return (
     <Tooltip
+      open={openTooltip}
       title={displayTooltip && <TooltipMessage input={input} />}
       arrow
       placement="right"
@@ -116,6 +133,10 @@ const PasswordTextField = forwardRef<
             ),
           },
         }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
     </Tooltip>
   );
