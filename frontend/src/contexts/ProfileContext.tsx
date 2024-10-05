@@ -12,6 +12,7 @@ interface UserProfileBase {
   firstName: string;
   lastName: string;
   biography?: string;
+  profilePictureUrl?: string | null;
 }
 
 interface UserProfile extends UserProfileBase {
@@ -19,7 +20,6 @@ interface UserProfile extends UserProfileBase {
   username: string;
   email: string;
   isAdmin: boolean;
-  profilePictureUrl?: string;
   createdAt: string;
 }
 
@@ -28,6 +28,7 @@ type ProfileContextType = {
   editProfileOpen: boolean;
   passwordModalOpen: boolean;
   fetchUser: (userId: string) => void;
+  uploadProfilePicture: (data: File) => Promise<{ message: string, imageUrl: string } | null>;
   updateProfile: (data: UserProfileBase) => void;
   updatePassword: ({
     oldPassword,
@@ -55,6 +56,24 @@ const ProfileContextProvider: React.FC<{ children: React.ReactNode }> = ({
       .then((res) => setUser(res.data.data))
       .catch(() => setUser(null));
   };
+
+  const uploadProfilePicture = async (
+    data: File
+  ): Promise<{ message: string, imageUrl: string } | null> => {
+    const formData = new FormData();
+    formData.append("profilePic", data);
+
+    try {
+      const res = await userClient.post("/users/images", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        },
+      });
+      return res.data;
+    } catch {
+      return null;
+    }
+  }
 
   const updateProfile = async (data: UserProfileBase) => {
     const token = localStorage.getItem("token");
@@ -101,6 +120,7 @@ const ProfileContextProvider: React.FC<{ children: React.ReactNode }> = ({
         passwordModalOpen,
         editProfileOpen,
         fetchUser,
+        uploadProfilePicture,
         updateProfile,
         updatePassword,
         setEditProfileModalOpen,

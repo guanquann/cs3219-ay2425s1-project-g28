@@ -81,11 +81,11 @@ export const createImageLink = async (
       const uploadPromises = files.map((file) => uploadFileToFirebase(file));
       const imageUrls = await Promise.all(uploadPromises);
       console.log(imageUrls);
-      res
+      return res
         .status(200)
         .json({ message: "Images uploaded successfully", imageUrls });
     } catch (error) {
-      res.status(500).json({ message: "Server error", error });
+      return res.status(500).json({ message: "Server error", error });
     }
   });
 };

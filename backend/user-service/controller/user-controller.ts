@@ -20,6 +20,8 @@ import {
   validateBiography,
 } from "../utils/validators";
 import { IUser } from "../model/user-model";
+import { upload } from "../config/multer";
+import { uploadFileToFirebase } from "../utils/utils";
 
 export async function createUser(
   req: Request,
@@ -91,6 +93,34 @@ export async function createUser(
       .json({ message: "Unknown error when creating new user!" });
   }
 }
+
+export const createImageLink = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "Failed to upload image", error: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
+
+    try {
+      const file = req.file as Express.Multer.File;
+      const imageUrl = await uploadFileToFirebase("profilePics/", file);
+
+      return res
+        .status(200)
+        .json({ message: "Image uploaded successfully", imageUrl: imageUrl });
+    } catch (error) {
+      return res.status(500).json({ message: "Server error", error });
+    }
+  });
+};
 
 export async function getUser(req: Request, res: Response): Promise<Response> {
   try {

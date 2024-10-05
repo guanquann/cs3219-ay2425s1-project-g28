@@ -29,6 +29,10 @@ export const EMAIL_INVALID_ERROR_MESSAGE = "Email is invalid";
 export const BIO_MAX_LENGTH_ERROR_MESSAGE =
   "Biography must be at most 255 characters long";
 
+/* Profile Picture Validation */
+export const PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE =
+  "*Profile picture file size should be no more than 5MB";
+
 /* Password Validation */
 export const PASSWORD_REQUIRED_ERROR_MESSAGE = "Password is required";
 export const PASSWORD_MIN_LENGTH_ERROR_MESSAGE =
