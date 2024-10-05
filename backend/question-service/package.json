@@ -4,9 +4,10 @@
   "main": "server.ts",
   "type": "module",
   "scripts": {
+    "seed": "tsx src/scripts/seed.ts",
     "start": "tsx server.ts",
     "dev": "tsx watch server.ts",
-    "test": "set NODE_ENV=test && jest",
+    "test": "export NODE_ENV=test && jest",
     "test:watch": "export NODE_ENV=test && jest --watch",
     "lint": "eslint ."
   },
