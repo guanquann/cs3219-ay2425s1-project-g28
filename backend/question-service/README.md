@@ -48,6 +48,20 @@
 
 4. Run the command `npm start` to start the Question Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
 
+## Seeding questions into MongoDB
+
+1. With Docker
+
+   - Run `docker ps` to get a list of the Docker containers on your machine.
+   
+   - Retrieve the `CONTAINER_ID` of `peerprep/question-service`.
+   
+   - Run `docker exec -it <CONTAINER_ID>  npm run seed`.
+
+2. Without Docker
+
+   - Run `npm run seed`.
+
 ## After running
 
 1. To view Question Service documentation, go to http://localhost:3000/docs.
