@@ -8,7 +8,7 @@
 
 We will be using Docker to set up PeerPrep. Install Docker [here](https://docs.docker.com/get-started/get-docker).
 
-Follow the instructions in the [backend directory](./backend/README.md) first before proceeding.
+Follow the instructions in the [backend directory](./backend/) first before proceeding.
 
 Run: 
 ```
