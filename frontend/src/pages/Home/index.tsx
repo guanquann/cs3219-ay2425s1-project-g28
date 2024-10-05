@@ -22,7 +22,7 @@ import reducer, {
   initialState,
 } from "../../reducers/questionReducer";
 import CustomChip from "../../components/CustomChip";
-import homepageImage from "/homepage_image.svg";
+// import homepageImage from "/homepage_image.svg";
 
 const Home: React.FC = () => {
   const [complexity, setComplexity] = useState<string[]>([]);
