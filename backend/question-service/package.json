@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsx server.ts",
     "dev": "tsx watch server.ts",
-    "test": "export NODE_ENV=test && jest",
+    "test": "set NODE_ENV=test && jest",
     "test:watch": "export NODE_ENV=test && jest --watch",
     "lint": "eslint ."
   },

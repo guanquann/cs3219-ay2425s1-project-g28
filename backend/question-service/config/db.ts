@@ -5,11 +5,16 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    if (process.env.MONGO_URI == undefined) {
-      throw new Error("MONGO_URI is undefined");
+    let mongoDBUri: string | undefined =
+      process.env.NODE_ENV === "production"
+        ? process.env.MONGO_CLOUD_URI
+        : process.env.MONGO_LOCAL_URI;
+
+    if (!mongoDBUri) {
+      throw new Error("MongoDB URI is not provided");
     }
 
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(mongoDBUri);
     console.log("MongoDB connected");
   } catch (error) {
     console.error(error);

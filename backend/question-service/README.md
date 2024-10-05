@@ -1,30 +1,6 @@
 # Question Service
 
-> This guide references the [user-service README in the PeerPrep-UserService repository](https://github.com/CS3219-AY2425S1/PeerPrep-UserService/blob/main/user-service/README.md)
-
-## Setting-up MongoDB
-
-> :notebook: If you are familiar to MongoDB and wish to use a local instance, please feel free to do so. This guide utilizes MongoDB Cloud Services.
-
-1. Set up a MongoDB Shared Cluster by following the steps in this [Guide](../user-service/MongoDBSetup.md).
-
-2. After setting up, go to the Database Deployment Page. You would see a list of the Databases you have set up. Select `Connect` on the cluster you just created earlier.
-
-   ![alt text](../user-service/GuideAssets/ConnectCluster.png)
-
-3. Select the `Drivers` option, as we have to link to a Node.js App (Question Service).
-
-   ![alt text](../user-service/GuideAssets/DriverSelection.png)
-
-4. Select `Node.js` in the `Driver` pull-down menu, and copy the connection string.
-
-   Notice, you may see `<password>` in this connection string. We will be replacing this with the admin account password that we created earlier on when setting up the Shared Cluster.
-
-   ![alt text](../user-service/GuideAssets/ConnectionString.png)
-
-5. In the `question-service` directory, create a copy of the `.env.sample` file and name it `.env`.
-
-6. Update the `MONGO_URI` of the `.env` file, and paste the string we copied earlier in step 4.
+> If you have not set-up either a local or cloud MongoDB, go [here](../README.md) first before proceding.
 
 ## Setting-up Firebase
 
@@ -52,11 +28,15 @@
 
 5. Go to `Settings`, `Project settings`, `Service accounts` and click `Generate new private key`. This will download a `.json` file, which will contain your credentials.
 
-6. In `.env` of question service, replace:
-   - `FIREBASE_PROJECT_ID` with `project_id` found in the downloaded json file.
-   - `FIREBASE_PRIVATE_KEY` with `private_key` found in the downloaded json file.
-   - `FIREBASE_CLIENT_EMAIL` with `client_email` found in the downloaded json file.
-   - `FIREBASE_STORAGE_BUCKET` with the folder path of the Storage. It should look something like `gs://<appname>.appspot.com`.
+## Setting-up Question Service
+
+1. In the `question-service` directory, create a copy of the `.env.sample` file and name it `.env`.
+
+2. Update `MONGO_CLOUD_URI`, `MONGO_LOCAL_URI`, `FIREBASE_PROJECT_ID`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_STORAGE_BUCKET`. 
+   - `FIREBASE_PROJECT_ID` is the value of `project_id` found in the downloaded json file.
+   - `FIREBASE_PRIVATE_KEY` is the value of `private_key` found in the downloaded json file.
+   - `FIREBASE_CLIENT_EMAIL` is the value of `client_email` found in the downloaded json file.
+   - `FIREBASE_STORAGE_BUCKET` is the folder path of the Storage. It should look something like `gs://<appname>.appspot.com`.
 
 ## Running Question Service
 

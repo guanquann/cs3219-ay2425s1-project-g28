@@ -4,8 +4,19 @@
 
 ## Group: G28
 
-### Note:
+## Setting up
 
-- You can choose to develop individual microservices within separate folders within this repository **OR** use individual repositories (all public) for each microservice.
-- In the latter scenario, you should enable sub-modules on this GitHub classroom repository to manage the development/deployment **AND** add your mentor to the individual repositories as a collaborator.
-- The teaching team should be given access to the repositories as we may require viewing the history of the repository in case of any disputes or disagreements.
+We will be using Docker to set up PeerPrep. Install Docker [here](https://docs.docker.com/get-started/get-docker).
+
+Follow the instructions in the [backend directory](./backend/README.md) first before proceeding.
+
+Run: 
+```
+docker-compose up --build
+```
+
+## Useful links
+
+- User Service: http://localhost:3001
+- Question Service: http://localhost:3000
+- Frontend: http://localhost:5173

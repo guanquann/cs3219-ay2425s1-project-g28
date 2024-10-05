@@ -5,11 +5,10 @@
   "main": "app.ts",
   "type": "module",
   "scripts": {
-    "seed": "tsx scripts/seed.ts",
     "start": "tsx server.ts",
     "dev": "tsx watch server.ts",
     "lint": "eslint .",
-    "test": "set NODE_ENV=test && jest",
+    "test": "export NODE_ENV=test && jest",
     "test:watch": "export NODE_ENV=test && jest --watch"
   },
   "keywords": [],
