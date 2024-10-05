@@ -6,7 +6,12 @@ let mongo: MongoMemoryServer;
 beforeAll(async () => {
   mongo = await MongoMemoryServer.create();
   const mongoUri = mongo.getUri();
-  await mongoose.connect(mongoUri, {});
+
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+
+  mongoose.connect(mongoUri, {});
 });
 
 afterEach(async () => {

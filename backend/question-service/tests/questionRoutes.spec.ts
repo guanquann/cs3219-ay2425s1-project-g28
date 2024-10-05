@@ -4,8 +4,12 @@ import supertest from "supertest";
 import app from "../app";
 import Question from "../src/models/Question";
 import {
+  DUPLICATE_QUESTION_MESSAGE,
+  MONGO_OBJ_ID_MALFORMED_MESSAGE,
   PAGE_LIMIT_INCORRECT_FORMAT_MESSAGE,
   PAGE_LIMIT_REQUIRED_MESSAGE,
+  QN_DESC_CHAR_LIMIT,
+  QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE,
   QN_NOT_FOUND_MESSAGE,
   SERVER_ERROR_MESSAGE,
 } from "../src/utils/constants";
@@ -164,6 +168,267 @@ describe("Question routes", () => {
       const res = await request.delete(`${BASE_URL}/66f77e9f27ab3f794bdae664`);
       expect(res.status).toBe(404);
       expect(res.body.message).toBe(QN_NOT_FOUND_MESSAGE);
+    });
+  });
+
+  describe("POST /", () => {
+    it("Creates new question", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = {
+        title,
+        complexity,
+        category: categories,
+        description,
+      };
+
+      const res = await request.post(`${BASE_URL}`).send(newQuestion);
+
+      expect(res.status).toBe(201);
+      expect(res.body.question.title).toBe(title);
+      expect(res.body.question.complexity).toBe(complexity);
+      expect(res.body.question.categories).toEqual(categories);
+      expect(res.body.question.description).toBe(description);
+    });
+
+    it("Does not create duplicate questions (case-insensitive, upper case)", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const duplicateTitle = title.toUpperCase();
+      const duplicateQuestion = {
+        title: duplicateTitle,
+        complexity,
+        category: categories,
+        description,
+      };
+
+      const res = await request.post(`${BASE_URL}`).send(duplicateQuestion);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(DUPLICATE_QUESTION_MESSAGE);
+    });
+
+    it("Does not create duplicate questions (case-insensitive, lower case)", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const duplicateTitle = title.toLowerCase();
+      const duplicateQuestion = {
+        title: duplicateTitle,
+        complexity,
+        category: categories,
+        description,
+      };
+
+      const res = await request.post(`${BASE_URL}`).send(duplicateQuestion);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(DUPLICATE_QUESTION_MESSAGE);
+    });
+
+    it("Does not create questions that exceed the character limit", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.words(QN_DESC_CHAR_LIMIT + 5);
+      const newQuestion = {
+        title,
+        complexity,
+        category: categories,
+        description,
+      };
+
+      const res = await request.post(`${BASE_URL}`).send(newQuestion);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE);
+    });
+  });
+
+  describe("PUT /:id", () => {
+    it("Updates an existing question", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const updatedTitle = title.toUpperCase();
+      const updatedQuestion = {
+        title: updatedTitle,
+        complexity,
+        category: categories,
+        description,
+      };
+
+      const res = await request
+        .put(`${BASE_URL}/${newQuestion.id}`)
+        .send(updatedQuestion);
+
+      expect(res.status).toBe(200);
+      expect(res.body.question.title).toBe(updatedTitle);
+      expect(res.body.question.complexity).toBe(complexity);
+      expect(res.body.question.categories).toEqual(categories);
+      expect(res.body.question.description).toBe(description);
+    });
+
+    it("Does not update non-existing question with invalid object id", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const updatedCategories = ["Algorithms", "Brainteaser"];
+      const updatedQuestion = {
+        title,
+        complexity,
+        category: updatedCategories,
+        description,
+      };
+
+      const res = await request.put(`${BASE_URL}/blah`).send(updatedQuestion);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(MONGO_OBJ_ID_MALFORMED_MESSAGE);
+    });
+
+    it("Does not update non-existing question with valid object id", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const updatedCategories = ["Algorithms", "Brainteaser"];
+      const updatedQuestion = {
+        title,
+        complexity,
+        category: updatedCategories,
+        description,
+      };
+
+      const res = await request
+        .put(`${BASE_URL}/66f77e9f27ab3f794bdae664`)
+        .send(updatedQuestion);
+
+      expect(res.status).toBe(404);
+      expect(res.body.message).toBe(QN_NOT_FOUND_MESSAGE);
+    });
+
+    it("Does not update an existing question if it causes a duplicate", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const otherTitle = faker.lorem.lines(1);
+      const otherComplexity = "Medium";
+      const otherCategories = ["String", "Data Structures"];
+      const otherDescription = faker.lorem.lines(5);
+      const otherQuestion = new Question({
+        title: otherTitle,
+        complexity: otherComplexity,
+        category: otherCategories,
+        description: otherDescription,
+      });
+
+      await otherQuestion.save();
+
+      const updatedQuestion = {
+        title: otherTitle.toLowerCase(),
+        complexity,
+        category: categories,
+        description,
+      };
+
+      const res = await request
+        .put(`${BASE_URL}/${newQuestion.id}`)
+        .send(updatedQuestion);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(DUPLICATE_QUESTION_MESSAGE);
+    });
+
+    it("Does not update an existing question if it exceeds the character limit", async () => {
+      const title = faker.lorem.lines(1);
+      const complexity = "Easy";
+      const categories = ["Algorithms"];
+      const description = faker.lorem.lines(5);
+      const newQuestion = new Question({
+        title,
+        complexity,
+        category: categories,
+        description,
+      });
+
+      await newQuestion.save();
+
+      const updatedQuestion = {
+        title,
+        complexity,
+        category: categories,
+        description: faker.lorem.words(QN_DESC_CHAR_LIMIT + 5),
+      };
+
+      const res = await request
+        .put(`${BASE_URL}/${newQuestion.id}`)
+        .send(updatedQuestion);
+
+      expect(res.status).toBe(400);
+      expect(res.body.message).toBe(QN_DESC_EXCEED_CHAR_LIMIT_MESSAGE);
     });
   });
 });
