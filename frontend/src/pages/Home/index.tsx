@@ -62,7 +62,8 @@ const Home: React.FC = () => {
           maxWidth: "80%",
         })}
       >
-        Specify your question preferences and sit back as we find you the best match.
+        Specify your question preferences and sit back as we find you the best
+        match.
       </Typography>
       {/* <Box
         component="img"

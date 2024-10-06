@@ -43,6 +43,7 @@ const ProfilePage: React.FC = () => {
     }
 
     fetchUser(userId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!user) {
@@ -106,7 +107,7 @@ const ProfilePage: React.FC = () => {
         <Box sx={(theme) => ({ flex: 3, paddingLeft: theme.spacing(4) })}>
           <Typography variant="h4">Questions attempted</Typography>
         </Box>
-        {editProfileOpen &&
+        {editProfileOpen && (
           <EditProfileModal
             open={editProfileOpen}
             onClose={() => setEditProfileModalOpen(false)}
@@ -114,12 +115,14 @@ const ProfilePage: React.FC = () => {
             currFirstName={user.firstName}
             currLastName={user.lastName}
             currBiography={user.biography}
-          />}
-        {passwordModalOpen && 
+          />
+        )}
+        {passwordModalOpen && (
           <ChangePasswordModal
             open={passwordModalOpen}
             onClose={() => setPasswordModalOpen(false)}
-          />}
+          />
+        )}
       </Box>
     </AppMargin>
   );

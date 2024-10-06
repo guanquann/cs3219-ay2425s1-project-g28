@@ -11,11 +11,20 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useForm } from "react-hook-form";
 import { useProfile } from "../../contexts/ProfileContext";
-import { bioValidator, nameValidator, profilePictureValidator } from "../../utils/validators";
-import { FAILED_PROFILE_UPDATE_MESSAGE, PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE, USE_AUTH_ERROR_MESSAGE, USE_PROFILE_ERROR_MESSAGE } from "../../utils/constants";
+import {
+  bioValidator,
+  nameValidator,
+  profilePictureValidator,
+} from "../../utils/validators";
+import {
+  FAILED_PROFILE_UPDATE_MESSAGE,
+  PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE,
+  USE_AUTH_ERROR_MESSAGE,
+  USE_PROFILE_ERROR_MESSAGE,
+} from "../../utils/constants";
 import { useRef, useState } from "react";
 import { Restore } from "@mui/icons-material";
 import { toast } from "react-toastify";
@@ -35,7 +44,14 @@ const StyledForm = styled("form")(({ theme }) => ({
 }));
 
 const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
-  const { open, onClose, currProfilePictureUrl, currFirstName, currLastName, currBiography } = props;
+  const {
+    open,
+    onClose,
+    currProfilePictureUrl,
+    currFirstName,
+    currLastName,
+    currBiography,
+  } = props;
 
   const {
     register,
@@ -77,12 +93,16 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
   const { setUser } = auth;
 
   // profile pic functionality referenced and adapted from https://dreamix.eu/insights/uploading-files-with-react-hook-form/
-  const [picPreview, setPicPreview] = useState<string | null>(currProfilePictureUrl || null);
+  const [picPreview, setPicPreview] = useState<string | null>(
+    currProfilePictureUrl || null
+  );
   const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
-  const { ref: registerRef, ...rest } = register("profilePic", { validate: profilePictureValidator });
+  const { ref: registerRef, ...rest } = register("profilePic", {
+    validate: profilePictureValidator,
+  });
   const onClickUpload = () => {
     hiddenFileInputRef.current?.click();
-  }
+  };
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -93,33 +113,35 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
         setValue("profilePictureUrl", "", { shouldDirty: true });
       }
     }
-  }
+  };
 
   const onClickReset = () => {
     if (getFieldState("profilePic").isDirty) {
       setValue("profilePic", null, { shouldValidate: true, shouldDirty: true });
       if (hiddenFileInputRef.current) {
-        hiddenFileInputRef.current.value = '';
+        hiddenFileInputRef.current.value = "";
       }
     }
     if (getFieldState("profilePictureUrl").isDirty) {
-      setValue("profilePictureUrl", currProfilePictureUrl || "", { shouldDirty: true })
+      setValue("profilePictureUrl", currProfilePictureUrl || "", {
+        shouldDirty: true,
+      });
     }
     setPicPreview(currProfilePictureUrl || "");
-  }
+  };
 
-  const onClickDelete = () =>  {
+  const onClickDelete = () => {
     if (getFieldState("profilePic").isDirty) {
       setValue("profilePic", null, { shouldValidate: true, shouldDirty: true });
       if (hiddenFileInputRef.current) {
-        hiddenFileInputRef.current.value = '';
+        hiddenFileInputRef.current.value = "";
       }
     }
     if (currProfilePictureUrl) {
       setValue("profilePictureUrl", "", { shouldDirty: true });
     }
     setPicPreview(null);
-  }
+  };
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -151,7 +173,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                           profilePictureUrl: url_data.profilePictureUrl,
                           createdAt: user.createdAt,
                           isAdmin: user.isAdmin,
-                        }
+                        };
                         setUser(updatedUser);
                       }
                     });
@@ -179,7 +201,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                       profilePictureUrl: url_data.profilePictureUrl,
                       createdAt: user.createdAt,
                       isAdmin: user.isAdmin,
-                    }
+                    };
                     setUser(updatedUser);
                   }
                 });
@@ -187,16 +209,18 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
               }
             })}
           >
-            <Stack 
-              direction="row" 
+            <Stack
+              direction="row"
               spacing={2}
               display="flex"
               alignItems="center"
-              sx={(theme) => ({ marginBottom: theme.spacing(2) })}>
-              {!picPreview
-                ? <Avatar sx={{ width: 56, height: 56 }} />
-                : <Avatar src={picPreview} sx={{ width: 56, height: 56 }} />
-              }
+              sx={(theme) => ({ marginBottom: theme.spacing(2) })}
+            >
+              {!picPreview ? (
+                <Avatar sx={{ width: 56, height: 56 }} />
+              ) : (
+                <Avatar src={picPreview} sx={{ width: 56, height: 56 }} />
+              )}
               {/* input referenced from https://dreamix.eu/insights/uploading-files-with-react-hook-form/ */}
               <input
                 type="file"
@@ -209,35 +233,32 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                 }}
                 onChange={handleImageChange}
               />
-              <Button 
+              <Button
                 size="small"
                 variant="outlined"
                 onClick={onClickUpload}
-                sx={{height: 30}}>
-                  Upload
+                sx={{ height: 30 }}
+              >
+                Upload
               </Button>
-              <IconButton
-                onClick={onClickReset}>
-                <Restore color="success"/>
+              <IconButton onClick={onClickReset}>
+                <Restore color="success" />
               </IconButton>
-              <IconButton
-                onClick={onClickDelete}>
-                <DeleteIcon color="error"/>
+              <IconButton onClick={onClickDelete}>
+                <DeleteIcon color="error" />
               </IconButton>
             </Stack>
-            {!!errors.profilePic
-              ? <Typography 
-                  color="error"
-                  sx={{fontSize: 13, 
-                    marginBottom: 2}}>
-                  {errors.profilePic.message}
-                </Typography>
-              : <Typography 
-                  sx={{fontSize: 13,
-                    marginBottom: 2,
-                    color: "#808080"}}>
-                    {PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE}
-                </Typography>}
+            {errors.profilePic ? (
+              <Typography color="error" sx={{ fontSize: 13, marginBottom: 2 }}>
+                {errors.profilePic.message}
+              </Typography>
+            ) : (
+              <Typography
+                sx={{ fontSize: 13, marginBottom: 2, color: "#808080" }}
+              >
+                {PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE}
+              </Typography>
+            )}
             <TextField
               fullWidth
               required
