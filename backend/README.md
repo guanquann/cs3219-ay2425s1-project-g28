@@ -10,7 +10,7 @@
 
 3. Your local Mongo URI will be `mongodb://<MONGO_INITDB_ROOT_USERNAME>:<MONGO_INITDB_ROOT_PASSWORD>@mongo:27017/`. Take note of it as we will be using in the `.env` file in the various microservices later on.
 
-5. You can view the MongoDB collections locally using Mongo Express. To set up Mongo Express, update `ME_CONFIG_BASICAUTH_USERNAME` and `ME_CONFIG_BASICAUTH_PASSWORD`. The username and password will be the login credentials when you access Mongo Express at http://localhost:8081.
+4. You can view the MongoDB collections locally using Mongo Express. To set up Mongo Express, update `ME_CONFIG_BASICAUTH_USERNAME` and `ME_CONFIG_BASICAUTH_PASSWORD`. The username and password will be the login credentials when you access Mongo Express at http://localhost:8081.
 
 ## Setting-up cloud MongoDB (in production)
 
@@ -49,7 +49,6 @@
 
 ![alt text](./GuideAssets/Selection4.png)
 
-
 ![alt text](./GuideAssets/Security.png)
 
 7. Next, click on `Add my Current IP Address`. This will whitelist your IP address and allow you to connect to the MongoDB Database.
@@ -61,23 +60,26 @@
 9. [Optional] Whitelisting All IP's
 
    1. Select `Network Access` from the left side pane on Dashboard.
-   ![alt text](./GuideAssets/SidePane.png)
+
+      ![alt text](./GuideAssets/SidePane.png)
 
    2. Click on the `Add IP Address` Button
-   ![alt text](./GuideAssets/AddIPAddress.png)
+
+      ![alt text](./GuideAssets/AddIPAddress.png)
 
    3. Select the `ALLOW ACCESS FROM ANYWHERE` Button and Click `Confirm`
-   ![alt text](./GuideAssets/IPWhitelisting.png)
+
+      ![alt text](./GuideAssets/IPWhitelisting.png)
 
    4. Now, any IP Address can access this Database.
 
 10. After setting up, go to the Database Deployment Page. You would see a list of the Databases you have set up. Select `Connect` on the cluster you just created earlier.
 
-   ![alt text](GuideAssets/ConnectCluster.png)
+    ![alt text](GuideAssets/ConnectCluster.png)
 
 11. Select the `Drivers` option.
 
-   ![alt text](GuideAssets/DriverSelection.png)
+    ![alt text](GuideAssets/DriverSelection.png)
 
 12. Select `Node.js` in the `Driver` pull-down menu, and copy the connection string.
 

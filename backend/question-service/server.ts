@@ -6,10 +6,12 @@ const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "test") {
   connectDB()
     .then(() => {
-      console.log("MongoDB connected");
+      console.log("MongoDB Connected!");
 
       app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+        console.log(
+          `Question service server listening on http://localhost:${PORT}`,
+        );
       });
     })
     .catch((err) => {

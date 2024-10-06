@@ -56,7 +56,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         });
     } else {
       setUser(null);
-      setLoading(false);
+      setTimeout(() => setLoading(false), 500);
     }
   }, []);
 
