@@ -14,18 +14,27 @@ import {
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import AppMargin from "../AppMargin";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 import { USE_AUTH_ERROR_MESSAGE } from "../../utils/constants";
 
-type NavbarItem = { label: string; link: string };
+type NavbarItem = { label: string; link: string; needsLogin: boolean };
 
 type NavbarProps = { navbarItems?: Array<NavbarItem> };
 
 const Navbar: React.FC<NavbarProps> = (props) => {
-  const { navbarItems = [{ label: "Questions", link: "/questions" }] } = props;
+  const {
+    navbarItems = [
+      { label: "Find Match", link: "/home", needsLogin: true },
+      { label: "Questions", link: "/questions", needsLogin: false },
+    ],
+  } = props;
+
   const navigate = useNavigate();
+  const location = useLocation();
+  const path = location.pathname;
+
   const auth = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -63,16 +72,18 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             PeerPrep
           </Typography>
           <Stack direction={"row"} alignItems={"center"} spacing={2}>
-            {navbarItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.link}
-                underline="none"
-                sx={{ color: "common.black" }}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navbarItems
+              .filter((item) => !item.needsLogin || (item.needsLogin && user))
+              .map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.link}
+                  underline="none"
+                  sx={{ color: "common.black" }}
+                >
+                  {path == item.link ? <b>{item.label}</b> : item.label}
+                </Link>
+              ))}
             {user ? (
               <>
                 <Tooltip title={"Account settings"}>

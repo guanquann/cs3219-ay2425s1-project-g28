@@ -1,66 +1,16 @@
 # User Service Guide
 
-> User Service was adapted from [PeerPrep-UserService repository](https://github.com/CS3219-AY2425S1/PeerPrep-UserService)
+> If you have not set-up either a local or cloud MongoDB, as well as Firebase, go [here](../) first before proceding.
 
-> This guide references the [user-service README in the PeerPrep-UserService repository](https://github.com/CS3219-AY2425S1/PeerPrep-UserService/blob/main/user-service/README.md)
+## Setting-up
 
-## Setting-up MongoDB
+1. In the `user-service` directory, create a copy of the `.env.sample` file and name it `.env`.
 
-> :notebook: If you are familiar to MongoDB and wish to use a local instance, please feel free to do so. This guide utilizes MongoDB Cloud Services.
+2. Update `MONGO_CLOUD_URI`, `MONGO_LOCAL_URI`, `FIREBASE_PROJECT_ID`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_STORAGE_BUCKET`, `JWT_SECRET`. 
 
-1. Set up a MongoDB Shared Cluster by following the steps in this [Guide](MongoDBSetup.md).
+3. A default admin account (`email: admin@gmail.com` and `password: Admin@123`) wil be created. If you wish to change the default credentials, update them in `.env`. Alternatively, you can also edit your credentials and user profile after you have created the default account.
 
-2. After setting up, go to the Database Deployment Page. You would see a list of the Databases you have set up. Select `Connect` on the cluster you just created earlier.
-
-   ![alt text](GuideAssets/ConnectCluster.png)
-
-3. Select the `Drivers` option, as we have to link to a Node.js App (User Service).
-
-   ![alt text](GuideAssets/DriverSelection.png)
-
-4. Select `Node.js` in the `Driver` pull-down menu, and copy the connection string.
-
-   Notice, you may see `<password>` in this connection string. We will be replacing this with the admin account password that we created earlier on when setting up the Shared Cluster.
-
-   ![alt text](GuideAssets/ConnectionString.png)
-
-5. In the `user-service` directory, create a copy of the `.env.sample` file and name it `.env`.
-
-6. Update the `DB_CLOUD_URI` of the `.env` file, and paste the string we copied earlier in step 4.
-
-## Setting-up Firebase
-
-1. Go to https://console.firebase.google.com/u/0/.
-
-2. Create a project and choose a project name. Navigate to `Storage` and click on it to activate it.
-
-3. Select `Start in production mode` and your preferred cloud storage region.
-
-4. After Storage is created, go to `Rules` section and set rule to:
-
-   ```
-   rules_version = '2';
-   service firebase.storage {
-     match /b/{bucket}/o {
-       match /{allPaths=**} {
-         allow read: if true;
-         allow write: if request.auth != null;
-       }
-     }
-   }
-   ```
-
-   This rule ensures that only verified users can upload images while ensuring that URLs of images are public. Remember to click `Publish` to save changes.
-
-5. Go to `Settings`, `Project settings`, `Service accounts` and click `Generate new private key`. This will download a `.json` file, which will contain your credentials.
-
-6. In `.env` of user service, replace:
-   - `FIREBASE_PROJECT_ID` with `project_id` found in the downloaded json file.
-   - `FIREBASE_PRIVATE_KEY` with `private_key` found in the downloaded json file.
-   - `FIREBASE_CLIENT_EMAIL` with `client_email` found in the downloaded json file.
-   - `FIREBASE_STORAGE_BUCKET` with the folder path of the Storage. It should look something like `gs://<appname>.appspot.com`.
-
-## Running User Service
+## Running User Service without Docker
 
 1. Follow the instructions [here](https://nodejs.org/en/download/package-manager) to set up Node v20.
 
@@ -68,10 +18,10 @@
 
 3. Run the command: `npm install`. This will install all the necessary dependencies.
 
-4. If you are running the user service for the first time with your own database, run `npm run seed`, to seed the database with a default admin account. If you wish to change the default, please update the `.env` file. Alternatively, you can also edit your credentials and user profile after you have created the default account. If you are using the .env file provided by us, the default admin account already exists in the database and you can skip this step.
+4. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
 
-5. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
+## After running
 
-6. To view User Service documentation, go to http://localhost:3001/docs.
+1. To view User Service documentation, go to http://localhost:3001/docs.
 
-7. Using applications like Postman, you can interact with the User Service on port 3001. If you wish to change this, please update the `.env` file.
+2. Using applications like Postman, you can interact with the User Service on port 3001. If you wish to change this, please update the `.env` file.

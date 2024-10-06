@@ -1,11 +1,18 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/bzPrOe11)
+# CS3219 Project (PeerPrep) - AY2425S1 Group 28
 
-# CS3219 Project (PeerPrep) - AY2425S1
+## Setting up
 
-## Group: G28
+We will be using Docker to set up PeerPrep. Install Docker [here](https://docs.docker.com/get-started/get-docker).
 
-### Note:
+Follow the instructions in the [backend directory](./backend/) first before proceeding.
 
-- You can choose to develop individual microservices within separate folders within this repository **OR** use individual repositories (all public) for each microservice.
-- In the latter scenario, you should enable sub-modules on this GitHub classroom repository to manage the development/deployment **AND** add your mentor to the individual repositories as a collaborator.
-- The teaching team should be given access to the repositories as we may require viewing the history of the repository in case of any disputes or disagreements.
+Run: 
+```
+docker-compose up --build
+```
+
+## Useful links
+
+- User Service: http://localhost:3001
+- Question Service: http://localhost:3000
+- Frontend: http://localhost:5173
