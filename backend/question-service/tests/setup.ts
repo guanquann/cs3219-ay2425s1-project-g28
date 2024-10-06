@@ -10,7 +10,7 @@ beforeAll(async () => {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
   }
-  
+
   await mongoose.connect(mongoUri, {});
 });
 
