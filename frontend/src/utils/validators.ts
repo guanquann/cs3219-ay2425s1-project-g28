@@ -13,6 +13,7 @@ import {
   PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE,
   PASSWORD_UPPER_CASE_ERROR_MESSAGE,
   PASSWORD_WEAK_ERROR_MESSAGE,
+  PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE,
   USERNAME_ALLOWED_CHAR_ERROR_MESSAGE,
   USERNAME_LENGTH_ERROR_MESSAGE,
 } from "./constants";
@@ -60,6 +61,14 @@ export const emailValidator = (value: string) => {
 export const bioValidator = (value: string) => {
   if (value.length > 255) {
     return BIO_MAX_LENGTH_ERROR_MESSAGE;
+  }
+
+  return true;
+};
+
+export const profilePictureValidator = (value: File | null) => {
+  if (value && value.size > 5 * 1024 * 1024) {
+    return PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE;
   }
 
   return true;

@@ -4,6 +4,7 @@ import axios from "axios";
 import { faker } from "@faker-js/faker";
 import * as hooks from "../../contexts/AuthContext";
 import Navbar from ".";
+import { MemoryRouter } from "react-router-dom";
 
 jest.mock("axios");
 
@@ -45,6 +46,7 @@ describe("Navigation routes", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: {
         id: "1",
         username,
@@ -57,7 +59,11 @@ describe("Navigation routes", () => {
         isAdmin,
       },
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     expect(screen.getByRole("link", { name: "Questions" })).toBeInTheDocument();
   });
 });
@@ -69,9 +75,14 @@ describe("Unauthenticated user", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: null,
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     expect(screen.getByRole("button", { name: "Sign up" })).toBeInTheDocument();
   });
 
@@ -81,9 +92,14 @@ describe("Unauthenticated user", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: null,
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     expect(screen.getByRole("button", { name: "Log in" })).toBeInTheDocument();
   });
 });
@@ -117,6 +133,7 @@ describe("Authenticated user", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: {
         id: "1",
         username,
@@ -129,7 +146,11 @@ describe("Authenticated user", () => {
         isAdmin,
       },
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     expect(screen.getByTestId("profile")).toBeInTheDocument();
   });
 
@@ -161,6 +182,7 @@ describe("Authenticated user", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: {
         id: "1",
         username,
@@ -173,11 +195,15 @@ describe("Authenticated user", () => {
         isAdmin,
       },
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     const avatar = screen.getByTestId("profile");
     fireEvent.click(avatar);
     expect(
-      screen.getByRole("menuitem", { name: "Profile" }),
+      screen.getByRole("menuitem", { name: "Profile" })
     ).toBeInTheDocument();
   });
 
@@ -209,6 +235,7 @@ describe("Authenticated user", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: {
         id: "1",
         username,
@@ -221,7 +248,11 @@ describe("Authenticated user", () => {
         isAdmin,
       },
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     const avatar = screen.getByTestId("profile");
     fireEvent.click(avatar);
     expect(mockUseNavigate).toHaveBeenCalled();
@@ -255,6 +286,7 @@ describe("Authenticated user", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      loading: false,
       user: {
         id: "1",
         username,
@@ -267,11 +299,15 @@ describe("Authenticated user", () => {
         isAdmin,
       },
     }));
-    render(<Navbar />);
+    render(
+      <MemoryRouter>
+        <Navbar />
+      </MemoryRouter>
+    );
     const avatar = screen.getByTestId("profile");
     fireEvent.click(avatar);
     expect(
-      screen.getByRole("menuitem", { name: "Logout" }),
+      screen.getByRole("menuitem", { name: "Logout" })
     ).toBeInTheDocument();
   });
 });

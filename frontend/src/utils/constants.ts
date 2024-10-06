@@ -29,6 +29,10 @@ export const EMAIL_INVALID_ERROR_MESSAGE = "Email is invalid";
 export const BIO_MAX_LENGTH_ERROR_MESSAGE =
   "Biography must be at most 255 characters long";
 
+/* Profile Picture Validation */
+export const PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE =
+  "*Profile picture file size should be no more than 5MB";
+
 /* Password Validation */
 export const PASSWORD_REQUIRED_ERROR_MESSAGE = "Password is required";
 export const PASSWORD_MIN_LENGTH_ERROR_MESSAGE =
@@ -71,3 +75,9 @@ export const SUCCESS_PW_UPDATE_MESSAGE = "Password updated successfully";
 export const FAILED_PW_UPDATE_MESSAGE = "Failed to update password";
 export const SUCCESS_PROFILE_UPDATE_MESSAGE = "Profile updated successfully";
 export const FAILED_PROFILE_UPDATE_MESSAGE = "Failed to update profile";
+
+// Image paths
+export const FIND_MATCH_FORM_PATH = "/find_match_form.png";
+export const MATCH_FOUND_PATH = "/match_found.png";
+export const QUESTIONS_LIST_PATH = "/questions_list.png";
+export const COLLABORATIVE_EDITOR_PATH = "/collaborative_editor.png";

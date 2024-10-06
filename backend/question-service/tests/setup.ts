@@ -10,8 +10,13 @@ beforeAll(async () => {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
   }
+<<<<<<< HEAD
 
   mongoose.connect(mongoUri, {});
+=======
+  
+  await mongoose.connect(mongoUri, {});
+>>>>>>> development
 });
 
 afterEach(async () => {
