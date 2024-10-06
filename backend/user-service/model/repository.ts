@@ -3,7 +3,10 @@ import "dotenv/config";
 import { connect } from "mongoose";
 
 export async function connectToDB() {
-  const mongoDBUri: string | undefined = process.env.DB_CLOUD_URI;
+  const mongoDBUri: string | undefined =
+    process.env.NODE_ENV === "production"
+      ? process.env.MONGO_CLOUD_URI
+      : process.env.MONGO_LOCAL_URI;
 
   if (!mongoDBUri) {
     throw new Error("MongoDB URI is not provided");

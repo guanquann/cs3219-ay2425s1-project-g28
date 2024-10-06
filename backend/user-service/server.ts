@@ -2,6 +2,7 @@ import http from "http";
 import index from "./app.ts";
 import dotenv from "dotenv";
 import { connectToDB } from "./model/repository";
+import { seedAdminAccount } from "./scripts/seed.ts";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ if (process.env.NODE_ENV !== "test") {
   await connectToDB()
     .then(() => {
       console.log("MongoDB Connected!");
+      seedAdminAccount();
 
       server.listen(port);
       console.log("User service server listening on http://localhost:" + port);
