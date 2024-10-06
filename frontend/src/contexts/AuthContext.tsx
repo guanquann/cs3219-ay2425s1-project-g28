@@ -13,8 +13,8 @@ type User = {
   firstName: string;
   lastName: string;
   email: string;
-  biography: string;
-  profilePictureUrl: string;
+  biography?: string;
+  profilePictureUrl?: string;
   createdAt: string;
   isAdmin: boolean;
 };
@@ -25,11 +25,13 @@ type AuthContextType = {
     lastName: string,
     username: string,
     email: string,
-    password: string,
+    password: string
   ) => void;
   login: (email: string, password: string) => void;
   logout: () => void;
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -42,15 +44,20 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("token");
-    userClient
-      .get("/auth/verify-token", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      .then((res) => setUser(res.data.data))
-      .catch(() => setUser(null))
-      .finally(() => {
-        setTimeout(() => setLoading(false), 1000);
-      });
+    if (accessToken) {
+      userClient
+        .get("/auth/verify-token", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .then((res) => setUser(res.data.data))
+        .catch(() => setUser(null))
+        .finally(() => {
+          setTimeout(() => setLoading(false), 500);
+        });
+    } else {
+      setUser(null);
+      setTimeout(() => setLoading(false), 500);
+    }
   }, []);
 
   const signup = (
@@ -58,7 +65,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     lastName: string,
     username: string,
     email: string,
-    password: string,
+    password: string
   ) => {
     userClient
       .post("/users", {
@@ -71,7 +78,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       .then(() => login(email, password))
       .catch((err) => {
         setUser(null);
-        toast.error(err.response.data.message);
+        toast.error(err.response?.data.message || err.message);
       });
   };
 
@@ -85,11 +92,11 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         const { accessToken, user } = res.data.data;
         localStorage.setItem("token", accessToken);
         setUser(user);
-        navigate("/");
+        navigate("/home");
       })
       .catch((err) => {
         setUser(null);
-        toast.error(err.response.data.message);
+        toast.error(err.response?.data.message || err.message);
       });
   };
 
@@ -105,7 +112,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   }
 
   return (
-    <AuthContext.Provider value={{ signup, login, logout, user }}>
+    <AuthContext.Provider value={{ signup, login, logout, user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

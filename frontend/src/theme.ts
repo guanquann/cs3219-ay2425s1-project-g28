@@ -26,6 +26,8 @@ const theme = createTheme({
         },
       },
     },
+    MuiTextField: { defaultProps: { size: "small" } },
+    MuiAutocomplete: { defaultProps: { size: "small" } },
     MuiCssBaseline: {
       styleOverrides: {
         html: {
@@ -45,6 +47,13 @@ const theme = createTheme({
         },
       },
     },
+      MuiListItemText: {
+        styleOverrides: {
+          primary: {
+            fontSize: "14px",
+          },
+        },
+      }
   },
 });
 

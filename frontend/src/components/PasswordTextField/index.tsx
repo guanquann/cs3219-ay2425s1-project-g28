@@ -1,179 +1,145 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import {
-  FormControl,
-  FormHelperText,
+  Check,
+  Circle,
+  Clear,
+  Visibility,
+  VisibilityOff,
+} from "@mui/icons-material";
+import {
   IconButton,
   InputAdornment,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   TextField,
+  TextFieldProps,
+  Tooltip,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { forwardRef, useState } from "react";
+import { passwordValidators } from "../../utils/validators";
 
-interface PasswordTextFieldProps {
-  label: string;
-  passwordVal: boolean;
-  password: string;
-  setPassword: (password: string) => void;
-  isMatch: boolean;
-  passwordToMatch?: string;
-  setValidity: (isValid: boolean) => void;
-}
+const TooltipMessage: React.FC<{
+  input: string;
+}> = (props) => {
+  const { input } = props;
+  return (
+    <List>
+      {passwordValidators.map((validator, index) => (
+        <ListItem
+          key={index}
+          sx={(theme) => ({
+            padding: theme.spacing(0, 0.2),
+            alignItems: "flex-start",
+          })}
+        >
+          <ListItemIcon
+            sx={(theme) => ({
+              minWidth: theme.spacing(4),
+              paddingLeft: theme.spacing(0.2),
+              paddingTop: theme.spacing(0.7),
+            })}
+          >
+            {!input ? (
+              <Circle
+                sx={(theme) => ({
+                  fontSize: theme.spacing(0.8),
+                  marginTop: theme.spacing(0.8),
+                  marginLeft: theme.spacing(0.8),
+                  color: "white",
+                })}
+              />
+            ) : validator.validate(input) ? (
+              <Check
+                sx={(theme) => ({
+                  fontSize: theme.spacing(2.5),
+                  color: "success.main",
+                })}
+              />
+            ) : (
+              <Clear
+                sx={(theme) => ({
+                  fontSize: theme.spacing(2.5),
+                  color: "error.main",
+                })}
+              />
+            )}
+          </ListItemIcon>
+          <ListItemText primary={validator.message} />
+        </ListItem>
+      ))}
+    </List>
+  );
+};
 
-const PasswordTextField: React.FC<PasswordTextFieldProps> = ({
-  label,
-  passwordVal,
-  password,
-  setPassword,
-  isMatch,
-  passwordToMatch,
-  setValidity,
-}) => {
-  const validatePasswordError = (
-    passwordVal: boolean,
-    password: string
-  ): boolean => {
-    return passwordVal
-      ? password.length < 8 ||
-          !/[a-z]/.test(password) ||
-          !/[A-Z]/.test(password) ||
-          !/\d/.test(password) ||
-          // eslint-disable-next-line no-useless-escape
-          !/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)
-      : false;
-  };
-
-  const comparePasswordError = (
-    isMatch: boolean,
-    password: string,
-    passwordToMatch: string | undefined
-  ): boolean => {
-    return isMatch ? password != passwordToMatch : false;
-  };
-
-  const checkEmptyError = (password: string): boolean => {
-    return !password;
-  };
-
-  const isInvalid =
-    validatePasswordError(passwordVal, password) ||
-    comparePasswordError(isMatch, password, passwordToMatch) ||
-    checkEmptyError(password);
-
-  //to listen to other password input changes
-  useEffect(() => {
-    setValidity(
-      !(
-        validatePasswordError(passwordVal, password) ||
-        comparePasswordError(isMatch, password, passwordToMatch) ||
-        checkEmptyError(password)
-      )
-    );
-  }, [passwordVal, isMatch, password, passwordToMatch, setValidity]);
-
+const PasswordTextField = forwardRef<
+  HTMLInputElement,
+  TextFieldProps & { displayTooltip?: boolean; input?: string }
+>((props, ref) => {
+  const { displayTooltip = false, input = "", ...rest } = props;
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [openTooltip, setOpenTooltip] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-  const handleMouseDownPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
+  const handleMouseEnter = () => {
+    setOpenTooltip(true);
   };
-
-  const handleMouseUpPassword = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    event.preventDefault();
+  const handleMouseLeave = () => {
+    if (!isFocused) {
+      setOpenTooltip(false);
+    }
   };
-
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const val = event.target.value;
-    setPassword(val);
-    setValidity(
-      !(
-        validatePasswordError(passwordVal, val) ||
-        comparePasswordError(isMatch, val, passwordToMatch) ||
-        checkEmptyError(val)
-      )
-    );
+  const handleFocus = () => {
+    setIsFocused(true);
+    setOpenTooltip(true);
+  };
+  const handleBlur = () => {
+    setIsFocused(false);
+    setOpenTooltip(false);
   };
 
   return (
-    <FormControl fullWidth>
+    <Tooltip
+      open={openTooltip}
+      title={displayTooltip && <TooltipMessage input={input} />}
+      arrow
+      placement="right"
+    >
       <TextField
-        required
-        id="outlined-basic"
-        label={label}
+        ref={ref}
         type={showPassword ? "text" : "password"}
-        sx={{ marginTop: 2 }}
-        value={password}
-        error={isInvalid}
-        onChange={handlePasswordChange}
+        {...rest}
         slotProps={{
           input: {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  onMouseUp={handleMouseUpPassword}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onMouseUp={(e) => e.preventDefault()}
                   edge="end"
                 >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                  {showPassword ? (
+                    <VisibilityOff
+                      sx={(theme) => ({ fontSize: theme.spacing(2.5) })}
+                    />
+                  ) : (
+                    <Visibility
+                      sx={(theme) => ({ fontSize: theme.spacing(2.5) })}
+                    />
+                  )}
                 </IconButton>
               </InputAdornment>
             ),
           },
         }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
-      {checkEmptyError(password) && (
-        <FormHelperText error={checkEmptyError(password)}>
-          Required field
-        </FormHelperText>
-      )}
-      {validatePasswordError(passwordVal, password) && (
-        <div>
-          <FormHelperText
-            sx={(theme) => ({ color: theme.palette.success.main })}
-            error={password.length < 8}
-          >
-            Password must be at least 8 characters long
-          </FormHelperText>
-          <FormHelperText
-            sx={(theme) => ({ color: theme.palette.success.main })}
-            error={!/[a-z]/.test(password)}
-          >
-            Password must contain at least 1 lowercase letter
-          </FormHelperText>
-          <FormHelperText
-            sx={(theme) => ({ color: theme.palette.success.main })}
-            error={!/[A-Z]/.test(password)}
-          >
-            Password must contain at least 1 uppercase letter
-          </FormHelperText>
-          <FormHelperText
-            sx={(theme) => ({ color: theme.palette.success.main })}
-            error={!/\d/.test(password)}
-          >
-            Password must contain at least 1 digit
-          </FormHelperText>
-          <FormHelperText
-            sx={(theme) => ({ color: theme.palette.success.main })}
-            // eslint-disable-next-line no-useless-escape
-            error={!/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password)}
-          >
-            Password must contain at least 1 special character
-          </FormHelperText>
-        </div>
-      )}
-      {comparePasswordError(isMatch, password, passwordToMatch) && (
-        <FormHelperText
-          error={comparePasswordError(isMatch, password, passwordToMatch)}
-        >
-          Password does not match
-        </FormHelperText>
-      )}
-    </FormControl>
+    </Tooltip>
   );
-};
+});
 
 export default PasswordTextField;

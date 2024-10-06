@@ -17,7 +17,9 @@ jest.mock("../../utils/api", () => ({
     post: jest.fn(),
   },
 }));
-const mockedPost = userClient.post as jest.MockedFunction<typeof userClient.post>;
+const mockedPost = userClient.post as jest.MockedFunction<
+  typeof userClient.post
+>;
 
 describe("Log In Components", () => {
   beforeEach(() => {
@@ -36,12 +38,12 @@ describe("Log In Components", () => {
 
   it("Email field is rendered", () => {
     render(<LogIn />);
-    expect(screen.getByTestId("Email")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Email/)).toBeInTheDocument();
   });
 
   it("Password field is rendered", () => {
     render(<LogIn />);
-    expect(screen.getByTestId("Password")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Password/)).toBeInTheDocument();
   });
 
   it("Log in button is rendered", () => {
@@ -83,8 +85,12 @@ describe("Log In Events", () => {
 
     render(<LogIn />);
 
-    fireEvent.change(screen.getByTestId("Email"), { target: { value: email } });
-    fireEvent.change(screen.getByTestId("Password"), { target: { value: password } });
+    fireEvent.change(screen.getByLabelText(/Email/), {
+      target: { value: email },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/), {
+      target: { value: password },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Log in" }));
 
     await waitFor(() => {
@@ -100,8 +106,12 @@ describe("Log In Events", () => {
 
     render(<LogIn />);
 
-    fireEvent.change(screen.getByTestId("Email"), { target: { value: invalidEmail } });
-    fireEvent.change(screen.getByTestId("Password"), { target: { value: password } });
+    fireEvent.change(screen.getByLabelText(/Email/), {
+      target: { value: invalidEmail },
+    });
+    fireEvent.change(screen.getByLabelText(/Password/), {
+      target: { value: password },
+    });
     fireEvent.click(screen.getByRole("button", { name: "Log in" }));
 
     await waitFor(() => {

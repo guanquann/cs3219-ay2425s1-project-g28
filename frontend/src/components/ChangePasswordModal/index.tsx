@@ -1,136 +1,148 @@
-import { forwardRef, useState } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import PasswordTextField from "../PasswordTextField";
-import { userClient } from "../../utils/api";
-import axios from "axios";
 import {
-  FAILED_PW_UPDATE_MESSAGE,
-  SUCCESS_PW_UPDATE_MESSAGE,
+  Button,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  styled,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import { useProfile } from "../../contexts/ProfileContext";
+import { passwordValidator } from "../../utils/validators";
+import PasswordTextField from "../PasswordTextField";
+import {
+  PASSWORD_MISMATCH_ERROR_MESSAGE,
+  PASSWORD_REQUIRED_ERROR_MESSAGE,
+  USE_PROFILE_ERROR_MESSAGE,
 } from "../../utils/constants";
 
 interface ChangePasswordModalProps {
-  handleClose: () => void;
-  userId: string;
-  onUpdate: (
-    isProfileEdit: boolean,
-    message: string,
-    isSuccess: boolean,
-  ) => void;
+  open: boolean;
+  onClose: () => void;
 }
 
-const ChangePasswordModal = forwardRef<
-  HTMLDivElement,
-  ChangePasswordModalProps
->((props, ref) => {
-  const { handleClose, userId, onUpdate } = props;
-  const [currPassword, setCurrPassword] = useState<string>("");
-  const [newPassword, setNewPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+const StyledForm = styled("form")(({ theme }) => ({
+  marginTop: theme.spacing(1),
+}));
 
-  const [isCurrPasswordValid, setIsCurrPasswordValid] =
-    useState<boolean>(false);
-  const [isNewPasswordValid, setIsNewPasswordValid] = useState<boolean>(false);
-  const [isConfirmPasswordValid, setIsConfirmPasswordValid] =
-    useState<boolean>(false);
+const ChangePasswordModal: React.FC<ChangePasswordModalProps> = (props) => {
+  const { open, onClose } = props;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, dirtyFields, isDirty, isValid },
+    watch,
+    trigger,
+  } = useForm<{
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }>({
+    mode: "all",
+  });
 
-  const isUpdateDisabled = !(
-    isCurrPasswordValid &&
-    isNewPasswordValid &&
-    isConfirmPasswordValid
-  );
+  const profile = useProfile();
 
-  const handleSubmit = async () => {
-    const accessToken = localStorage.getItem("token");
+  if (!profile) {
+    throw new Error(USE_PROFILE_ERROR_MESSAGE);
+  }
 
-    try {
-      await userClient.patch(
-        `/users/${userId}`,
-        {
-          oldPassword: currPassword,
-          newPassword: newPassword,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      handleClose();
-      onUpdate(false, SUCCESS_PW_UPDATE_MESSAGE, true);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message =
-          error.response?.data.message || FAILED_PW_UPDATE_MESSAGE;
-        onUpdate(false, message, false);
-      } else {
-        onUpdate(false, FAILED_PW_UPDATE_MESSAGE, false);
-      }
-    }
-  };
+  const { updatePassword } = profile;
 
   return (
-    <Box
-      ref={ref}
-      sx={(theme) => ({
-        backgroundColor: theme.palette.common.white,
-        display: "flex",
-        width: 600,
-        flexDirection: "column",
-        alignItems: "center",
-        borderRadius: "16px",
-        padding: "40px",
-      })}
-    >
-      <Typography component="h1" variant="h3">
-        Change Password
-      </Typography>
-      <PasswordTextField
-        label="Current password"
-        passwordVal={false}
-        password={currPassword}
-        setPassword={setCurrPassword}
-        isMatch={false}
-        setValidity={setIsCurrPasswordValid}
-      />
-      <PasswordTextField
-        label="New password"
-        passwordVal={true}
-        password={newPassword}
-        setPassword={setNewPassword}
-        isMatch={true}
-        passwordToMatch={confirmPassword}
-        setValidity={setIsNewPasswordValid}
-      />
-      <PasswordTextField
-        label="Confirm new password"
-        passwordVal={false}
-        password={confirmPassword}
-        setPassword={setConfirmPassword}
-        isMatch={true}
-        passwordToMatch={newPassword}
-        setValidity={setIsConfirmPasswordValid}
-      />
-      <Stack direction="row" spacing={2} sx={{ marginTop: 2, width: "100%" }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleClose}
-          sx={{ flexGrow: 1 }}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          disabled={isUpdateDisabled}
-          onClick={handleSubmit}
-          sx={{ flexGrow: 1 }}
-        >
-          Update
-        </Button>
-      </Stack>
-    </Box>
+    <Dialog fullWidth open={open} onClose={onClose}>
+      <DialogTitle fontSize={24} sx={{ paddingBottom: 0 }}>
+        Change password
+      </DialogTitle>
+      <DialogContent>
+        <Container maxWidth="sm" disableGutters>
+          <StyledForm
+            onSubmit={handleSubmit((data) => {
+              updatePassword({
+                oldPassword: data.oldPassword,
+                newPassword: data.newPassword,
+              });
+              onClose();
+            })}
+          >
+            <PasswordTextField
+              label="Current password"
+              required
+              fullWidth
+              margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+              {...register("oldPassword", {
+                setValueAs: (value: string) => value.trim(),
+                required: PASSWORD_REQUIRED_ERROR_MESSAGE,
+              })}
+              error={!!errors.oldPassword}
+              helperText={errors.oldPassword?.message}
+            />
+            <PasswordTextField
+              displayTooltip
+              label="New password"
+              required
+              fullWidth
+              margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+              input={watch("newPassword", "")}
+              {...register("newPassword", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { passwordValidator },
+                onChange: () => {
+                  if (dirtyFields.confirmPassword) {
+                    trigger("confirmPassword");
+                  }
+                },
+              })}
+              error={!!errors.newPassword}
+              helperText={errors.newPassword?.message}
+            />
+            <PasswordTextField
+              label="Confirm password"
+              required
+              fullWidth
+              margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+              {...register("confirmPassword", {
+                setValueAs: (value: string) => value.trim(),
+                validate: {
+                  matchPassword: (value) =>
+                    watch("newPassword") === value ||
+                    PASSWORD_MISMATCH_ERROR_MESSAGE,
+                },
+              })}
+              error={!!errors.confirmPassword}
+              helperText={errors.confirmPassword?.message}
+            />
+            <Stack
+              direction={"row"}
+              spacing={2}
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+            >
+              <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                disabled={!isDirty || !isValid}
+                type="submit"
+              >
+                Update
+              </Button>
+            </Stack>
+          </StyledForm>
+        </Container>
+      </DialogContent>
+    </Dialog>
   );
-});
+};
 
 export default ChangePasswordModal;

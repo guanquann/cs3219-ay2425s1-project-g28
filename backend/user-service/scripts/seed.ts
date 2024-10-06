@@ -26,20 +26,22 @@ export async function seedAdminAccount() {
     const existingAdmin = await findUserByEmail(adminEmail);
     if (existingAdmin) {
       console.error("Admin account already exists in the database.");
-      process.exit(1);
+      return;
     }
 
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(adminPassword, salt);
 
-    await createUser(adminFirstName, adminLastName, adminUsername, adminEmail, hashedPassword, true);
-
+    await createUser(
+      adminFirstName,
+      adminLastName,
+      adminUsername,
+      adminEmail,
+      hashedPassword,
+      true
+    );
     console.log("Admin account created successfully.");
-    process.exit(0);
-  } catch (err) {
-    console.error("Error seeding admin account:", err);
-    process.exit(1);
+  } catch {
+    console.error("Error creating admin account.");
   }
 }
-
-seedAdminAccount();

@@ -5,7 +5,6 @@ import yaml from "yaml";
 import fs from "fs";
 import cors from "cors";
 
-import connectDB from "./config/db.ts";
 import questionRoutes from "./src/routes/questionRoutes.ts";
 
 dotenv.config();
@@ -18,10 +17,6 @@ const file = fs.readFileSync("./swagger.yml", "utf-8");
 const swaggerDocument = yaml.parse(file);
 
 const app = express();
-
-if (process.env.NODE_ENV !== "test") {
-  connectDB();
-}
 
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.options("*", cors({ origin: allowedOrigins, credentials: true }));
