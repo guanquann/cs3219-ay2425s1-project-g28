@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+
 import { createContext, useContext, useState } from "react";
 import { userClient } from "../utils/api";
 import {
@@ -29,7 +31,9 @@ type ProfileContextType = {
   editProfileOpen: boolean;
   passwordModalOpen: boolean;
   fetchUser: (userId: string) => void;
-  uploadProfilePicture: (data: File) => Promise<{ message: string, imageUrl: string } | null>;
+  uploadProfilePicture: (
+    data: File
+  ) => Promise<{ message: string; imageUrl: string } | null>;
   updateProfile: (data: UserProfileBase) => Promise<boolean>;
   updatePassword: ({
     oldPassword,
@@ -60,38 +64,34 @@ const ProfileContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const uploadProfilePicture = async (
     data: File
-  ): Promise<{ message: string, imageUrl: string } | null> => {
+  ): Promise<{ message: string; imageUrl: string } | null> => {
     const formData = new FormData();
     formData.append("profilePic", data);
 
     try {
       const res = await userClient.post("/users/images", formData, {
         headers: {
-          "Content-Type": "multipart/form-data"
+          "Content-Type": "multipart/form-data",
         },
       });
       return res.data;
     } catch {
       return null;
     }
-  }
+  };
 
-  const updateProfile = async (
-    data: UserProfileBase
-  ): Promise<boolean> => {
+  const updateProfile = async (data: UserProfileBase): Promise<boolean> => {
     const token = localStorage.getItem("token");
     try {
-      const res = await userClient
-      .patch(`/users/${user?.id}`, data, 
-      {
+      const res = await userClient.patch(`/users/${user?.id}`, data, {
         headers: { Authorization: `Bearer ${token}` },
-      })
+      });
       setUser(res.data.data);
       toast.success(SUCCESS_PROFILE_UPDATE_MESSAGE);
       return true;
     } catch (error) {
-      console.error('Error:', error);
-      if(axios.isAxiosError(error)) {
+      console.error("Error:", error);
+      if (axios.isAxiosError(error)) {
         const message =
           error.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
         toast.error(message);
