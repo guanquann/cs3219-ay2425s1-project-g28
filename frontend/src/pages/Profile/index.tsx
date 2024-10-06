@@ -67,6 +67,7 @@ const ProfilePage: React.FC = () => {
         <Box sx={(theme) => ({ flex: 1, paddingRight: theme.spacing(4) })}>
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <ProfileDetails
+              profilePictureUrl={user.profilePictureUrl}
               username={user.username}
               firstName={user.firstName}
               lastName={user.lastName}
@@ -109,6 +110,7 @@ const ProfilePage: React.FC = () => {
           <EditProfileModal
             open={editProfileOpen}
             onClose={() => setEditProfileModalOpen(false)}
+            currProfilePictureUrl={user.profilePictureUrl}
             currFirstName={user.firstName}
             currLastName={user.lastName}
             currBiography={user.biography}

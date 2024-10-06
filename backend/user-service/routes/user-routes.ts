@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+  createImageLink,
   createUser,
   deleteUser,
   getAllUsers,
@@ -26,6 +27,8 @@ router.patch(
 );
 
 router.post("/", createUser);
+
+router.post("/images", createImageLink);
 
 router.get("/:id", getUser);
 

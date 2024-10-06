@@ -88,7 +88,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
               <>
                 <Tooltip title={"Account settings"}>
                   <IconButton onClick={handleClick} data-testid="profile">
-                    <Avatar />
+                    <Avatar src={user.profilePictureUrl}/>
                   </IconButton>
                 </Tooltip>
                 <Menu

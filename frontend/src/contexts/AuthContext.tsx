@@ -13,8 +13,8 @@ type User = {
   firstName: string;
   lastName: string;
   email: string;
-  biography: string;
-  profilePictureUrl: string;
+  biography?: string;
+  profilePictureUrl?: string;
   createdAt: string;
   isAdmin: boolean;
 };
@@ -30,6 +30,7 @@ type AuthContextType = {
   login: (email: string, password: string) => void;
   logout: () => void;
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 };
 
@@ -111,7 +112,7 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   }
 
   return (
-    <AuthContext.Provider value={{ signup, login, logout, user, loading }}>
+    <AuthContext.Provider value={{ signup, login, logout, user, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

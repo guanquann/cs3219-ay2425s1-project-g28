@@ -2,6 +2,7 @@ import { Avatar, Box, Typography } from "@mui/material";
 import React from "react";
 
 type ProfileSectionProps = {
+  profilePictureUrl?: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -9,7 +10,7 @@ type ProfileSectionProps = {
 };
 
 const ProfileDetails: React.FC<ProfileSectionProps> = (props) => {
-  const { firstName, lastName, username, biography } = props;
+  const { profilePictureUrl, firstName, lastName, username, biography } = props;
 
   return (
     <Box>
@@ -23,7 +24,9 @@ const ProfileDetails: React.FC<ProfileSectionProps> = (props) => {
             marginBottom: theme.spacing(2),
           })}
         >
-          <Avatar sx={{ width: 56, height: 56 }} />
+          <Avatar 
+            src={profilePictureUrl}
+            sx={{ width: 56, height: 56 }}/>
           <Box sx={(theme) => ({ marginLeft: theme.spacing(2) })}>
             <Typography fontSize={"h6.fontSize"}>
               {firstName} {lastName}
