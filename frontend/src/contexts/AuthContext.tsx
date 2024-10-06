@@ -30,7 +30,7 @@ type AuthContextType = {
   login: (email: string, password: string) => void;
   logout: () => void;
   user: User | null;
-  setUser: (data: User) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 };
 
