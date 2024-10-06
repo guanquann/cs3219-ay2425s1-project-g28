@@ -1,6 +1,10 @@
 # PeerPrep Backend
 
-> Set-up either a local or cloud MongoDB first, before proceeding to each microservice for more instructions.
+> Before proceeding to each microservice for more instructions:
+
+1. Set-up either a local or cloud MongoDB.
+
+2. Set-up Firebase.
 
 ## Setting-up local MongoDB (only if you are using Docker)
 
@@ -8,7 +12,7 @@
 
 2. To set up credentials for the MongoDB database, update `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` of the `.env` file.
 
-3. Your local Mongo URI will be `mongodb://<MONGO_INITDB_ROOT_USERNAME>:<MONGO_INITDB_ROOT_PASSWORD>@mongo:27017/`. Take note of it as we will be using in the `.env` file in the various microservices later on.
+3. Your local Mongo URI will be `mongodb://<MONGO_INITDB_ROOT_USERNAME>:<MONGO_INITDB_ROOT_PASSWORD>@mongo:27017/`. Take note of it as we will be using in the `.env` files in the various microservices later on.
 
 4. You can view the MongoDB collections locally using Mongo Express. To set up Mongo Express, update `ME_CONFIG_BASICAUTH_USERNAME` and `ME_CONFIG_BASICAUTH_PASSWORD`. The username and password will be the login credentials when you access Mongo Express at http://localhost:8081.
 
@@ -87,4 +91,36 @@
 
     ![alt text](GuideAssets/ConnectionString.png)
 
-13. Your cloud Mongo URI will be the string you copied earlier. Take note of it as we will be using in the `.env` file in the various microservices later on.
+13. Your cloud Mongo URI will be the string you copied earlier. Take note of it as we will be using in the `.env` files in the various microservices later on.
+
+## Setting-up Firebase
+
+1. Go to https://console.firebase.google.com/u/0/.
+
+2. Create a project and choose a project name. Navigate to `Storage` and click on it to activate it.
+
+3. Select `Start in production mode` and your preferred cloud storage region.
+
+4. After Storage is created, go to `Rules` section and set rule to:
+
+   ```
+   rules_version = '2';
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /{allPaths=**} {
+         allow read: if true;
+         allow write: if request.auth != null;
+       }
+     }
+   }
+   ```
+
+   This rule ensures that only verified users can upload images while ensuring that URLs of images are public. Remember to click `Publish` to save changes.
+
+5. Go to `Settings`, `Project settings`, `Service accounts` and click `Generate new private key`. This will download a `.json` file, which will contain your credentials.
+
+6. You will need to update the following variables in the `.env` files of the various microservices later on.
+   - `FIREBASE_PROJECT_ID` is the value of `project_id` found in the downloaded json file.
+   - `FIREBASE_PRIVATE_KEY` is the value of `private_key` found in the downloaded json file.
+   - `FIREBASE_CLIENT_EMAIL` is the value of `client_email` found in the downloaded json file.
+   - `FIREBASE_STORAGE_BUCKET` is the folder path of the Storage. It should look something like `gs://<appname>.appspot.com`.

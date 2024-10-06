@@ -1,8 +1,8 @@
 # User Service Guide
 
-> If you have not set-up either a local or cloud MongoDB, as well as Firebase, go [here](../README.md) first before proceding.
+> If you have not set-up either a local or cloud MongoDB, as well as Firebase, visit [this](../README.md) before proceeding.
 
-## Setting-up
+## Setting-up User Service
 
 1. In the `user-service` directory, create a copy of the `.env.sample` file and name it `.env`.
 

@@ -1,32 +1,6 @@
 # Question Service
 
-> If you have not set-up either a local or cloud MongoDB, go [here](../README.md) first before proceding.
-
-## Setting-up Firebase
-
-1. Go to https://console.firebase.google.com/u/0/.
-
-2. Create a project and choose a project name. Navigate to `Storage` and click on it to activate it.
-
-3. Select `Start in production mode` and your preferred cloud storage region.
-
-4. After Storage is created, go to `Rules` section and set rule to:
-
-   ```
-   rules_version = '2';
-   service firebase.storage {
-     match /b/{bucket}/o {
-       match /{allPaths=**} {
-         allow read: if true;
-         allow write: if request.auth != null;
-       }
-     }
-   }
-   ```
-
-   This rule ensures that only verified users can upload images while ensuring that URLs of images are public. Remember to click `Publish` to save changes.
-
-5. Go to `Settings`, `Project settings`, `Service accounts` and click `Generate new private key`. This will download a `.json` file, which will contain your credentials.
+> If you have not set-up either a local or cloud MongoDB, as well as Firebase, visit [this](../README.md) before proceeding.
 
 ## Setting-up Question Service
 
@@ -35,10 +9,6 @@
 2. To connect to your cloud MongoDB instead of your local MongoDB, set the `NODE_ENV` to `production` instead of `development`.
 
 3. Update `MONGO_CLOUD_URI`, `MONGO_LOCAL_URI`, `FIREBASE_PROJECT_ID`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_STORAGE_BUCKET`.
-   - `FIREBASE_PROJECT_ID` is the value of `project_id` found in the downloaded json file.
-   - `FIREBASE_PRIVATE_KEY` is the value of `private_key` found in the downloaded json file.
-   - `FIREBASE_CLIENT_EMAIL` is the value of `client_email` found in the downloaded json file.
-   - `FIREBASE_STORAGE_BUCKET` is the folder path of the Storage. It should look something like `gs://<appname>.appspot.com`.
 
 ## Running Question Service without Docker
 
