@@ -3,7 +3,7 @@ import "dotenv/config";
 import { connect } from "mongoose";
 
 export async function connectToDB() {
-  let mongoDBUri: string | undefined =
+  const mongoDBUri: string | undefined =
     process.env.NODE_ENV === "production"
       ? process.env.MONGO_CLOUD_URI
       : process.env.MONGO_LOCAL_URI;
