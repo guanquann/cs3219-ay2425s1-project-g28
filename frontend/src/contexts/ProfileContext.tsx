@@ -7,12 +7,13 @@ import {
   SUCCESS_PW_UPDATE_MESSAGE,
 } from "../utils/constants";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 interface UserProfileBase {
   firstName: string;
   lastName: string;
   biography?: string;
-  profilePictureUrl?: string | null;
+  profilePictureUrl?: string;
 }
 
 interface UserProfile extends UserProfileBase {
@@ -29,7 +30,7 @@ type ProfileContextType = {
   passwordModalOpen: boolean;
   fetchUser: (userId: string) => void;
   uploadProfilePicture: (data: File) => Promise<{ message: string, imageUrl: string } | null>;
-  updateProfile: (data: UserProfileBase) => void;
+  updateProfile: (data: UserProfileBase) => Promise<boolean>;
   updatePassword: ({
     oldPassword,
     newPassword,
@@ -75,21 +76,31 @@ const ProfileContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }
 
-  const updateProfile = async (data: UserProfileBase) => {
+  const updateProfile = async (
+    data: UserProfileBase
+  ): Promise<boolean> => {
     const token = localStorage.getItem("token");
-    await userClient
-      .patch(`/users/${user?.id}`, data, {
+    try {
+      const res = await userClient
+      .patch(`/users/${user?.id}`, data, 
+      {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        setUser(res.data.data);
-        toast.success(SUCCESS_PROFILE_UPDATE_MESSAGE);
-      })
-      .catch((err) => {
+      setUser(res.data.data);
+      toast.success(SUCCESS_PROFILE_UPDATE_MESSAGE);
+      return true;
+    } catch (error) {
+      console.error('Error:', error);
+      if(axios.isAxiosError(error)) {
         const message =
-          err.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
+          error.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
         toast.error(message);
-      });
+        return false;
+      } else {
+        toast.error(FAILED_PROFILE_UPDATE_MESSAGE);
+        return false;
+      }
+    }
   };
 
   const updatePassword = async ({

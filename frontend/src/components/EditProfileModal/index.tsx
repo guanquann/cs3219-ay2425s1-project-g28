@@ -15,10 +15,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from "react-hook-form";
 import { useProfile } from "../../contexts/ProfileContext";
 import { bioValidator, nameValidator, profilePictureValidator } from "../../utils/validators";
-import { FAILED_PROFILE_UPDATE_MESSAGE, PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE, USE_PROFILE_ERROR_MESSAGE } from "../../utils/constants";
+import { FAILED_PROFILE_UPDATE_MESSAGE, PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE, USE_AUTH_ERROR_MESSAGE, USE_PROFILE_ERROR_MESSAGE } from "../../utils/constants";
 import { useRef, useState } from "react";
 import { Restore } from "@mui/icons-material";
 import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface EditProfileModalProps {
   onClose: () => void;
@@ -44,17 +45,17 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
     getFieldState,
   } = useForm<{
     profilePic: File | null;
-    profilePictureUrl: string | null;
+    profilePictureUrl: string;
     firstName: string;
     lastName: string;
     biography: string;
   }>({
     defaultValues: {
       profilePic: null,
-      profilePictureUrl: currProfilePictureUrl || null,
+      profilePictureUrl: currProfilePictureUrl || "",
       firstName: currFirstName,
       lastName: currLastName,
-      biography: currBiography,
+      biography: currBiography || "",
     },
     mode: "all",
   });
@@ -65,7 +66,15 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
     throw new Error(USE_PROFILE_ERROR_MESSAGE);
   }
 
-  const { uploadProfilePicture, updateProfile } = profile;
+  const { user, uploadProfilePicture, updateProfile } = profile;
+
+  const auth = useAuth();
+
+  if (!auth) {
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
+  }
+
+  const { setUser } = auth;
 
   // profile pic functionality referenced and adapted from https://dreamix.eu/insights/uploading-files-with-react-hook-form/
   const [picPreview, setPicPreview] = useState<string | null>(currProfilePictureUrl || null);
@@ -81,7 +90,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
       setValue("profilePic", file, { shouldValidate: true, shouldDirty: true });
 
       if (currProfilePictureUrl) {
-        setValue("profilePictureUrl", null, { shouldDirty: true });
+        setValue("profilePictureUrl", "", { shouldDirty: true });
       }
     }
   }
@@ -94,9 +103,9 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
       }
     }
     if (getFieldState("profilePictureUrl").isDirty) {
-      setValue("profilePictureUrl", currProfilePictureUrl || null, { shouldDirty: true })
+      setValue("profilePictureUrl", currProfilePictureUrl || "", { shouldDirty: true })
     }
-    setPicPreview(currProfilePictureUrl || null);
+    setPicPreview(currProfilePictureUrl || "");
   }
 
   const onClickDelete = () =>  {
@@ -107,7 +116,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
       }
     }
     if (currProfilePictureUrl) {
-      setValue("profilePictureUrl", null, { shouldDirty: true });
+      setValue("profilePictureUrl", "", { shouldDirty: true });
     }
     setPicPreview(null);
   }
@@ -122,7 +131,6 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
           <StyledForm
             onSubmit={handleSubmit((data) => {
               if (data.profilePic) {
-                //send to firebase and get the url back
                 uploadProfilePicture(data.profilePic).then((res) => {
                   if (res) {
                     const url_data = {
@@ -131,7 +139,22 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                       biography: data.biography,
                       profilePictureUrl: res.imageUrl,
                     };
-                    updateProfile(url_data);
+                    updateProfile(url_data).then((res) => {
+                      if (res && user) {
+                        const updatedUser = {
+                          id: user.id,
+                          username: user.username,
+                          firstName: url_data.firstName,
+                          lastName: url_data.lastName,
+                          email: user.email,
+                          biography: url_data.biography,
+                          profilePictureUrl: url_data.profilePictureUrl,
+                          createdAt: user.createdAt,
+                          isAdmin: user.isAdmin,
+                        }
+                        setUser(updatedUser);
+                      }
+                    });
                     onClose();
                   } else {
                     toast.error(FAILED_PROFILE_UPDATE_MESSAGE);
@@ -144,7 +167,22 @@ const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
                   biography: data.biography,
                   profilePictureUrl: data.profilePictureUrl,
                 };
-                updateProfile(url_data);
+                updateProfile(url_data).then((res) => {
+                  if (res && user) {
+                    const updatedUser = {
+                      id: user.id,
+                      username: user.username,
+                      firstName: url_data.firstName,
+                      lastName: url_data.lastName,
+                      email: user.email,
+                      biography: url_data.biography,
+                      profilePictureUrl: url_data.profilePictureUrl,
+                      createdAt: user.createdAt,
+                      isAdmin: user.isAdmin,
+                    }
+                    setUser(updatedUser);
+                  }
+                });
                 onClose();
               }
             })}
