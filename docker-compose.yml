@@ -23,6 +23,7 @@ services:
     networks:
       - peerprep-network
     restart: on-failure
+
   frontend:
     image: peerprep/frontend
     build: ./frontend
