@@ -47,6 +47,13 @@ const theme = createTheme({
         },
       },
     },
+      MuiListItemText: {
+        styleOverrides: {
+          primary: {
+            fontSize: "14px",
+          },
+        },
+      }
   },
 });
 

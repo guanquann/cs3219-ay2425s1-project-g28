@@ -23,6 +23,17 @@ services:
     networks:
       - peerprep-network
     restart: on-failure
+  frontend:
+    image: peerprep/frontend
+    build: ./frontend
+    ports:
+      - 5173:5173
+    depends_on:
+      - user-service
+      - question-service
+    networks:
+      - peerprep-network
+    restart: on-failure
 
   mongo:
     image: mongo

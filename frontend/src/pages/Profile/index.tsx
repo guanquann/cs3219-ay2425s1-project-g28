@@ -9,6 +9,10 @@ import ServerError from "../../components/ServerError";
 import EditProfileModal from "../../components/EditProfileModal";
 import ChangePasswordModal from "../../components/ChangePasswordModal";
 import { useProfile } from "../../contexts/ProfileContext";
+import {
+  USE_AUTH_ERROR_MESSAGE,
+  USE_PROFILE_ERROR_MESSAGE,
+} from "../../utils/constants";
 
 const ProfilePage: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -17,11 +21,11 @@ const ProfilePage: React.FC = () => {
   const profile = useProfile();
 
   if (!auth) {
-    throw new Error("useAuth() must be used within AuthProvider");
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
 
   if (!profile) {
-    throw new Error("useProfile() must be used within ProfileContextProvider");
+    throw new Error(USE_PROFILE_ERROR_MESSAGE);
   }
 
   const {

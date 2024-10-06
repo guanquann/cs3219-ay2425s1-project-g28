@@ -68,7 +68,7 @@ const ProfileContextProvider: React.FC<{ children: React.ReactNode }> = ({
       })
       .catch((err) => {
         const message =
-          err.response.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
+          err.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
         toast.error(message);
       });
   };
@@ -89,7 +89,7 @@ const ProfileContextProvider: React.FC<{ children: React.ReactNode }> = ({
       )
       .then(() => toast.success(SUCCESS_PW_UPDATE_MESSAGE))
       .catch((err) => {
-        const message = err.response.data.message || FAILED_PW_UPDATE_MESSAGE;
+        const message = err.response?.data.message || FAILED_PW_UPDATE_MESSAGE;
         toast.error(message);
       });
   };

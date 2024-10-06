@@ -1,40 +1,40 @@
 import {
-  // Autocomplete,
-  // Button,
-  // Card,
-  // FormControl,
-  // Grid2,
-  // TextField,
+  Autocomplete,
+  Button,
+  Card,
+  FormControl,
+  Grid2,
+  TextField,
   Typography,
 } from "@mui/material";
-// import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import classes from "./index.module.css";
 import AppMargin from "../../components/AppMargin";
-// import {
-//   complexityList,
-//   languageList,
-//   maxMatchTimeout,
-//   minMatchTimeout,
-// } from "../../utils/constants";
-// import reducer, {
-//   getQuestionCategories,
-//   initialState,
-// } from "../../reducers/questionReducer";
-// import CustomChip from "../../components/CustomChip";
+import {
+  complexityList,
+  languageList,
+  maxMatchTimeout,
+  minMatchTimeout,
+} from "../../utils/constants";
+import reducer, {
+  getQuestionCategories,
+  initialState,
+} from "../../reducers/questionReducer";
+import CustomChip from "../../components/CustomChip";
 // import homepageImage from "/homepage_image.svg";
 
 const Home: React.FC = () => {
-  // const [complexity, setComplexity] = useState<string[]>([]);
-  // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  // const [language, setLanguage] = useState<string[]>([]);
-  // const [timeout, setTimeout] = useState<number>(30);
+  const [complexity, setComplexity] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [language, setLanguage] = useState<string[]>([]);
+  const [timeout, setTimeout] = useState<number>(30);
 
-  // const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  // useEffect(() => {
-  //   getQuestionCategories(dispatch);
-  // }, []);
+  useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
 
   return (
     <AppMargin
@@ -50,7 +50,7 @@ const Home: React.FC = () => {
           marginBottom: theme.spacing(4),
         })}
       >
-        Level up in your technical interviews!
+        Start an interactive practice session today!
       </Typography>
 
       <Typography
@@ -62,11 +62,9 @@ const Home: React.FC = () => {
           maxWidth: "80%",
         })}
       >
-        Your ultimate technical interview preparation platform to practice
-        whiteboard style interview questions with a peer.
+        Specify your question preferences and sit back as we find you the best match.
       </Typography>
-      {/* 
-      <Box
+      {/* <Box
         component="img"
         src={homepageImage}
         alt="Interview Practice Buddy"
@@ -79,7 +77,7 @@ const Home: React.FC = () => {
           objectFit: "contain",
         }}
       /> */}
-      {/* <Card
+      <Card
         sx={{
           padding: 4,
           width: "100%",
@@ -269,7 +267,7 @@ const Home: React.FC = () => {
         >
           Find my match!
         </Button>
-      </Card> */}
+      </Card>
     </AppMargin>
   );
 };

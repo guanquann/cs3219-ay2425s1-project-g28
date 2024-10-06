@@ -112,7 +112,7 @@ export const createQuestion = async (
     .catch((err) => {
       dispatch({
         type: QuestionActionTypes.ERROR_CREATING_QUESTION,
-        payload: err.response.data.message,
+        payload: err.response?.data.message || err.message,
       });
       return false;
     });
@@ -130,7 +130,7 @@ export const getQuestionCategories = (dispatch: Dispatch<QuestionActions>) => {
     .catch((err) =>
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_QUESTION_CATEGORIES,
-        payload: err.response.data.message,
+        payload: err.response?.data.message || err.message,
       })
     );
 };
@@ -162,7 +162,7 @@ export const getQuestionList = (
     .catch((err) =>
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_QUESTION_LIST,
-        payload: err.response.data.message,
+        payload: err.response?.data.message || err.message,
       })
     );
 };
@@ -182,7 +182,7 @@ export const getQuestionById = (
     .catch((err) =>
       dispatch({
         type: QuestionActionTypes.ERROR_FETCHING_SELECTED_QN,
-        payload: err.response.data.message,
+        payload: err.response?.data.message || err.message,
       })
     );
 };
@@ -218,7 +218,7 @@ export const updateQuestionById = async (
     .catch((err) => {
       dispatch({
         type: QuestionActionTypes.ERROR_UPDATING_QUESTION,
-        payload: err.response.data.message,
+        payload: err.response?.data.message || err.message,
       });
       return false;
     });
