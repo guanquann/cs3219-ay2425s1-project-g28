@@ -71,3 +71,9 @@ export const SUCCESS_PW_UPDATE_MESSAGE = "Password updated successfully";
 export const FAILED_PW_UPDATE_MESSAGE = "Failed to update password";
 export const SUCCESS_PROFILE_UPDATE_MESSAGE = "Profile updated successfully";
 export const FAILED_PROFILE_UPDATE_MESSAGE = "Failed to update profile";
+
+// Image paths
+export const FIND_MATCH_FORM_PATH = "/find_match_form.png";
+export const MATCH_FOUND_PATH = "/match_found.png";
+export const QUESTIONS_LIST_PATH = "/questions_list.png";
+export const COLLABORATIVE_EDITOR_PATH = "/collaborative_editor.png";
