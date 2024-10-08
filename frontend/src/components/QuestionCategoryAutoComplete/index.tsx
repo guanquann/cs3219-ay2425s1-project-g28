@@ -26,7 +26,6 @@ const QuestionCategoryAutoComplete: React.FC<
       multiple
       freeSolo
       options={state.questionCategories}
-      size="small"
       sx={{ marginTop: 2 }}
       value={selectedCategories}
       onChange={(_e, newCategoriesSelected) => {

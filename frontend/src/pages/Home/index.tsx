@@ -50,7 +50,7 @@ const Home: React.FC = () => {
           marginBottom: theme.spacing(4),
         })}
       >
-        Level up in your technical interviews!
+        Start an interactive practice session today!
       </Typography>
 
       <Typography
@@ -62,11 +62,10 @@ const Home: React.FC = () => {
           maxWidth: "80%",
         })}
       >
-        Your ultimate technical interview preparation platform to practice
-        whiteboard style interview questions with a peer.
+        Specify your question preferences and sit back as we find you the best
+        match.
       </Typography>
-      {/* 
-      <Box
+      {/* <Box
         component="img"
         src={homepageImage}
         alt="Interview Practice Buddy"

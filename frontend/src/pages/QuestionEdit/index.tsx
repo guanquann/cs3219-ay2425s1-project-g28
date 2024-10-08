@@ -37,7 +37,7 @@ const QuestionEdit = () => {
   const [title, setTitle] = useState<string>("");
   const [markdownText, setMarkdownText] = useState<string>("");
   const [selectedComplexity, setselectedComplexity] = useState<string | null>(
-    null,
+    null
   );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [uploadedImagesUrl, setUploadedImagesUrl] = useState<string[]>([]);
@@ -63,7 +63,7 @@ const QuestionEdit = () => {
   const handleBack = () => {
     if (
       !confirm(
-        "Are you sure you want to leave this page? All process will be lost.",
+        "Are you sure you want to leave this page? All process will be lost."
       )
     ) {
       return;
@@ -104,7 +104,7 @@ const QuestionEdit = () => {
         complexity: selectedComplexity,
         categories: selectedCategories,
       },
-      dispatch,
+      dispatch
     );
 
     if (result) {
@@ -133,7 +133,6 @@ const QuestionEdit = () => {
           <TextField
             label="Title"
             variant="outlined"
-            size="small"
             fullWidth
             autoComplete="off"
             value={title}
@@ -143,7 +142,6 @@ const QuestionEdit = () => {
 
           <Autocomplete
             options={complexityList}
-            size="small"
             sx={{ marginTop: 2 }}
             value={selectedComplexity}
             onChange={(_e, newcomplexitySelected) => {

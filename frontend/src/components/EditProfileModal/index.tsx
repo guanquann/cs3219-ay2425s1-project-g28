@@ -1,255 +1,328 @@
-import { forwardRef, useState } from "react";
 import {
-  Box,
+  Avatar,
   Button,
-  FormControl,
-  FormHelperText,
+  Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
   Stack,
+  styled,
   TextField,
   Typography,
 } from "@mui/material";
-import { userClient } from "../../utils/api";
-import axios from "axios";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useForm } from "react-hook-form";
+import { useProfile } from "../../contexts/ProfileContext";
+import {
+  bioValidator,
+  nameValidator,
+  profilePictureValidator,
+} from "../../utils/validators";
 import {
   FAILED_PROFILE_UPDATE_MESSAGE,
-  SUCCESS_PROFILE_UPDATE_MESSAGE,
+  PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE,
+  USE_AUTH_ERROR_MESSAGE,
+  USE_PROFILE_ERROR_MESSAGE,
 } from "../../utils/constants";
+import { useRef, useState } from "react";
+import { Restore } from "@mui/icons-material";
+import { toast } from "react-toastify";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface EditProfileModalProps {
-  handleClose: () => void;
+  onClose: () => void;
+  open: boolean;
+  currProfilePictureUrl?: string;
   currFirstName: string;
   currLastName: string;
   currBiography?: string;
-  userId: string;
-  onUpdate: (
-    isProfileEdit: boolean,
-    message: string,
-    isSuccess: boolean,
-  ) => void;
 }
 
-const EditProfileModal = forwardRef<HTMLDivElement, EditProfileModalProps>(
-  (props, ref) => {
-    const {
-      handleClose,
-      currFirstName,
-      currLastName,
-      currBiography,
-      userId,
-      onUpdate,
-    } = props;
-    const nameCharLimit = 50;
-    const bioCharLimit = 255;
-    const [newFirstName, setNewFirstName] = useState<string>(currFirstName);
-    const [newLastName, setNewLastName] = useState<string>(currLastName);
-    const [newBio, setNewBio] = useState<string>(currBiography || "");
+const StyledForm = styled("form")(({ theme }) => ({
+  marginTop: theme.spacing(1),
+}));
 
-    const [firstNameError, setFirstNameError] = useState<boolean>(false);
-    const [lastNameError, setLastNameError] = useState<boolean>(false);
+const EditProfileModal: React.FC<EditProfileModalProps> = (props) => {
+  const {
+    open,
+    onClose,
+    currProfilePictureUrl,
+    currFirstName,
+    currLastName,
+    currBiography,
+  } = props;
 
-    const checkForChanges = (): boolean => {
-      if (
-        newFirstName != currFirstName ||
-        newLastName != currLastName ||
-        newBio != currBiography
-      ) {
-        return true;
-      } else {
-        return false;
+  const {
+    register,
+    formState: { errors, isValid, isDirty },
+    handleSubmit,
+    setValue,
+    getFieldState,
+  } = useForm<{
+    profilePic: File | null;
+    profilePictureUrl: string;
+    firstName: string;
+    lastName: string;
+    biography: string;
+  }>({
+    defaultValues: {
+      profilePic: null,
+      profilePictureUrl: currProfilePictureUrl || "",
+      firstName: currFirstName,
+      lastName: currLastName,
+      biography: currBiography || "",
+    },
+    mode: "all",
+  });
+
+  const profile = useProfile();
+
+  if (!profile) {
+    throw new Error(USE_PROFILE_ERROR_MESSAGE);
+  }
+
+  const { user, uploadProfilePicture, updateProfile } = profile;
+
+  const auth = useAuth();
+
+  if (!auth) {
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
+  }
+
+  const { setUser } = auth;
+
+  // profile pic functionality referenced and adapted from https://dreamix.eu/insights/uploading-files-with-react-hook-form/
+  const [picPreview, setPicPreview] = useState<string | null>(
+    currProfilePictureUrl || null
+  );
+  const hiddenFileInputRef = useRef<HTMLInputElement | null>(null);
+  const { ref: registerRef, ...rest } = register("profilePic", {
+    validate: profilePictureValidator,
+  });
+  const onClickUpload = () => {
+    hiddenFileInputRef.current?.click();
+  };
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setPicPreview(URL.createObjectURL(file));
+      setValue("profilePic", file, { shouldValidate: true, shouldDirty: true });
+
+      if (currProfilePictureUrl) {
+        setValue("profilePictureUrl", "", { shouldDirty: true });
       }
-    };
+    }
+  };
 
-    const isUpdateDisabled =
-      firstNameError || lastNameError || !checkForChanges();
-
-    const handleSubmit = async () => {
-      const accessToken = localStorage.getItem("token");
-
-      try {
-        await userClient.patch(
-          `/users/${userId}`,
-          {
-            firstName: newFirstName,
-            lastName: newLastName,
-            biography: newBio,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          },
-        );
-        handleClose();
-        onUpdate(true, SUCCESS_PROFILE_UPDATE_MESSAGE, true);
-      } catch (error) {
-        console.error("Error:", error);
-        if (axios.isAxiosError(error)) {
-          const message =
-            error.response?.data.message || FAILED_PROFILE_UPDATE_MESSAGE;
-          onUpdate(true, message, false);
-        } else {
-          onUpdate(true, FAILED_PROFILE_UPDATE_MESSAGE, false);
-        }
+  const onClickReset = () => {
+    if (getFieldState("profilePic").isDirty) {
+      setValue("profilePic", null, { shouldValidate: true, shouldDirty: true });
+      if (hiddenFileInputRef.current) {
+        hiddenFileInputRef.current.value = "";
       }
-    };
+    }
+    if (getFieldState("profilePictureUrl").isDirty) {
+      setValue("profilePictureUrl", currProfilePictureUrl || "", {
+        shouldDirty: true,
+      });
+    }
+    setPicPreview(currProfilePictureUrl || "");
+  };
 
-    return (
-      <Box
-        ref={ref}
-        sx={(theme) => ({
-          backgroundColor: theme.palette.common.white,
-          display: "flex",
-          width: 600,
-          flexDirection: "column",
-          alignItems: "center",
-          borderRadius: "16px",
-          padding: "40px",
-        })}
-      >
-        <Typography component="h1" variant="h3">
-          Edit Profile
-        </Typography>
-        <FormControl fullWidth>
-          <TextField
-            required
-            id="outlined-basic"
-            label="First name"
-            sx={{ marginTop: 2 }}
-            slotProps={{
-              htmlInput: {
-                maxLength: nameCharLimit,
-              },
-            }}
-            defaultValue={currFirstName}
-            onChange={(input) => {
-              const val = input.target.value;
-              if (!/^[a-zA-Z\s-]*$/.test(val) || val.length == 0) {
-                setFirstNameError(true);
+  const onClickDelete = () => {
+    if (getFieldState("profilePic").isDirty) {
+      setValue("profilePic", null, { shouldValidate: true, shouldDirty: true });
+      if (hiddenFileInputRef.current) {
+        hiddenFileInputRef.current.value = "";
+      }
+    }
+    if (currProfilePictureUrl) {
+      setValue("profilePictureUrl", "", { shouldDirty: true });
+    }
+    setPicPreview(null);
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle fontSize={24} sx={{ paddingBottom: 0 }}>
+        Edit profile
+      </DialogTitle>
+      <DialogContent>
+        <Container maxWidth="sm" disableGutters>
+          <StyledForm
+            onSubmit={handleSubmit((data) => {
+              if (data.profilePic) {
+                uploadProfilePicture(data.profilePic).then((res) => {
+                  if (res) {
+                    const url_data = {
+                      firstName: data.firstName,
+                      lastName: data.lastName,
+                      biography: data.biography,
+                      profilePictureUrl: res.imageUrl,
+                    };
+                    updateProfile(url_data).then((res) => {
+                      if (res && user) {
+                        const updatedUser = {
+                          id: user.id,
+                          username: user.username,
+                          firstName: url_data.firstName,
+                          lastName: url_data.lastName,
+                          email: user.email,
+                          biography: url_data.biography,
+                          profilePictureUrl: url_data.profilePictureUrl,
+                          createdAt: user.createdAt,
+                          isAdmin: user.isAdmin,
+                        };
+                        setUser(updatedUser);
+                      }
+                    });
+                    onClose();
+                  } else {
+                    toast.error(FAILED_PROFILE_UPDATE_MESSAGE);
+                  }
+                });
               } else {
-                setFirstNameError(false);
+                const url_data = {
+                  firstName: data.firstName,
+                  lastName: data.lastName,
+                  biography: data.biography,
+                  profilePictureUrl: data.profilePictureUrl,
+                };
+                updateProfile(url_data).then((res) => {
+                  if (res && user) {
+                    const updatedUser = {
+                      id: user.id,
+                      username: user.username,
+                      firstName: url_data.firstName,
+                      lastName: url_data.lastName,
+                      email: user.email,
+                      biography: url_data.biography,
+                      profilePictureUrl: url_data.profilePictureUrl,
+                      createdAt: user.createdAt,
+                      isAdmin: user.isAdmin,
+                    };
+                    setUser(updatedUser);
+                  }
+                });
+                onClose();
               }
-              setNewFirstName(val);
-            }}
-            error={firstNameError}
-          />
-          {firstNameError ? (
+            })}
+          >
             <Stack
               direction="row"
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
+              spacing={2}
+              display="flex"
+              alignItems="center"
+              sx={(theme) => ({ marginBottom: theme.spacing(2) })}
             >
-              {newFirstName.length == 0 ? (
-                <FormHelperText error={firstNameError}>
-                  Required field
-                </FormHelperText>
+              {!picPreview ? (
+                <Avatar sx={{ width: 56, height: 56 }} />
               ) : (
-                <FormHelperText error={firstNameError}>
-                  Only alphabetical, hyphen and white space characters allowed
-                </FormHelperText>
+                <Avatar src={picPreview} sx={{ width: 56, height: 56 }} />
               )}
-              <FormHelperText>
-                {newFirstName.length} / {nameCharLimit} characters
-              </FormHelperText>
+              {/* input referenced from https://dreamix.eu/insights/uploading-files-with-react-hook-form/ */}
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                {...rest}
+                ref={(e) => {
+                  registerRef(e);
+                  hiddenFileInputRef.current = e;
+                }}
+                onChange={handleImageChange}
+              />
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={onClickUpload}
+                sx={{ height: 30 }}
+              >
+                Upload
+              </Button>
+              <IconButton onClick={onClickReset}>
+                <Restore color="success" />
+              </IconButton>
+              <IconButton onClick={onClickDelete}>
+                <DeleteIcon color="error" />
+              </IconButton>
             </Stack>
-          ) : (
-            <FormHelperText sx={{ textAlign: "right" }}>
-              {newFirstName.length} / {nameCharLimit} characters
-            </FormHelperText>
-          )}
-        </FormControl>
-        <FormControl fullWidth>
-          <TextField
-            required
-            id="outlined-basic"
-            label="Last name"
-            sx={{ marginTop: 2 }}
-            slotProps={{
-              htmlInput: {
-                maxLength: nameCharLimit,
-              },
-            }}
-            defaultValue={currLastName}
-            onChange={(input) => {
-              const val = input.target.value;
-              if (!/^[a-zA-Z\s-]*$/.test(val) || val.length == 0) {
-                setLastNameError(true);
-              } else {
-                setLastNameError(false);
-              }
-              setNewLastName(val);
-            }}
-            error={lastNameError}
-          />
-          {lastNameError ? (
+            {errors.profilePic ? (
+              <Typography color="error" sx={{ fontSize: 13, marginBottom: 2 }}>
+                {errors.profilePic.message}
+              </Typography>
+            ) : (
+              <Typography
+                sx={{ fontSize: 13, marginBottom: 2, color: "#808080" }}
+              >
+                {PROFILE_PIC_MAX_SIZE_ERROR_MESSAGE}
+              </Typography>
+            )}
+            <TextField
+              fullWidth
+              required
+              label="First name"
+              margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+              {...register("firstName", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { nameValidator },
+              })}
+              error={!!errors.firstName}
+              helperText={errors.firstName?.message}
+            />
+            <TextField
+              fullWidth
+              required
+              label="Last name"
+              margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+              {...register("lastName", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { nameValidator },
+              })}
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
+            />
+            <TextField
+              fullWidth
+              multiline
+              label="Biography"
+              margin="normal"
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
+              {...register("biography", {
+                setValueAs: (value: string) => value.trim(),
+                validate: { bioValidator },
+              })}
+            />
             <Stack
-              direction="row"
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-              }}
+              direction={"row"}
+              spacing={2}
+              sx={(theme) => ({ marginTop: theme.spacing(1) })}
             >
-              {newLastName.length == 0 ? (
-                <FormHelperText error={lastNameError}>
-                  Required field
-                </FormHelperText>
-              ) : (
-                <FormHelperText error={lastNameError}>
-                  Only alphabetical, hyphen and white space characters allowed
-                </FormHelperText>
-              )}
-              <FormHelperText>
-                {newLastName.length} / {nameCharLimit} characters
-              </FormHelperText>
+              <Button
+                fullWidth
+                variant="contained"
+                color="secondary"
+                onClick={onClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                fullWidth
+                variant="contained"
+                type="submit"
+                disabled={!isDirty || !isValid}
+              >
+                Update
+              </Button>
             </Stack>
-          ) : (
-            <FormHelperText sx={{ textAlign: "right" }}>
-              {newLastName.length} / {nameCharLimit} characters
-            </FormHelperText>
-          )}
-        </FormControl>
-        <TextField
-          fullWidth
-          id="outlined-basic"
-          label="Biography"
-          sx={{ marginTop: 2 }}
-          slotProps={{
-            htmlInput: {
-              maxLength: bioCharLimit,
-            },
-            formHelperText: {
-              sx: { textAlign: "right" },
-            },
-          }}
-          defaultValue={currBiography}
-          onChange={(input) => {
-            setNewBio(input.target.value);
-          }}
-          helperText={newBio.length + ` / ${bioCharLimit} characters`}
-        />
-        <Stack direction="row" spacing={2} sx={{ marginTop: 2, width: "100%" }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleClose}
-            sx={{ flexGrow: 1 }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            disabled={isUpdateDisabled}
-            onClick={handleSubmit}
-            sx={{ flexGrow: 1 }}
-          >
-            Update
-          </Button>
-        </Stack>
-      </Box>
-    );
-  },
-);
+          </StyledForm>
+        </Container>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 export default EditProfileModal;
