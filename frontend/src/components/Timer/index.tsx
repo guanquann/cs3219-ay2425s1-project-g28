@@ -15,7 +15,10 @@ const Timer: React.FC<CircularProgressProps & TimerProps> = (props) => {
   const formattedSeconds = String(seconds).padStart(2, "0");
   const formattedMinutes = String(minutes).padStart(2, "0");
   return (
-    <Box sx={{ position: "relative", display: "inline-flex" }}>
+    <Box
+      sx={{ position: "relative", display: "inline-flex" }}
+      data-testid="timer"
+    >
       <CircularProgress
         variant="determinate"
         size={size}
