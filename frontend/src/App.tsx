@@ -41,7 +41,7 @@ function App() {
               </ProfileContextProvider>
             }
           />
-          <Route path="match">
+          <Route path="match" element={<ProtectedRoutes />}>
             <Route index element={<Matching />} />
           </Route>
           <Route path="*" element={<PageNotFound />} />

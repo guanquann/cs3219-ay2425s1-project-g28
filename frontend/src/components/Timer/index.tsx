@@ -8,7 +8,7 @@ import {
 type TimerProps = { totalTime: number; timeLeft: number };
 
 const Timer: React.FC<CircularProgressProps & TimerProps> = (props) => {
-  const { totalTime, timeLeft, thickness, size } = props;
+  const { totalTime, timeLeft, thickness, size, ...rest } = props;
   const percentage = (timeLeft / totalTime) * 100;
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -29,7 +29,6 @@ const Timer: React.FC<CircularProgressProps & TimerProps> = (props) => {
         size={size}
         sx={{ position: "absolute" }}
         thickness={thickness}
-        {...props}
       />
       <Box
         sx={{
