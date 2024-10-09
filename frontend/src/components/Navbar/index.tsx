@@ -18,6 +18,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 import { USE_AUTH_ERROR_MESSAGE } from "../../utils/constants";
+import { isMatchingPage } from "../../utils/url";
 
 type NavbarItem = { label: string; link: string; needsLogin: boolean };
 
@@ -34,8 +35,6 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   const navigate = useNavigate();
   const location = useLocation();
   const path = location.pathname;
-
-  console.log(path);
 
   const auth = useAuth();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -73,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
           >
             PeerPrep
           </Typography>
-          {path !== "/match" ? (
+          {!isMatchingPage(path) ? (
             <Stack direction={"row"} alignItems={"center"} spacing={2}>
               {navbarItems
                 .filter((item) => !item.needsLogin || (item.needsLogin && user))
