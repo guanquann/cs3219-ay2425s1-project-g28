@@ -9,6 +9,9 @@ services:
       - mongo
     networks:
       - peerprep-network
+    volumes:
+      - ./backend/user-service:/user-service
+      - /user-service/node_modules
     restart: on-failure
 
   question-service:
@@ -22,6 +25,9 @@ services:
       - user-service
     networks:
       - peerprep-network
+    volumes:
+      - ./backend/question-service:/question-service
+      - /question-service/node_modules
     restart: on-failure
 
   frontend:
@@ -34,6 +40,9 @@ services:
       - question-service
     networks:
       - peerprep-network
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
     restart: on-failure
 
   mongo:
