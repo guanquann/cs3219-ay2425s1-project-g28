@@ -48,8 +48,8 @@ function App() {
           </Route>
           <Route path="*" element={<PageNotFound />} />
         </Route>
-        <Route path="signup" element={<SignUp />}></Route>
-        <Route path="login" element={<LogIn />}></Route>
+        <Route path="signup" element={<SignUp />} />
+        <Route path="login" element={<LogIn />} />
       </Routes>
     </AuthProvider>
   );

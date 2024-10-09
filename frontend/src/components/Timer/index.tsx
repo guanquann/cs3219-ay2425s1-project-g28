@@ -22,6 +22,7 @@ const Timer: React.FC<CircularProgressProps & TimerProps> = (props) => {
         value={100}
         sx={{ opacity: 0.4 }}
         thickness={thickness}
+        {...rest}
       />
       <CircularProgress
         variant="determinate"
@@ -29,6 +30,7 @@ const Timer: React.FC<CircularProgressProps & TimerProps> = (props) => {
         size={size}
         sx={{ position: "absolute" }}
         thickness={thickness}
+        {...rest}
       />
       <Box
         sx={{
