@@ -1,40 +1,95 @@
 import {
-  // Autocomplete,
-  // Button,
-  // Card,
-  // FormControl,
-  // Grid2,
-  // TextField,
+  Autocomplete,
+  Box,
+  Button,
+  Card,
+  FormControl,
+  Grid2,
+  TextField,
   Typography,
 } from "@mui/material";
-// import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import classes from "./index.module.css";
 import AppMargin from "../../components/AppMargin";
-// import {
-//   complexityList,
-//   languageList,
-//   maxMatchTimeout,
-//   minMatchTimeout,
-// } from "../../utils/constants";
-// import reducer, {
-//   getQuestionCategories,
-//   initialState,
-// } from "../../reducers/questionReducer";
-// import CustomChip from "../../components/CustomChip";
-// import homepageImage from "/homepage_image.svg";
+import {
+  complexityList,
+  languageList,
+  maxMatchTimeout,
+  minMatchTimeout,
+  USE_AUTH_ERROR_MESSAGE,
+} from "../../utils/constants";
+import reducer, {
+  getQuestionCategories,
+  initialState,
+} from "../../reducers/questionReducer";
+import CustomChip from "../../components/CustomChip";
+import homepageImage from "/homepage_image.svg";
+import { io } from "socket.io-client";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Home: React.FC = () => {
-  // const [complexity, setComplexity] = useState<string[]>([]);
-  // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  // const [language, setLanguage] = useState<string[]>([]);
-  // const [timeout, setTimeout] = useState<number>(30);
+  const [complexity, setComplexity] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [language, setLanguage] = useState<string[]>([]);
+  const [timeout, setTimeout] = useState<number>(30);
 
-  // const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  // useEffect(() => {
-  //   getQuestionCategories(dispatch);
-  // }, []);
+  useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
+
+  const auth = useAuth();
+  if (!auth) {
+    throw new Error(USE_AUTH_ERROR_MESSAGE);
+  }
+  const { user } = auth; // TODO: if (!user)
+
+  const handleFindMatch = () => {
+    const socket = io("http://localhost:3002/matching");
+
+    // TODO: pass socket to matching pages for stop matching button
+    // socket.disconnect();
+
+    // socket.on("connect", () => {
+    //   console.log("Socket connected");
+    // });
+
+    socket.emit("match_request", {
+      user: user!.id,
+      complexities: complexity,
+      categories: selectedCategories,
+      languages: language,
+      timeout: timeout,
+    });
+
+    socket.on("match_found", (partner) => {
+      console.log(`Potential match partner: ${partner}`);
+      // TODO: the user may accept / decline the match
+      // socket.emit("match_accepted");
+      // socket.emit("match_declined");
+    });
+
+    socket.on("match_successful", (partner) => {
+      console.log(`Successful match partner: ${partner}`);
+      socket.disconnect();
+    });
+
+    socket.on("match_unsuccessful", () => {
+      console.log("Match unsuccessful");
+      socket.disconnect();
+    });
+
+    socket.on("match_timeout", () => {
+      console.log("Match timeout");
+      socket.disconnect();
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Oops, something went wrong");
+    });
+  };
 
   return (
     <AppMargin
@@ -65,7 +120,7 @@ const Home: React.FC = () => {
         Specify your question preferences and sit back as we find you the best
         match.
       </Typography>
-      {/* <Box
+      <Box
         component="img"
         src={homepageImage}
         alt="Interview Practice Buddy"
@@ -77,8 +132,8 @@ const Home: React.FC = () => {
           height: "auto",
           objectFit: "contain",
         }}
-      /> */}
-      {/* <Card
+      />
+      <Card
         sx={{
           padding: 4,
           width: "100%",
@@ -252,23 +307,24 @@ const Home: React.FC = () => {
           color="primary"
           fullWidth
           sx={{ marginTop: 2 }}
-          disabled={
-            isNaN(timeout) ||
-            timeout < minMatchTimeout ||
-            timeout > maxMatchTimeout ||
-            complexity.length == 0 ||
-            selectedCategories.length == 0 ||
-            language.length == 0
-          }
+          // disabled={
+          //   isNaN(timeout) ||
+          //   timeout < minMatchTimeout ||
+          //   timeout > maxMatchTimeout ||
+          //   complexity.length == 0 ||
+          //   selectedCategories.length == 0 ||
+          //   language.length == 0
+          // }
           onClick={() => {
-            alert(
-              `${complexity}, ${selectedCategories}, ${language}, ${timeout}`
-            );
+            // alert(
+            //   `${complexity}, ${selectedCategories}, ${language}, ${timeout}`
+            // );
+            handleFindMatch();
           }}
         >
           Find my match!
         </Button>
-      </Card> */}
+      </Card>
     </AppMargin>
   );
 };
