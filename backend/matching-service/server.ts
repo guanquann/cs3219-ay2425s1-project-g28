@@ -1,11 +1,20 @@
 import http from "http";
-import app from "./app.ts";
-import Websocket from "./src/websocket/websocket.ts";
-import { handleMatchRequest } from "./src/websocket/websocketHandlers.ts";
+import app, { allowedOrigins } from "./app.ts";
+import { handleWebsocketMatchEvents } from "./src/handlers/websocketHandler.ts";
+import { Server } from "socket.io";
 
 const server = http.createServer(app);
-const io = Websocket.getInstance(server);
-io.initSocketHandlers([{ path: "/matching", handler: handleMatchRequest }]);
+export const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+  },
+  connectionStateRecovery: {},
+});
+
+io.on("connection", (socket) => {
+  handleWebsocketMatchEvents(socket);
+});
 
 const PORT = process.env.PORT || 3002;
 

@@ -17,7 +17,6 @@ import {
   languageList,
   maxMatchTimeout,
   minMatchTimeout,
-  USE_AUTH_ERROR_MESSAGE,
 } from "../../utils/constants";
 import reducer, {
   getQuestionCategories,
@@ -25,13 +24,15 @@ import reducer, {
 } from "../../reducers/questionReducer";
 import CustomChip from "../../components/CustomChip";
 import homepageImage from "/homepage_image.svg";
-import { io } from "socket.io-client";
-import { useAuth } from "../../contexts/AuthContext";
+import { useOutletContext } from "react-router-dom";
+import { User } from "../../types/types";
+import { MatchHandler } from "../../handlers/matchHandler";
 
 const Home: React.FC = () => {
-  const [complexity, setComplexity] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [language, setLanguage] = useState<string[]>([]);
+  const user = useOutletContext<User>();
+  const [complexities, setComplexities] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
   const [timeout, setTimeout] = useState<number>(30);
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -39,57 +40,6 @@ const Home: React.FC = () => {
   useEffect(() => {
     getQuestionCategories(dispatch);
   }, []);
-
-  const auth = useAuth();
-  if (!auth) {
-    throw new Error(USE_AUTH_ERROR_MESSAGE);
-  }
-  const { user } = auth; // TODO: if (!user)
-
-  const handleFindMatch = () => {
-    const socket = io("http://localhost:3002/matching");
-
-    // TODO: pass socket to matching pages for stop matching button
-    // socket.disconnect();
-
-    // socket.on("connect", () => {
-    //   console.log("Socket connected");
-    // });
-
-    socket.emit("match_request", {
-      user: user!.id,
-      complexities: complexity,
-      categories: selectedCategories,
-      languages: language,
-      timeout: timeout,
-    });
-
-    socket.on("match_found", (partner) => {
-      console.log(`Potential match partner: ${partner}`);
-      // TODO: the user may accept / decline the match
-      // socket.emit("match_accepted");
-      // socket.emit("match_declined");
-    });
-
-    socket.on("match_successful", (partner) => {
-      console.log(`Successful match partner: ${partner}`);
-      socket.disconnect();
-    });
-
-    socket.on("match_unsuccessful", () => {
-      console.log("Match unsuccessful");
-      socket.disconnect();
-    });
-
-    socket.on("match_timeout", () => {
-      console.log("Match timeout");
-      socket.disconnect();
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Oops, something went wrong");
-    });
-  };
 
   return (
     <AppMargin
@@ -162,7 +112,7 @@ const Home: React.FC = () => {
                 disableCloseOnSelect
                 options={complexityList}
                 onChange={(_, selectedOptions) => {
-                  setComplexity(selectedOptions);
+                  setComplexities(selectedOptions);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -202,7 +152,7 @@ const Home: React.FC = () => {
                 disableCloseOnSelect
                 options={state.questionCategories}
                 onChange={(_, selectedOptions) => {
-                  setSelectedCategories(selectedOptions);
+                  setCategories(selectedOptions);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -242,7 +192,7 @@ const Home: React.FC = () => {
                 disableCloseOnSelect
                 options={languageList}
                 onChange={(_, selectedOptions) => {
-                  setLanguage(selectedOptions);
+                  setLanguages(selectedOptions);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -311,15 +261,19 @@ const Home: React.FC = () => {
           //   isNaN(timeout) ||
           //   timeout < minMatchTimeout ||
           //   timeout > maxMatchTimeout ||
-          //   complexity.length == 0 ||
-          //   selectedCategories.length == 0 ||
-          //   language.length == 0
+          //   complexities.length == 0 ||
+          //   categories.length == 0 ||
+          //   languages.length == 0
           // }
           onClick={() => {
-            // alert(
-            //   `${complexity}, ${selectedCategories}, ${language}, ${timeout}`
-            // );
-            handleFindMatch();
+            const matchHandler = new MatchHandler();
+            matchHandler.findMatch(
+              user,
+              complexities,
+              categories,
+              languages,
+              timeout
+            );
           }}
         >
           Find my match!

@@ -35,7 +35,7 @@ const ProtectedRoutes: React.FC<ProtectedRoutesProps> = ({
     );
   }
 
-  return <Outlet />;
+  return <Outlet context={user} />;
 };
 
 export default ProtectedRoutes;

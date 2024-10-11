@@ -81,3 +81,19 @@ export const FIND_MATCH_FORM_PATH = "/find_match_form.png";
 export const MATCH_FOUND_PATH = "/match_found.png";
 export const QUESTIONS_LIST_PATH = "/questions_list.png";
 export const COLLABORATIVE_EDITOR_PATH = "/collaborative_editor.png";
+
+/* Websocket */
+// Socket Events
+export const SOCKET_DISCONNECT = "disconnect";
+export const SOCKET_CLIENT_DISCONNECT = "io client disconnect";
+export const SOCKET_RECONNECT_FAILED = "reconnect_failed";
+
+// Match Events
+export const MATCH_REQUEST = "match_request";
+export const MATCH_TIMEOUT = "match_timeout";
+export const MATCH_FOUND = "match_found";
+export const MATCH_RECEIVED = "match_received";
+export const MATCH_ACCEPTED = "match_accepted";
+export const MATCH_DECLINED = "match_declined";
+export const MATCH_SUCCESSFUL = "match_successful";
+export const MATCH_UNSUCCESSFUL = "match_unsuccessful";
