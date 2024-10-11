@@ -10,6 +10,8 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
+import Matched from "./pages/Matched";
+import Timeout from "./pages/Timeout";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import Layout from "./components/Layout";
 import AuthProvider from "./contexts/AuthContext";
@@ -40,6 +42,11 @@ function App() {
               </ProfileContextProvider>
             }
           />
+          <Route path="matching" element={<ProtectedRoutes />}>
+            <Route index element={<div>Matching...</div>} />
+            <Route path="matched" element={<Matched />} />
+            <Route path="timeout" element={<Timeout />} />
+          </Route>
           <Route path="*" element={<PageNotFound />} />
         </Route>
         <Route path="/signup" element={<SignUp />}></Route>
