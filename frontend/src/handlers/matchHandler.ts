@@ -44,7 +44,6 @@ export class MatchHandler {
   };
 
   private openConnection = () => {
-    matchSocket.removeAllListeners();
     this.initSocketListeners();
     matchSocket.connect();
   };
@@ -55,43 +54,59 @@ export class MatchHandler {
   };
 
   private initSocketListeners = () => {
-    matchSocket.on(MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      this.setMatchDetails(matchId, user1, user2);
-      matchSocket.emit(MATCH_RECEIVED, this.matchId);
-    });
+    if (!matchSocket.hasListeners(MATCH_FOUND)) {
+      matchSocket.on(MATCH_FOUND, ({ matchId, user1, user2 }) => {
+        this.setMatchDetails(matchId, user1, user2);
+        matchSocket.emit(MATCH_RECEIVED, this.matchId);
+      });
+    }
 
-    matchSocket.on(MATCH_IN_PROGRESS, () => {
-      console.log("Matching in progress... / Match already found!");
-    });
+    if (!matchSocket.hasListeners(MATCH_IN_PROGRESS)) {
+      matchSocket.on(MATCH_IN_PROGRESS, () => {
+        console.log("Matching in progress... / Match already found!");
+      });
+    }
 
-    matchSocket.on(MATCH_SUCCESSFUL, () => {
-      console.log("Match successful");
-      this.closeConnection();
-    });
+    if (!matchSocket.hasListeners(MATCH_SUCCESSFUL)) {
+      matchSocket.on(MATCH_SUCCESSFUL, () => {
+        console.log("Match successful");
+        this.closeConnection();
+      });
+    }
 
-    matchSocket.on(MATCH_UNSUCCESSFUL, () => {
-      console.log("Match unsuccessful");
-      this.closeConnection();
-    });
+    if (!matchSocket.hasListeners(MATCH_UNSUCCESSFUL)) {
+      matchSocket.on(MATCH_UNSUCCESSFUL, () => {
+        console.log("Match unsuccessful");
+        this.closeConnection();
+      });
+    }
 
-    matchSocket.on(MATCH_TIMEOUT, () => {
-      console.log("Match timeout");
-      this.closeConnection();
-    });
+    if (!matchSocket.hasListeners(MATCH_TIMEOUT)) {
+      matchSocket.on(MATCH_TIMEOUT, () => {
+        console.log("Match timeout");
+        this.closeConnection();
+      });
+    }
 
-    matchSocket.on(SOCKET_DISCONNECT, (reason) => {
-      if (reason !== SOCKET_CLIENT_DISCONNECT) {
-        console.log("Oops, something went wrong! Reconnecting...");
-      }
-    });
+    if (!matchSocket.hasListeners(SOCKET_DISCONNECT)) {
+      matchSocket.on(SOCKET_DISCONNECT, (reason) => {
+        if (reason !== SOCKET_CLIENT_DISCONNECT) {
+          console.log("Oops, something went wrong! Reconnecting...");
+        }
+      });
+    }
 
-    matchSocket.io.on(SOCKET_RECONNECT_SUCCESS, () => {
-      console.log("Reconnected!");
-    });
+    if (!matchSocket.io.hasListeners(SOCKET_RECONNECT_SUCCESS)) {
+      matchSocket.io.on(SOCKET_RECONNECT_SUCCESS, () => {
+        console.log("Reconnected!");
+      });
+    }
 
-    matchSocket.io.on(SOCKET_RECONNECT_FAILED, () => {
-      console.log("Oops, something went wrong! Please try again later.");
-    });
+    if (!matchSocket.io.hasListeners(SOCKET_RECONNECT_FAILED)) {
+      matchSocket.io.on(SOCKET_RECONNECT_FAILED, () => {
+        console.log("Oops, something went wrong! Please try again later.");
+      });
+    }
   };
 
   findMatch = (
