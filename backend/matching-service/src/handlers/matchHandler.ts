@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   MATCH_ACCEPTANCE_TIMEOUT,
   MATCH_FOUND,
+  MATCH_IN_PROGRESS,
   MATCH_SUCCESSFUL,
   MATCH_TIMEOUT,
   MATCH_UNSUCCESSFUL,
@@ -30,7 +31,10 @@ export const createMatchItem = (socket: Socket, matchRequest: MatchRequest) => {
     acceptedMatch: false,
   };
 
-  appendToMatchQueue(matchQueueItem);
+  const result = appendToMatchQueue(matchQueueItem);
+  if (!result) {
+    socket.emit(MATCH_IN_PROGRESS);
+  }
 };
 
 export const createMatch = (matchItems: MatchItem[]) => {
@@ -95,4 +99,10 @@ export const handleMatchDecline = (matchId: string) => {
   clearTimeout(match.timeout!);
   io.to(matchId).emit(MATCH_UNSUCCESSFUL);
   delete matches[matchId];
+};
+
+export const isUserMatched = (userId: string): boolean => {
+  return !!Object.values(matches).find(
+    (match) => match.item1.user.id === userId || match.item2.user.id === userId
+  );
 };

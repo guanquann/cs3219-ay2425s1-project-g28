@@ -1,5 +1,5 @@
 import { MatchItem } from "../types/matchTypes";
-import { createMatch } from "./matchHandler";
+import { createMatch, isUserMatched } from "./matchHandler";
 
 /* Basic queue set-up for websocket testing (feel free to replace with the actual queueing mechanism) */
 
@@ -10,6 +10,9 @@ setInterval(() => {
 }, 5000);
 
 const findMatch = () => {
+  matchQueue.forEach((item) =>
+    console.log(`${item.user.username} is ${item.socket.connected}`)
+  );
   if (matchQueue.length < 2) {
     return;
   }
@@ -30,7 +33,17 @@ const findMatch = () => {
 };
 
 export const appendToMatchQueue = (item: MatchItem) => {
-  if (!matchQueue.find((queueItem) => queueItem.user.id === item.user.id)) {
-    matchQueue.push(item);
+  if (
+    matchQueue.find(
+      (queueItem) =>
+        queueItem.user.id === item.user.id && queueItem.socket.connected
+    ) ||
+    isUserMatched(item.user.id)
+  ) {
+    return false;
   }
+
+  console.log(item.user.username);
+  matchQueue.push(item);
+  return true;
 };

@@ -1,8 +1,8 @@
-import { io, Socket } from "socket.io-client";
 import {
   MATCH_ACCEPTED,
   MATCH_DECLINED,
   MATCH_FOUND,
+  MATCH_IN_PROGRESS,
   MATCH_RECEIVED,
   MATCH_REQUEST,
   MATCH_SUCCESSFUL,
@@ -11,88 +11,114 @@ import {
   SOCKET_CLIENT_DISCONNECT,
   SOCKET_DISCONNECT,
   SOCKET_RECONNECT_FAILED,
+  SOCKET_RECONNECT_SUCCESS,
 } from "../utils/constants";
-import { User } from "../types/types";
+import { matchSocket } from "../utils/matchSocket";
 
-const SOCKET_URL = "http://localhost:3002";
+interface MatchUser {
+  id: string;
+  username: string;
+  profile?: string;
+}
 
 export class MatchHandler {
-  socket: Socket;
   matchId?: string;
+  user: MatchUser;
+  partner?: MatchUser;
 
-  constructor() {
-    this.socket = io(SOCKET_URL, {
-      reconnectionAttempts: 3,
-    });
+  constructor(user: MatchUser) {
+    this.user = user;
   }
 
-  findMatch = (
-    user: User,
-    complexities: string[],
-    categories: string[],
-    languages: string[],
-    timeout: number
+  private setMatchDetails = (
+    matchId: string,
+    user1: MatchUser,
+    user2: MatchUser
   ) => {
-    this.socket.emit(MATCH_REQUEST, {
-      user: {
-        id: user.id,
-        username: user.username,
-        profile: user.profilePictureUrl,
-      },
-      complexities: complexities,
-      categories: categories,
-      languages: languages,
-      timeout: timeout,
+    this.matchId = matchId;
+    user1.id !== this.user.id ? (this.partner = user1) : (this.partner = user2);
+
+    console.log(`Match ID: ${this.matchId}`);
+    console.log(`User: ${this.user!.username}`);
+    console.log(`Partner: ${this.partner!.username}`);
+  };
+
+  private openConnection = () => {
+    matchSocket.removeAllListeners();
+    this.initSocketListeners();
+    matchSocket.connect();
+  };
+
+  private closeConnection = () => {
+    matchSocket.removeAllListeners();
+    matchSocket.disconnect();
+  };
+
+  private initSocketListeners = () => {
+    matchSocket.on(MATCH_FOUND, ({ matchId, user1, user2 }) => {
+      this.setMatchDetails(matchId, user1, user2);
+      matchSocket.emit(MATCH_RECEIVED, this.matchId);
     });
 
-    this.socket.on(MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      console.log(`Match ID: ${matchId}`);
-      console.log(`User 1: ${user1.username}`);
-      console.log(`User 2: ${user2.username}`);
-      this.matchId = matchId;
-      this.socket.emit(MATCH_RECEIVED, this.matchId);
+    matchSocket.on(MATCH_IN_PROGRESS, () => {
+      console.log("Matching in progress... / Match already found!");
     });
 
-    this.socket.on(MATCH_SUCCESSFUL, () => {
+    matchSocket.on(MATCH_SUCCESSFUL, () => {
       console.log("Match successful");
       this.closeConnection();
     });
 
-    this.socket.on(MATCH_UNSUCCESSFUL, () => {
+    matchSocket.on(MATCH_UNSUCCESSFUL, () => {
       console.log("Match unsuccessful");
       this.closeConnection();
     });
 
-    this.socket.on(MATCH_TIMEOUT, () => {
+    matchSocket.on(MATCH_TIMEOUT, () => {
       console.log("Match timeout");
       this.closeConnection();
     });
 
-    this.socket.on(SOCKET_DISCONNECT, (reason) => {
+    matchSocket.on(SOCKET_DISCONNECT, (reason) => {
       if (reason !== SOCKET_CLIENT_DISCONNECT) {
         console.log("Oops, something went wrong! Reconnecting...");
       }
     });
 
-    this.socket.io.on(SOCKET_RECONNECT_FAILED, () => {
+    matchSocket.io.on(SOCKET_RECONNECT_SUCCESS, () => {
+      console.log("Reconnected!");
+    });
+
+    matchSocket.io.on(SOCKET_RECONNECT_FAILED, () => {
       console.log("Oops, something went wrong! Please try again later.");
     });
   };
 
+  findMatch = (
+    complexities: string[],
+    categories: string[],
+    languages: string[],
+    timeout: number
+  ) => {
+    this.openConnection();
+    matchSocket.emit(MATCH_REQUEST, {
+      user: this.user,
+      complexities: complexities,
+      categories: categories,
+      languages: languages,
+      timeout: timeout,
+    });
+  };
+
   acceptMatch = () => {
-    this.socket.emit(MATCH_ACCEPTED, this.matchId);
+    matchSocket.emit(MATCH_ACCEPTED, this.matchId);
   };
 
   declineMatch = () => {
-    this.socket.emit(MATCH_DECLINED, this.matchId);
+    matchSocket.emit(MATCH_DECLINED, this.matchId);
   };
 
   stopMatch = () => {
     this.closeConnection();
-  };
-
-  closeConnection = () => {
-    this.socket.removeAllListeners();
-    this.socket.disconnect();
   };
 }

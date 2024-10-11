@@ -29,13 +29,19 @@ import { User } from "../../types/types";
 import { MatchHandler } from "../../handlers/matchHandler";
 
 const Home: React.FC = () => {
-  const user = useOutletContext<User>();
   const [complexities, setComplexities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [timeout, setTimeout] = useState<number>(30);
 
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  const user = useOutletContext<User>();
+  const matchHandler = new MatchHandler({
+    id: user.id,
+    username: user.username,
+    profile: user.profilePictureUrl,
+  });
 
   useEffect(() => {
     getQuestionCategories(dispatch);
@@ -265,19 +271,14 @@ const Home: React.FC = () => {
           //   categories.length == 0 ||
           //   languages.length == 0
           // }
-          onClick={() => {
-            const matchHandler = new MatchHandler();
-            matchHandler.findMatch(
-              user,
-              complexities,
-              categories,
-              languages,
-              timeout
-            );
-          }}
+          onClick={() =>
+            matchHandler.findMatch(complexities, categories, languages, timeout)
+          }
         >
           Find my match!
         </Button>
+        <Button onClick={() => matchHandler.acceptMatch()}>Accept</Button>
+        <Button onClick={() => matchHandler.declineMatch()}>Decline</Button>
       </Card>
     </AppMargin>
   );
