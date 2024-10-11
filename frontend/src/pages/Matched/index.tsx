@@ -32,7 +32,7 @@ const Matched: React.FC = () => {
           <Avatar sx={{ width: 120, height: 120 }} />
         </Box>
 
-        <Typography variant="h3">Practice with @johnjoe?</Typography>
+        <Typography variant="h3">Practice with @john?</Typography>
 
         <Stack spacing={2} direction="row" paddingTop={2} width={700}>
           <Button
