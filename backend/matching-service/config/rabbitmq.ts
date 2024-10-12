@@ -9,9 +9,7 @@ const queue = "match_requests";
 
 export const connectRabbitMq = async () => {
   try {
-    mrConnection = await amqplib.connect(
-      `amqp://${process.env.RABBITMQ_DEFAULT_USER}:${process.env.RABBITMQ_DEFAULT_PASS}@rabbitmq`
-    );
+    mrConnection = await amqplib.connect(`${process.env.RABBITMQ_ADDR}`);
     const consumerChannel = await mrConnection.createChannel();
     await consumerChannel.assertQueue(queue);
 

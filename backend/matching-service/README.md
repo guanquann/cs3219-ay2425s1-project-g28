@@ -2,11 +2,12 @@
 
 ## Setting-up Matching Service
 
-1. In the `matching-service` directory, create a copy of the `.env.sample` file and name it `.env`.
+1. In the `matching-service` directory, create a copy of the `.env.sample` file and name it `.env`. If you are looking to run matching service with the other services using docker-compose, comment out the variable `RABBITMQ_ADDR` under use case (1) in the .env file. Otherwise, if you are looking to run matching service individually, comment out the variables `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` and `RABBITMQ_ADDR` under use case (2) in the .env file.
 
-2. To set up credentials for RabbitMq, update `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` of the `.env` file. If you are running Matching Service individually, update `RABBITMQ_DEFAULT_USER` and `RABBITMQ_DEFAULT_PASS` to RabbitMq's default username `guest` and password `guest` respectively. If you are running Matching Service with the other services using the docker-compose file, you can update `RABBITMQ_DEFAULT_USER` and `RABBITMQ_DEFAULT_PASS` to whatever you want.
+2. If you are running matching service together with other services using docker-compose, to set up credentials for RabbitMq, update the RabbitMq variables in the `.env` file. Update `RABBITMQ_DEFAULT_USER` and `RABBITMQ_DEFAULT_PASS` to what you want, then update `RABBITMQ_ADDR` to be `amqp://<RABBITMQ_DEFAULT_USER>:<RABBITMQ_DEFAULT_PASS>@rabbitmq:5672`.
+You can access RabbitMq management user interface locally with the username in `RABBITMQ_DEFAULT_USER` and password in `RABBITMQ_DEFAULT_PASS` at http://localhost:15672.
 
-3. You can access RabbitMq management user interface locally with the username in `RABBITMQ_DEFAULT_USER` and password in `RABBITMQ_DEFAULT_PASS` at http://localhost:15672.
+3. If you are running matching service individually, you can access RabbitMq management user interface locally with the username `guest` and password `guest` at http://localhost:15672.
 
 ## Running Matching Service Individually with Docker
 
