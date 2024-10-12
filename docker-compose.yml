@@ -27,6 +27,8 @@ services:
   matching-service:
     image: peerprep/matching-service
     build: ./backend/matching-service
+    environment:
+      - CHOKIDAR_USEPOLLING=true
     env_file: ./backend/matching-service/.env
     ports:
       - 3002:3002
@@ -37,6 +39,9 @@ services:
         condition: service_started
     networks:
       - peerprep-network
+    volumes:
+      - ./backend/matching-service:/matching-service
+      - /matching-service/node_modules
     restart: on-failure
 
   frontend:
