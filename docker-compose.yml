@@ -24,6 +24,21 @@ services:
       - peerprep-network
     restart: on-failure
 
+  matching-service:
+    image: peerprep/matching-service
+    build: ./backend/matching-service
+    env_file: ./backend/matching-service/.env
+    ports:
+      - 3002:3002
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    networks:
+      - peerprep-network
+    restart: on-failure
+
   frontend:
     image: peerprep/frontend
     build: ./frontend
@@ -58,6 +73,23 @@ services:
     depends_on:
       - mongo
     env_file: ./backend/.env
+
+  rabbitmq: 
+    image: rabbitmq:4.0-management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks: 
+      - peerprep-network
+    env_file: ./backend/matching-service/.env
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
 
 volumes:
   mongo-data:

@@ -4,6 +4,10 @@
 
 1. In the `matching-service` directory, create a copy of the `.env.sample` file and name it `.env`.
 
+2. To set up credentials for RabbitMq, update `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` of the `.env` file.
+
+3. You can access RabbitMq management user interface locally with the username in `RABBITMQ_DEFAULT_USER` and password in `RABBITMQ_DEFAULT_PASS` at http://localhost:15672.
+
 ## Running Matching Service without Docker
 
 1. Follow the instructions [here](https://nodejs.org/en/download/package-manager) to set up Node v20.
