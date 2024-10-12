@@ -7,7 +7,7 @@
 2. If you are running matching service together with other services using docker-compose, to set up credentials for RabbitMq, update the RabbitMq variables in the `.env` file. Update `RABBITMQ_DEFAULT_USER` and `RABBITMQ_DEFAULT_PASS` to what you want, then update `RABBITMQ_ADDR` to be `amqp://<RABBITMQ_DEFAULT_USER>:<RABBITMQ_DEFAULT_PASS>@rabbitmq:5672`.
 You can access RabbitMq management user interface locally with the username in `RABBITMQ_DEFAULT_USER` and password in `RABBITMQ_DEFAULT_PASS` at http://localhost:15672.
 
-3. If you are running matching service individually, you can access RabbitMq management user interface locally with the username `guest` and password `guest` at http://localhost:15672.
+3. If you are running matching service individually, you do not need to make any changes to `RABBITMQ_ADDR`. You can access RabbitMq management user interface locally with the username `guest` and password `guest` at http://localhost:15672.
 
 ## Running Matching Service Individually with Docker
 
