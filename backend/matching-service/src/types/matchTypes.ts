@@ -1,9 +1,7 @@
-import { Socket } from "socket.io";
-
 export interface MatchUser {
   id: string;
   username: string;
-  profile: string;
+  profile?: string;
 }
 
 export interface MatchRequest {
@@ -15,12 +13,12 @@ export interface MatchRequest {
 }
 
 export interface MatchItem {
-  socket: Socket;
   user: MatchUser;
   complexities: string[];
   categories: string[];
   languages: string[];
-  timeout: NodeJS.Timeout;
+  sentTimestamp: number;
+  ttlInSecs: number;
   acceptedMatch: boolean;
 }
 

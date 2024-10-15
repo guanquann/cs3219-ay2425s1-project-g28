@@ -10,7 +10,7 @@ export const io = new Server(server, {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
-  connectionStateRecovery: {},
+  connectionStateRecovery: {}, // TODO: rejoin room?
 });
 
 io.on("connection", (socket) => {
@@ -29,24 +29,6 @@ if (process.env.NODE_ENV !== "test") {
           `Matching service server listening on http://localhost:${PORT}`
         );
       });
-
-      //can use this to test if rabbitmq works for you (import sendRabbitMq from rabbitmq.ts first)
-      /*const message1 = {
-        userId: "1",
-        categories: "Algorithms",
-        complexities: "Easy",
-        sentTimestamp: Date.now(),
-        ttlInSecs: 30,
-      };
-      sendRabbitMq(message1);
-      const message2 = {
-        userId: "2",
-        categories: "Algorithms",
-        complexities: "Medium",
-        sentTimestamp: Date.now(),
-        ttlInSecs: 30,
-      };
-      sendRabbitMq(message2);*/
     })
     .catch((err) => {
       console.error("Failed to connect to RabbitMq");

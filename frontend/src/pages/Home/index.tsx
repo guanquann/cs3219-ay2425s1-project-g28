@@ -17,16 +17,15 @@ import {
   languageList,
   maxMatchTimeout,
   minMatchTimeout,
+  USE_MATCH_ERROR_MESSAGE,
 } from "../../utils/constants";
 import reducer, {
   getQuestionCategories,
-  initialState,
+  initialState as initialState,
 } from "../../reducers/questionReducer";
 import CustomChip from "../../components/CustomChip";
 import homepageImage from "/homepage_image.svg";
-import { useOutletContext } from "react-router-dom";
-import { User } from "../../types/types";
-import { MatchHandler } from "../../handlers/matchHandler";
+import { useMatch } from "../../contexts/MatchContext";
 
 const Home: React.FC = () => {
   const [complexities, setComplexities] = useState<string[]>([]);
@@ -36,12 +35,11 @@ const Home: React.FC = () => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const user = useOutletContext<User>();
-  const matchHandler = new MatchHandler({
-    id: user.id,
-    username: user.username,
-    profile: user.profilePictureUrl,
-  });
+  const match = useMatch();
+  if (!match) {
+    throw new Error(USE_MATCH_ERROR_MESSAGE);
+  }
+  const { findMatch } = match;
 
   useEffect(() => {
     getQuestionCategories(dispatch);
@@ -272,13 +270,11 @@ const Home: React.FC = () => {
           //   languages.length == 0
           // }
           onClick={() =>
-            matchHandler.findMatch(complexities, categories, languages, timeout)
+            findMatch(complexities, categories, languages, timeout)
           }
         >
           Find my match!
         </Button>
-        <Button onClick={() => matchHandler.acceptMatch()}>Accept</Button>
-        <Button onClick={() => matchHandler.declineMatch()}>Decline</Button>
       </Card>
     </AppMargin>
   );

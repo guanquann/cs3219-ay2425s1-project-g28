@@ -1,10 +1,36 @@
-import { useNavigate } from "react-router-dom";
 import AppMargin from "../../components/AppMargin";
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
 import classes from "./index.module.css";
+import { useMatch } from "../../contexts/MatchContext";
+import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
+const acceptanceTimeout = 10;
+
+// TODO: Prevent user from accessing this page via URL
 const Matched: React.FC = () => {
-  const navigate = useNavigate();
+  const match = useMatch();
+  if (!match) {
+    throw new Error(USE_MATCH_ERROR_MESSAGE);
+  }
+  const { closeConnection, acceptMatch, rematch, matchUser, partner } = match;
+
+  const [timeLeft, setTimeLeft] = useState<number>(acceptanceTimeout);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => (prevTime <= 0 ? 0 : prevTime - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      toast.error("Match acceptance timeout!");
+      closeConnection("/home");
+    }
+  }, [timeLeft]);
 
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
@@ -18,7 +44,7 @@ const Matched: React.FC = () => {
           paddingTop={2}
           paddingBottom={2}
         >
-          <Avatar sx={{ width: 120, height: 120 }} />
+          <Avatar src={matchUser?.profile} sx={{ width: 120, height: 120 }} />
 
           <Box
             sx={(theme) => ({
@@ -29,21 +55,23 @@ const Matched: React.FC = () => {
             })}
           />
 
-          <Avatar sx={{ width: 120, height: 120 }} />
+          <Avatar src={partner?.profile} sx={{ width: 120, height: 120 }} />
         </Box>
 
-        <Typography variant="h3">Practice with @john?</Typography>
+        <Typography variant="h3">
+          Practice with @{partner?.username}?
+        </Typography>
 
         <Stack spacing={2} direction="row" paddingTop={2} width={700}>
           <Button
             variant="contained"
             color="secondary"
             fullWidth
-            onClick={() => navigate("/matching")}
+            onClick={rematch}
           >
             Rematch
           </Button>
-          <Button variant="contained" fullWidth>
+          <Button variant="contained" fullWidth onClick={acceptMatch}>
             Accept
           </Button>
         </Stack>

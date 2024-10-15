@@ -1,13 +1,24 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AppMargin from "../../components/AppMargin";
 import { Stack, Typography } from "@mui/material";
 import matching from "../../assets/matching.svg";
 import classes from "./index.module.css";
 import Timer from "../../components/Timer";
+import { useNavigate } from "react-router-dom";
+import { useMatch } from "../../contexts/MatchContext";
+import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
 
+// TODO: Prevent user from accessing this page via URL
 const Matching: React.FC = () => {
-  const totalTime = 30;
-  const [timeLeft, setTimeLeft] = React.useState(totalTime);
+  const navigate = useNavigate();
+
+  const match = useMatch();
+  if (!match) {
+    throw new Error(USE_MATCH_ERROR_MESSAGE);
+  }
+  const { closeConnection, matchId, matchCriteria } = match;
+
+  const [timeLeft, setTimeLeft] = useState<number>(matchCriteria.timeout);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -15,6 +26,18 @@ const Matching: React.FC = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      closeConnection("timeout");
+    }
+  }, [timeLeft]);
+
+  useEffect(() => {
+    if (matchId) {
+      navigate("matched", { replace: true });
+    }
+  }, [matchId, navigate]);
 
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
@@ -24,7 +47,7 @@ const Matching: React.FC = () => {
         </Typography>
         <img src={matching} style={{ height: 120, width: "auto" }} />
         <Timer
-          totalTime={totalTime}
+          totalTime={matchCriteria.timeout}
           timeLeft={timeLeft}
           thickness={4.8}
           size={120}

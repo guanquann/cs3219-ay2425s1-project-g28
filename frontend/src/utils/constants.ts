@@ -7,6 +7,8 @@ export const USE_AUTH_ERROR_MESSAGE =
   "useAuth() must be used within AuthProvider";
 export const USE_PROFILE_ERROR_MESSAGE =
   "useProfile() must be used within ProfileContextProvider";
+export const USE_MATCH_ERROR_MESSAGE =
+  "useMatch() must be used within MatchProvider";
 
 /* Name Validation */
 export const NAME_REQUIRED_ERROR_MESSAGE = "Name is required";
@@ -81,21 +83,3 @@ export const FIND_MATCH_FORM_PATH = "/find_match_form.png";
 export const MATCH_FOUND_PATH = "/match_found.png";
 export const QUESTIONS_LIST_PATH = "/questions_list.png";
 export const COLLABORATIVE_EDITOR_PATH = "/collaborative_editor.png";
-
-/* Websocket */
-// Socket Events
-export const SOCKET_DISCONNECT = "disconnect";
-export const SOCKET_CLIENT_DISCONNECT = "io client disconnect";
-export const SOCKET_RECONNECT_SUCCESS = "reconnect";
-export const SOCKET_RECONNECT_FAILED = "reconnect_failed";
-
-// Match Events
-export const MATCH_REQUEST = "match_request";
-export const MATCH_TIMEOUT = "match_timeout";
-export const MATCH_FOUND = "match_found";
-export const MATCH_IN_PROGRESS = "match_in_progress";
-export const MATCH_RECEIVED = "match_received";
-export const MATCH_ACCEPTED = "match_accepted";
-export const MATCH_DECLINED = "match_declined";
-export const MATCH_SUCCESSFUL = "match_successful";
-export const MATCH_UNSUCCESSFUL = "match_unsuccessful";
