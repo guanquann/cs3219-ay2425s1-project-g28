@@ -1,7 +1,7 @@
 import amqplib, { Connection } from "amqplib";
 import dotenv from "dotenv";
 import { matchUsers } from "../src/utils/mq_utils";
-import { MatchItem } from "../src/types/matchTypes";
+import { MatchItem } from "../src/handlers/matchHandler";
 
 dotenv.config();
 

@@ -50,6 +50,7 @@ type MatchContextType = {
   matchUser: MatchUser | null;
   matchCriteria: MatchCriteria;
   partner: MatchUser | null;
+  loading: boolean;
 };
 
 const MatchContext = createContext<MatchContextType | null>(null);
@@ -81,6 +82,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   });
   const [matchId, setMatchId] = useState<string | null>(null);
   const [partner, setPartner] = useState<MatchUser | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const closeConnection = () => {
     matchSocket.removeAllListeners();
@@ -154,6 +156,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     languages: string[],
     timeout: number
   ) => {
+    setLoading(true);
     openConnection();
     matchSocket.emit(
       MatchEvents.MATCH_REQUEST,
@@ -165,6 +168,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         timeout: timeout,
       },
       (result: boolean) => {
+        setTimeout(() => setLoading(false), 500);
         if (result) {
           setMatchCriteria({
             complexities,
@@ -192,6 +196,10 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   };
 
   const rematch = () => {
+    setLoading(true);
+    setMatchId(null);
+    setPartner(null);
+
     const rematchRequest = {
       user: matchUser,
       complexities: matchCriteria.complexities,
@@ -199,11 +207,17 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       languages: matchCriteria.languages,
       timeout: matchCriteria.timeout,
     };
-    matchSocket.emit(MatchEvents.REMATCH_REQUEST, matchId, rematchRequest);
-
-    setMatchId(null);
-    setPartner(null);
-    appNavigate("/matching");
+    matchSocket.emit(
+      MatchEvents.REMATCH_REQUEST,
+      matchId,
+      rematchRequest,
+      (result: boolean) => {
+        setTimeout(() => setLoading(false), 500);
+        if (result) {
+          appNavigate("/matching");
+        }
+      }
+    );
   };
 
   const stopMatch = (path: string) => {
@@ -230,6 +244,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         matchUser,
         matchCriteria,
         partner,
+        loading,
       }}
     >
       {children}

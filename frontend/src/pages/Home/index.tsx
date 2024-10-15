@@ -26,12 +26,13 @@ import reducer, {
 import CustomChip from "../../components/CustomChip";
 import homepageImage from "/homepage_image.svg";
 import { useMatch } from "../../contexts/MatchContext";
+import Loader from "../../components/Loader";
 
 const Home: React.FC = () => {
   const [complexities, setComplexities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
-  const [timeout, setTimeout] = useState<number>(30);
+  const [timeout, setTimeout] = useState<number | undefined>(30);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -39,11 +40,15 @@ const Home: React.FC = () => {
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { findMatch } = match;
+  const { findMatch, loading } = match;
 
   useEffect(() => {
     getQuestionCategories(dispatch);
   }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <AppMargin
@@ -230,17 +235,16 @@ const Home: React.FC = () => {
               required
               fullWidth
               type="number"
-              value={timeout}
+              onKeyDown={(event) => event.key === "e" && event.preventDefault()}
+              value={timeout !== undefined ? timeout : ""}
               onChange={(event) => {
-                const value = parseInt(event.target.value, 10);
-                setTimeout(value);
-              }}
-              InputProps={{
-                inputProps: { min: minMatchTimeout, max: maxMatchTimeout },
+                const value = event.target.value;
+                const newTimeout = value ? parseInt(value, 10) : undefined;
+                setTimeout(newTimeout);
               }}
               helperText={`Set a timeout between ${minMatchTimeout} to ${maxMatchTimeout} seconds`}
               error={
-                isNaN(timeout) ||
+                !timeout ||
                 timeout < minMatchTimeout ||
                 timeout > maxMatchTimeout
               }
@@ -262,7 +266,7 @@ const Home: React.FC = () => {
           fullWidth
           sx={{ marginTop: 2 }}
           // disabled={
-          //   isNaN(timeout) ||
+          //   !timeout ||
           //   timeout < minMatchTimeout ||
           //   timeout > maxMatchTimeout ||
           //   complexities.length == 0 ||
@@ -270,7 +274,7 @@ const Home: React.FC = () => {
           //   languages.length == 0
           // }
           onClick={() =>
-            findMatch(complexities, categories, languages, timeout)
+            findMatch(complexities, categories, languages, timeout!)
           }
         >
           Find my match!

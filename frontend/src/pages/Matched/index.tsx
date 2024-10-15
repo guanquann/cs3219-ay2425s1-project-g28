@@ -6,16 +6,17 @@ import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
+import Loader from "../../components/Loader";
 
 const acceptanceTimeout = 10;
 
-// TODO: Prevent user from accessing this page via URL
 const Matched: React.FC = () => {
   const match = useMatch();
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { acceptMatch, rematch, stopMatch, matchUser, partner } = match;
+  const { acceptMatch, rematch, stopMatch, matchUser, partner, loading } =
+    match;
 
   const [timeLeft, setTimeLeft] = useState<number>(acceptanceTimeout);
 
@@ -35,6 +36,10 @@ const Matched: React.FC = () => {
 
   if (!matchUser || !partner) {
     return <Navigate to="/home" />;
+  }
+
+  if (loading) {
+    return <Loader />;
   }
 
   return (

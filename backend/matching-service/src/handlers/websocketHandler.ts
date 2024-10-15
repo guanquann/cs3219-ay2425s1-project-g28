@@ -6,12 +6,12 @@ import {
   SOCKET_CLIENT_DISCONNECT,
   SOCKET_DISCONNECT,
 } from "../utils/constants";
-import { MatchRequest } from "../types/matchTypes";
 import {
   createMatchItem,
   handleMatchAcceptance,
   handleMatchTermination,
   handleRematch,
+  MatchRequest,
 } from "./matchHandler";
 
 export const handleWebsocketMatchEvents = (socket: Socket) => {
@@ -27,9 +27,24 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
     handleMatchAcceptance(matchId)
   );
 
-  socket.on(REMATCH_REQUEST, (matchId: string, rematchRequest: MatchRequest) =>
-    handleRematch(socket, matchId, rematchRequest)
+  socket.on(
+    REMATCH_REQUEST,
+    async (
+      matchId: string,
+      rematchRequest: MatchRequest,
+      callback: (result: boolean) => void
+    ) => {
+      const result = await handleRematch(socket, matchId, rematchRequest);
+      callback(result);
+    }
   );
+
+  socket.on(SOCKET_DISCONNECT, (reason) => {
+    if (reason === SOCKET_CLIENT_DISCONNECT) {
+      console.log("Client manually disconnected");
+      handleMatchTermination(socket);
+    }
+  });
 
   // TODO: handle client reconnect failure
   socket.on(SOCKET_DISCONNECT, (reason) => {

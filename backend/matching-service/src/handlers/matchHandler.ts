@@ -1,5 +1,4 @@
 import { io } from "../../server";
-import { Match, MatchItem, MatchRequest } from "../types/matchTypes";
 import { v4 as uuidv4 } from "uuid";
 import {
   MATCH_FOUND,
@@ -11,16 +10,40 @@ import {
 import { Socket } from "socket.io";
 import { sendRabbitMq } from "../../config/rabbitmq";
 
-const matches: Match = {};
-export const userSockets: Map<string, Socket> = new Map<string, Socket>();
+interface MatchUser {
+  id: string;
+  username: string;
+  profile?: string;
+}
+
+export interface MatchRequest {
+  user: MatchUser;
+  complexities: string[];
+  categories: string[];
+  languages: string[];
+  timeout: number;
+}
+
+export interface MatchItem {
+  user: MatchUser;
+  complexities: string[];
+  categories: string[];
+  languages: string[];
+  sentTimestamp: number;
+  ttlInSecs: number;
+}
+
+const matches = new Map<string, boolean>();
+const userSockets = new Map<string, Socket>();
 
 export const createMatchItem = async (
   socket: Socket,
-  matchRequest: MatchRequest
+  matchRequest: MatchRequest,
+  rematch?: boolean
 ): Promise<boolean> => {
   const { user, complexities, categories, languages, timeout } = matchRequest;
 
-  if (userSockets.has(user.id)) {
+  if (!rematch && userSockets.has(user.id)) {
     console.log(`user request exists: ${user.username}`);
     socket.emit(MATCH_IN_PROGRESS);
     return false;
@@ -35,7 +58,6 @@ export const createMatchItem = async (
     languages: languages,
     sentTimestamp: Date.now(),
     ttlInSecs: timeout,
-    acceptedMatch: false,
   };
 
   const result = await sendRabbitMq(matchQueueItem);
@@ -47,14 +69,8 @@ export const createMatchItem = async (
 
 export const createMatch = (matchItem1: MatchItem, matchItem2: MatchItem) => {
   const matchId = uuidv4();
-  matches[matchId] = {
-    item1: matchItem1,
-    item2: matchItem2,
-    timeout: null,
-    accepted: false,
-  };
+  matches.set(matchId, false);
 
-  // check for disconnection? or just send the match (disconnected user will timeout anyway)
   userSockets.get(matchItem1.user.id)!.join(matchId);
   userSockets.get(matchItem2.user.id)!.join(matchId);
   io.to(matchId).emit(MATCH_FOUND, {
@@ -65,30 +81,28 @@ export const createMatch = (matchItem1: MatchItem, matchItem2: MatchItem) => {
 };
 
 export const handleMatchAcceptance = (matchId: string) => {
-  const match = matches[matchId];
+  const match = matches.has(matchId);
   if (!match) {
     return;
   }
 
-  if (match.accepted) {
+  if (matches.get(matchId)) {
     io.to(matchId).emit(MATCH_SUCCESSFUL);
   } else {
-    match.accepted = true;
+    matches.set(matchId, true);
   }
 };
 
-export const handleRematch = (
+export const handleRematch = async (
   socket: Socket,
   matchId: string,
   rematchRequest: MatchRequest
-) => {
-  const match = matches[matchId];
-  if (match) {
-    delete matches[matchId];
-    socket.to(matchId).emit(MATCH_UNSUCCESSFUL);
+): Promise<boolean> => {
+  if (matches.delete(matchId)) {
+    socket.to(matchId).emit(MATCH_UNSUCCESSFUL); // TODO: emit other user reject?
   }
 
-  createMatchItem(socket, rematchRequest);
+  return await createMatchItem(socket, rematchRequest, true);
 };
 
 export const handleMatchTermination = (terminatedSocket: Socket) => {
@@ -100,10 +114,14 @@ export const handleMatchTermination = (terminatedSocket: Socket) => {
   }
 
   // TODO: no access to rooms
-  const matchId = Array.from(terminatedSocket.rooms)[1];
-  const match = matches[matchId];
-  if (match) {
-    delete matches[matchId];
-    terminatedSocket.to(matchId).emit(MATCH_UNSUCCESSFUL);
-  }
+  // const matchId = Array.from(terminatedSocket.rooms)[1];
+  // const match = matches[matchId];
+  // if (match) {
+  //   delete matches[matchId];
+  //   terminatedSocket.to(matchId).emit(MATCH_UNSUCCESSFUL);
+  // }
+};
+
+export const hasUserDisconnected = (uid: string) => {
+  return !userSockets.has(uid);
 };

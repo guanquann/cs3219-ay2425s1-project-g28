@@ -1,5 +1,8 @@
-import { createMatch, userSockets } from "../handlers/matchHandler";
-import { MatchItem } from "../types/matchTypes";
+import {
+  createMatch,
+  hasUserDisconnected,
+  MatchItem,
+} from "../handlers/matchHandler";
 
 const matchingRequests = new Map<string, MatchItem>();
 
@@ -9,13 +12,13 @@ export const matchUsers = (newRequest: string) => {
   for (const [uid, pendingRequest] of matchingRequests) {
     if (
       isExpired(pendingRequest) ||
-      !userSockets.has(uid) ||
+      hasUserDisconnected(uid) ||
       uid === newRequestUid
     ) {
       matchingRequests.delete(uid);
       continue;
     }
-    if (isExpired(newRequestJson) || !userSockets.has(newRequestUid)) {
+    if (isExpired(newRequestJson) || hasUserDisconnected(newRequestUid)) {
       return;
     }
 
