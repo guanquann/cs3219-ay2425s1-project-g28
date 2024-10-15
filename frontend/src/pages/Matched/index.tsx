@@ -1,5 +1,12 @@
 import AppMargin from "../../components/AppMargin";
-import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  LinearProgress,
+  Stack,
+  Typography,
+} from "@mui/material";
 import classes from "./index.module.css";
 import { useMatch } from "../../contexts/MatchContext";
 import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
@@ -7,6 +14,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
 import Loader from "../../components/Loader";
+import { CheckCircleOutlineRounded } from "@mui/icons-material";
 
 const acceptanceTimeout = 10;
 
@@ -15,22 +23,38 @@ const Matched: React.FC = () => {
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { acceptMatch, rematch, stopMatch, matchUser, partner, loading } =
-    match;
+  const {
+    acceptMatch,
+    rematch,
+    stopMatch,
+    matchUser,
+    matchId,
+    partner,
+    loading,
+  } = match;
 
   const [timeLeft, setTimeLeft] = useState<number>(acceptanceTimeout);
+  const [accepted, setAccepted] = useState<boolean>(false);
 
   useEffect(() => {
+    const startTime = new Date().getTime();
+    const endTime = startTime + acceptanceTimeout * 1000;
+
     const timer = setInterval(() => {
-      setTimeLeft((prevTime) => (prevTime <= 0 ? 0 : prevTime - 1));
-    }, 1000);
+      const currentTime = new Date().getTime();
+      const remainingTime = Math.max(0, (endTime - currentTime) / 1000);
+      setTimeLeft(remainingTime);
+    }, 100);
+
     return () => clearInterval(timer);
   }, []);
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      toast.error("Match acceptance timeout!");
-      stopMatch("/home");
+      accepted
+        ? toast.error("Match unsuccessful! Your partner was not ready.")
+        : toast.error("Match offer timeout!");
+      stopMatch("/home", true);
     }
   }, [timeLeft]);
 
@@ -70,17 +94,34 @@ const Matched: React.FC = () => {
 
         <Typography variant="h3">Practice with @{partner.username}?</Typography>
 
+        <Box sx={{ width: "100%" }}>
+          <LinearProgress
+            variant="determinate"
+            value={(timeLeft / acceptanceTimeout) * 100}
+          />
+        </Box>
+
         <Stack spacing={2} direction="row" paddingTop={2} width={700}>
           <Button
             variant="contained"
             color="secondary"
             fullWidth
+            disabled={accepted}
             onClick={rematch}
           >
             Rematch
           </Button>
-          <Button variant="contained" fullWidth onClick={acceptMatch}>
-            Accept
+          <Button
+            variant="contained"
+            fullWidth
+            disabled={!matchId || accepted}
+            onClick={() => {
+              acceptMatch();
+              setAccepted(true);
+            }}
+            endIcon={accepted ? <CheckCircleOutlineRounded /> : null}
+          >
+            {accepted ? "Accepted" : "Accept"}
           </Button>
         </Stack>
       </Stack>

@@ -5,11 +5,13 @@ import {
   MATCH_REQUEST,
   SOCKET_CLIENT_DISCONNECT,
   SOCKET_DISCONNECT,
+  MATCH_STOP_REQUEST,
 } from "../utils/constants";
 import {
   createMatchItem,
   handleMatchAcceptance,
-  handleMatchTermination,
+  handleMatchStopRequest,
+  handleUserDisconnect,
   handleRematch,
   MatchRequest,
 } from "./matchHandler";
@@ -39,18 +41,26 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
     }
   );
 
-  socket.on(SOCKET_DISCONNECT, (reason) => {
-    if (reason === SOCKET_CLIENT_DISCONNECT) {
-      console.log("Client manually disconnected");
-      handleMatchTermination(socket);
+  socket.on(
+    MATCH_STOP_REQUEST,
+    (
+      uid: string | undefined,
+      matchId: string | null,
+      matchPending: boolean,
+      isMutual: boolean,
+      callback: () => void
+    ) => {
+      handleMatchStopRequest(socket, uid, matchId, matchPending, isMutual);
+      callback();
     }
-  });
+  );
 
   // TODO: handle client reconnect failure
   socket.on(SOCKET_DISCONNECT, (reason) => {
     if (reason === SOCKET_CLIENT_DISCONNECT) {
       console.log("Client manually disconnected");
-      handleMatchTermination(socket);
+      handleUserDisconnect(socket);
     }
+    console.log("disconnect");
   });
 };

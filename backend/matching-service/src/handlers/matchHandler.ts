@@ -4,8 +4,9 @@ import {
   MATCH_FOUND,
   MATCH_IN_PROGRESS,
   MATCH_SUCCESSFUL,
-  MATCH_UNSUCCESSFUL,
+  MATCH_ENDED,
   MATCH_REQUEST_ERROR,
+  MATCH_NOT_ACCEPTED,
 } from "../utils/constants";
 import { Socket } from "socket.io";
 import { sendRabbitMq } from "../../config/rabbitmq";
@@ -14,6 +15,12 @@ interface MatchUser {
   id: string;
   username: string;
   profile?: string;
+}
+
+interface Match {
+  uid1: string;
+  uid2: string;
+  accepted: boolean;
 }
 
 export interface MatchRequest {
@@ -33,18 +40,17 @@ export interface MatchItem {
   ttlInSecs: number;
 }
 
-const matches = new Map<string, boolean>();
+const matches = new Map<string, Match>();
 const userSockets = new Map<string, Socket>();
 
 export const createMatchItem = async (
   socket: Socket,
   matchRequest: MatchRequest,
-  rematch?: boolean
+  isRematch?: boolean
 ): Promise<boolean> => {
   const { user, complexities, categories, languages, timeout } = matchRequest;
 
-  if (!rematch && userSockets.has(user.id)) {
-    console.log(`user request exists: ${user.username}`);
+  if (!isRematch && userSockets.has(user.id)) {
     socket.emit(MATCH_IN_PROGRESS);
     return false;
   }
@@ -68,11 +74,18 @@ export const createMatchItem = async (
 };
 
 export const createMatch = (matchItem1: MatchItem, matchItem2: MatchItem) => {
-  const matchId = uuidv4();
-  matches.set(matchId, false);
+  const uid1 = matchItem1.user.id;
+  const uid2 = matchItem2.user.id;
 
-  userSockets.get(matchItem1.user.id)!.join(matchId);
-  userSockets.get(matchItem2.user.id)!.join(matchId);
+  const matchId = uuidv4();
+  matches.set(matchId, {
+    uid1: uid1,
+    uid2: uid2,
+    accepted: false,
+  });
+
+  userSockets.get(uid1)?.join(matchId);
+  userSockets.get(uid2)?.join(matchId);
   io.to(matchId).emit(MATCH_FOUND, {
     matchId: matchId,
     user1: matchItem1.user,
@@ -81,15 +94,21 @@ export const createMatch = (matchItem1: MatchItem, matchItem2: MatchItem) => {
 };
 
 export const handleMatchAcceptance = (matchId: string) => {
-  const match = matches.has(matchId);
+  const match = matches.get(matchId);
   if (!match) {
     return;
   }
 
-  if (matches.get(matchId)) {
+  if (match.accepted) {
     io.to(matchId).emit(MATCH_SUCCESSFUL);
   } else {
-    matches.set(matchId, true);
+    matches.set(matchId, { ...match, accepted: true });
+  }
+};
+
+const handleMatchDecline = (socket: Socket, matchId: string) => {
+  if (matches.delete(matchId)) {
+    socket.to(matchId).emit(MATCH_NOT_ACCEPTED);
   }
 };
 
@@ -98,28 +117,45 @@ export const handleRematch = async (
   matchId: string,
   rematchRequest: MatchRequest
 ): Promise<boolean> => {
-  if (matches.delete(matchId)) {
-    socket.to(matchId).emit(MATCH_UNSUCCESSFUL); // TODO: emit other user reject?
-  }
-
+  handleMatchDecline(socket, matchId);
   return await createMatchItem(socket, rematchRequest, true);
 };
 
-export const handleMatchTermination = (terminatedSocket: Socket) => {
+export const handleMatchStopRequest = (
+  socket: Socket,
+  uid: string | undefined,
+  matchId: string | null,
+  matchPending: boolean,
+  isMutual: boolean
+) => {
+  if (matchId) {
+    if (matchPending) {
+      handleMatchDecline(socket, matchId);
+      return;
+    }
+
+    const match = matches.get(matchId);
+    if (match) {
+      userSockets.delete(match.uid1);
+      userSockets.delete(match.uid2);
+      matches.delete(matchId);
+    }
+
+    if (!isMutual) {
+      socket.to(matchId).emit(MATCH_ENDED);
+    }
+  } else if (uid) {
+    userSockets.delete(uid);
+  }
+};
+
+export const handleUserDisconnect = (disconnectedSocket: Socket) => {
   for (const [uid, socket] of userSockets) {
-    if (socket.id === terminatedSocket.id) {
+    if (socket.id === disconnectedSocket.id) {
       userSockets.delete(uid);
       break;
     }
   }
-
-  // TODO: no access to rooms
-  // const matchId = Array.from(terminatedSocket.rooms)[1];
-  // const match = matches[matchId];
-  // if (match) {
-  //   delete matches[matchId];
-  //   terminatedSocket.to(matchId).emit(MATCH_UNSUCCESSFUL);
-  // }
 };
 
 export const hasUserDisconnected = (uid: string) => {

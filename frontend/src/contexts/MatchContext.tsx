@@ -26,9 +26,11 @@ enum MatchEvents {
   MATCH_FOUND = "match_found",
   MATCH_IN_PROGRESS = "match_in_progress",
   MATCH_ACCEPTED = "match_accepted",
+  MATCH_NOT_ACCEPTED = "match_not_accepted",
   REMATCH_REQUEST = "rematch_request",
   MATCH_SUCCESSFUL = "match_successful",
-  MATCH_UNSUCCESSFUL = "match_unsuccessful",
+  MATCH_ENDED = "match_ended",
+  MATCH_STOP_REQUEST = "match_stop_request",
 
   SOCKET_DISCONNECT = "disconnect",
   SOCKET_CLIENT_DISCONNECT = "io client disconnect",
@@ -46,9 +48,10 @@ type MatchContextType = {
   retryMatch: () => void;
   acceptMatch: () => void;
   rematch: () => void;
-  stopMatch: (path: string) => void;
+  stopMatch: (path: string, mutual?: boolean) => void;
   matchUser: MatchUser | null;
   matchCriteria: MatchCriteria;
+  matchId: string | null;
   partner: MatchUser | null;
   loading: boolean;
 };
@@ -82,6 +85,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   });
   const [matchId, setMatchId] = useState<string | null>(null);
   const [partner, setPartner] = useState<MatchUser | null>(null);
+  const [matchPending, setMatchPending] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const closeConnection = () => {
@@ -99,6 +103,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
         setMatchId(matchId);
         matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+        setMatchPending(true);
         appNavigate("/matching/matched");
       });
     }
@@ -111,14 +116,23 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     if (!matchSocket.hasListeners(MatchEvents.MATCH_SUCCESSFUL)) {
       matchSocket.on(MatchEvents.MATCH_SUCCESSFUL, () => {
+        setMatchPending(false);
         appNavigate("/collaboration");
       });
     }
 
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_UNSUCCESSFUL)) {
-      matchSocket.on(MatchEvents.MATCH_UNSUCCESSFUL, () => {
-        toast.error("Matching unsuccessful!");
-        stopMatch("/home");
+    if (!matchSocket.hasListeners(MatchEvents.MATCH_NOT_ACCEPTED)) {
+      matchSocket.on(MatchEvents.MATCH_NOT_ACCEPTED, () => {
+        toast.error("Unfortunately, your partner did not accept the match.");
+        setMatchId(null);
+        setMatchPending(false);
+      });
+    }
+
+    if (!matchSocket.hasListeners(MatchEvents.MATCH_ENDED)) {
+      matchSocket.on(MatchEvents.MATCH_ENDED, () => {
+        toast.error("Your partner has ended the match."); // TODO: stop match during matching
+        afterMatchCleanUp("/home");
       });
     }
 
@@ -199,6 +213,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     setLoading(true);
     setMatchId(null);
     setPartner(null);
+    setMatchPending(false);
 
     const rematchRequest = {
       user: matchUser,
@@ -220,7 +235,18 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     );
   };
 
-  const stopMatch = (path: string) => {
+  const stopMatch = (path: string, isMutual: boolean = false) => {
+    matchSocket.emit(
+      MatchEvents.MATCH_STOP_REQUEST,
+      matchUser?.id,
+      matchId,
+      matchPending,
+      isMutual,
+      () => afterMatchCleanUp(path)
+    );
+  };
+
+  const afterMatchCleanUp = (path: string) => {
     closeConnection();
     setMatchCriteria({
       complexities: [],
@@ -230,6 +256,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     });
     setMatchId(null);
     setPartner(null);
+    setMatchPending(false);
     appNavigate(path);
   };
 
@@ -243,6 +270,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         stopMatch,
         matchUser,
         matchCriteria,
+        matchId,
         partner,
         loading,
       }}
