@@ -1,11 +1,11 @@
 /* eslint-disable react-refresh/only-export-components */
 
 import { createContext, useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { matchSocket } from "../utils/matchSocket";
 import { minMatchTimeout, USE_AUTH_ERROR_MESSAGE } from "../utils/constants";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
+import { useAppNavigate } from "../components/NoDirectAccessRoutes";
 
 type MatchUser = {
   id: string;
@@ -37,7 +37,6 @@ enum MatchEvents {
 }
 
 type MatchContextType = {
-  closeConnection: (path: string) => void;
   findMatch: (
     complexities: string[],
     categories: string[],
@@ -47,10 +46,9 @@ type MatchContextType = {
   retryMatch: () => void;
   acceptMatch: () => void;
   rematch: () => void;
-  stopMatch: () => void;
+  stopMatch: (path: string) => void;
   matchUser: MatchUser | null;
   matchCriteria: MatchCriteria;
-  matchId: string | null;
   partner: MatchUser | null;
 };
 
@@ -58,7 +56,7 @@ const MatchContext = createContext<MatchContextType | null>(null);
 
 const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const { children } = props;
-  const navigate = useNavigate();
+  const appNavigate = useAppNavigate();
 
   const auth = useAuth();
   if (!auth) {
@@ -84,18 +82,9 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const [matchId, setMatchId] = useState<string | null>(null);
   const [partner, setPartner] = useState<MatchUser | null>(null);
 
-  const closeConnection = (path: string) => {
+  const closeConnection = () => {
     matchSocket.removeAllListeners();
     matchSocket.disconnect();
-    setMatchCriteria({
-      complexities: [],
-      categories: [],
-      languages: [],
-      timeout: minMatchTimeout,
-    });
-    setMatchId(null);
-    setPartner(null);
-    navigate(path, { replace: true });
   };
 
   const openConnection = () => {
@@ -108,6 +97,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
         setMatchId(matchId);
         matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+        appNavigate("/matching/matched");
       });
     }
 
@@ -119,20 +109,20 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     if (!matchSocket.hasListeners(MatchEvents.MATCH_SUCCESSFUL)) {
       matchSocket.on(MatchEvents.MATCH_SUCCESSFUL, () => {
-        navigate("/collaboration", { replace: true });
+        appNavigate("/collaboration");
       });
     }
 
     if (!matchSocket.hasListeners(MatchEvents.MATCH_UNSUCCESSFUL)) {
       matchSocket.on(MatchEvents.MATCH_UNSUCCESSFUL, () => {
         toast.error("Matching unsuccessful!");
-        closeConnection("/home");
+        stopMatch("/home");
       });
     }
 
     if (!matchSocket.hasListeners(MatchEvents.MATCH_REQUEST_ERROR)) {
       matchSocket.on(MatchEvents.MATCH_REQUEST_ERROR, () => {
-        toast.error("Error sending match request! Please try again later.");
+        toast.error("Failed to send match request! Please try again later.");
       });
     }
 
@@ -153,7 +143,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_FAILED)) {
       matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_FAILED, () => {
-        console.log("Oops, something went wrong! Please try again later.");
+        toast.error("Failed to reconnect! Please try again later.");
       });
     }
   };
@@ -182,7 +172,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
             languages,
             timeout,
           });
-          navigate("/matching", { replace: true });
+          appNavigate("/matching");
         }
       }
     );
@@ -213,17 +203,25 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     setMatchId(null);
     setPartner(null);
-    navigate("/matching", { replace: true });
+    appNavigate("/matching");
   };
 
-  const stopMatch = () => {
-    closeConnection("/home");
+  const stopMatch = (path: string) => {
+    closeConnection();
+    setMatchCriteria({
+      complexities: [],
+      categories: [],
+      languages: [],
+      timeout: minMatchTimeout,
+    });
+    setMatchId(null);
+    setPartner(null);
+    appNavigate(path);
   };
 
   return (
     <MatchContext.Provider
       value={{
-        closeConnection,
         findMatch,
         retryMatch,
         acceptMatch,
@@ -231,7 +229,6 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         stopMatch,
         matchUser,
         matchCriteria,
-        matchId,
         partner,
       }}
     >

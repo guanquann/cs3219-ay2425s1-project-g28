@@ -6,7 +6,6 @@ import classes from "./index.module.css";
 import { useMatch } from "../../contexts/MatchContext";
 import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
 
-// TODO: Prevent user from accessing this page via URL
 const Timeout: React.FC = () => {
   const navigate = useNavigate();
 

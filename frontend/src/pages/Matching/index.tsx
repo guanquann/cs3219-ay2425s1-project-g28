@@ -4,19 +4,15 @@ import { Stack, Typography } from "@mui/material";
 import matching from "../../assets/matching.svg";
 import classes from "./index.module.css";
 import Timer from "../../components/Timer";
-import { useNavigate } from "react-router-dom";
 import { useMatch } from "../../contexts/MatchContext";
 import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
 
-// TODO: Prevent user from accessing this page via URL
 const Matching: React.FC = () => {
-  const navigate = useNavigate();
-
   const match = useMatch();
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { closeConnection, matchId, matchCriteria } = match;
+  const { stopMatch, matchCriteria } = match;
 
   const [timeLeft, setTimeLeft] = useState<number>(matchCriteria.timeout);
 
@@ -29,15 +25,9 @@ const Matching: React.FC = () => {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      closeConnection("timeout");
+      stopMatch("/matching/timeout");
     }
   }, [timeLeft]);
-
-  useEffect(() => {
-    if (matchId) {
-      navigate("matched", { replace: true });
-    }
-  }, [matchId, navigate]);
 
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>

@@ -19,6 +19,7 @@ import AuthProvider from "./contexts/AuthContext";
 import ProfileContextProvider from "./contexts/ProfileContext";
 import MatchProvider from "./contexts/MatchContext";
 import CollabSandbox from "./pages/CollabSandbox";
+import NoDirectAccessRoutes from "./components/NoDirectAccessRoutes";
 
 function App() {
   return (
@@ -47,12 +48,16 @@ function App() {
               }
             />
             <Route path="matching" element={<ProtectedRoutes />}>
-              <Route index element={<Matching />} />
-              <Route path="matched" element={<Matched />} />
-              <Route path="timeout" element={<Timeout />} />
+              <Route element={<NoDirectAccessRoutes />}>
+                <Route index element={<Matching />} />
+                <Route path="matched" element={<Matched />} />
+                <Route path="timeout" element={<Timeout />} />
+              </Route>
             </Route>
             <Route path="collaboration" element={<ProtectedRoutes />}>
-              <Route index element={<CollabSandbox />} />
+              <Route element={<NoDirectAccessRoutes />}>
+                <Route index element={<CollabSandbox />} />
+              </Route>
             </Route>
             <Route path="*" element={<PageNotFound />} />
           </Route>

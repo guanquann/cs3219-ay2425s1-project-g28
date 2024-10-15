@@ -5,6 +5,7 @@ import { useMatch } from "../../contexts/MatchContext";
 import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { Navigate } from "react-router-dom";
 
 const acceptanceTimeout = 10;
 
@@ -14,7 +15,7 @@ const Matched: React.FC = () => {
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { closeConnection, acceptMatch, rematch, matchUser, partner } = match;
+  const { acceptMatch, rematch, stopMatch, matchUser, partner } = match;
 
   const [timeLeft, setTimeLeft] = useState<number>(acceptanceTimeout);
 
@@ -28,9 +29,13 @@ const Matched: React.FC = () => {
   useEffect(() => {
     if (timeLeft <= 0) {
       toast.error("Match acceptance timeout!");
-      closeConnection("/home");
+      stopMatch("/home");
     }
   }, [timeLeft]);
+
+  if (!matchUser || !partner) {
+    return <Navigate to="/home" />;
+  }
 
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
@@ -44,7 +49,7 @@ const Matched: React.FC = () => {
           paddingTop={2}
           paddingBottom={2}
         >
-          <Avatar src={matchUser?.profile} sx={{ width: 120, height: 120 }} />
+          <Avatar src={matchUser.profile} sx={{ width: 120, height: 120 }} />
 
           <Box
             sx={(theme) => ({
@@ -55,12 +60,10 @@ const Matched: React.FC = () => {
             })}
           />
 
-          <Avatar src={partner?.profile} sx={{ width: 120, height: 120 }} />
+          <Avatar src={partner.profile} sx={{ width: 120, height: 120 }} />
         </Box>
 
-        <Typography variant="h3">
-          Practice with @{partner?.username}?
-        </Typography>
+        <Typography variant="h3">Practice with @{partner.username}?</Typography>
 
         <Stack spacing={2} direction="row" paddingTop={2} width={700}>
           <Button

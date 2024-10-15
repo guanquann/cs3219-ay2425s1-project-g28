@@ -135,7 +135,11 @@ const Navbar: React.FC<NavbarProps> = (props) => {
               )}
             </Stack>
           ) : (
-            <Button variant="outlined" color="error" onClick={stopMatch}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => stopMatch("/home")}
+            >
               Stop matching
             </Button>
           )}

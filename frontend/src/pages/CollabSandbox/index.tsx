@@ -4,13 +4,12 @@ import classes from "./index.module.css";
 import { useMatch } from "../../contexts/MatchContext";
 import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
 
-// TODO: Prevent user from accessing this page via URL
 const CollabSandbox: React.FC = () => {
   const match = useMatch();
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { closeConnection } = match;
+  const { stopMatch } = match;
 
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
@@ -20,7 +19,7 @@ const CollabSandbox: React.FC = () => {
         <Button
           variant="outlined"
           color="error"
-          onClick={() => closeConnection("/home")}
+          onClick={() => stopMatch("/home")}
         >
           End Session
         </Button>
