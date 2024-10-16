@@ -2,16 +2,16 @@ import { v4 as uuidv4 } from "uuid";
 import { sendRabbitMq } from "../../config/rabbitmq";
 import { sendMatchFound } from "./websocketHandler";
 
-interface MatchUser {
+interface Match {
+  matchUser1: MatchUser;
+  matchUser2: MatchUser;
+  accepted: boolean;
+}
+
+export interface MatchUser {
   id: string;
   username: string;
   profile?: string;
-}
-
-interface Match {
-  uid1: string;
-  uid2: string;
-  accepted: boolean;
 }
 
 export interface MatchRequest {
@@ -55,13 +55,16 @@ export const createMatch = (
   requestItem2: MatchRequestItem
 ) => {
   const matchId = uuidv4();
+  const matchUser1 = requestItem1.user;
+  const matchUser2 = requestItem2.user;
+
   matches.set(matchId, {
-    uid1: requestItem1.user.id,
-    uid2: requestItem2.user.id,
+    matchUser1: matchUser1,
+    matchUser2: matchUser2,
     accepted: false,
   });
 
-  sendMatchFound(matchId, requestItem1, requestItem2);
+  sendMatchFound(matchId, matchUser1, matchUser2);
 };
 
 export const handleMatchAccept = (matchId: string): boolean => {
@@ -80,8 +83,21 @@ export const handleMatchDelete = (matchId: string): boolean =>
 
 export const getMatchIdByUid = (uid: string): string | null => {
   for (const [matchId, match] of matches) {
-    if (match.uid1 === uid || match.uid2 === uid) {
+    if (match.matchUser1.id === uid || match.matchUser2.id === uid) {
       return matchId;
+    }
+  }
+  return null;
+};
+
+export const getMatchByUid = (
+  uid: string
+): { matchId: string; partner: MatchUser } | null => {
+  for (const [matchId, match] of matches) {
+    if (match.matchUser1.id === uid) {
+      return { matchId: matchId, partner: match.matchUser2 };
+    } else if (match.matchUser2.id === uid) {
+      return { matchId: matchId, partner: match.matchUser1 };
     }
   }
   return null;

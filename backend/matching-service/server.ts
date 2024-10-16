@@ -10,7 +10,7 @@ export const io = new Server(server, {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
   },
-  connectionStateRecovery: {}, // TODO: rejoin room?
+  connectionStateRecovery: {},
 });
 
 io.on("connection", (socket) => {

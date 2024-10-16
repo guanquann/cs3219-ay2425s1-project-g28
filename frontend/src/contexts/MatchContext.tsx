@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { matchSocket } from "../utils/matchSocket";
 import {
   FAILED_MATCH_REQUEST_MESSAGE,
+  MATCH_CONNECTION_ERROR,
   MATCH_ENDED_MESSAGE,
   MATCH_LOGIN_REQUIRED_MESSAGE,
   MATCH_REQUEST_EXISTS_MESSAGE,
@@ -35,6 +36,7 @@ enum MatchEvents {
   MATCH_DECLINE_REQUEST = "match_decline_request",
   REMATCH_REQUEST = "rematch_request",
   MATCH_END_REQUEST = "match_end_request",
+  MATCH_STATUS_REQUEST = "match_status_request",
 
   USER_CONNECTED = "user_connected",
   USER_DISCONNECTED = "user_disconnected",
@@ -49,6 +51,7 @@ enum MatchEvents {
 
   SOCKET_DISCONNECT = "disconnect",
   SOCKET_CLIENT_DISCONNECT = "io client disconnect",
+  SOCKET_SERVER_DISCONNECT = "io server disconnect",
   SOCKET_RECONNECT_SUCCESS = "reconnect",
   SOCKET_RECONNECT_FAILED = "reconnect_failed",
 }
@@ -74,12 +77,15 @@ type MatchContextType = {
   retryMatch: () => void;
   matchingTimeout: () => void;
   matchOfferTimeout: () => void;
+  verifyMatchStatus: () => void;
   matchUser: MatchUser | null;
   matchCriteria: MatchCriteria | null;
   partner: MatchUser | null;
   matchPending: boolean;
   loading: boolean;
 };
+
+const requestTimeoutDuration = 5000;
 
 const MatchContext = createContext<MatchContextType | null>(null);
 
@@ -108,7 +114,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const [matchId, setMatchId] = useState<string | null>(null);
   const [partner, setPartner] = useState<MatchUser | null>(null);
   const [matchPending, setMatchPending] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (
@@ -143,18 +149,23 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   };
 
   const openSocketConnection = () => {
-    console.log("user request to connect");
     matchSocket.connect();
     initListeners();
   };
 
   const closeSocketConnection = () => {
-    console.log("user request to disconnect");
-    matchSocket.emit(MatchEvents.USER_DISCONNECTED, matchUser?.id, matchId);
+    matchSocket.emit(MatchEvents.USER_DISCONNECTED, matchUser?.id);
+    removeListeners();
+  };
+
+  const removeListeners = () => {
     matchSocket.removeAllListeners();
+    matchSocket.io.removeListener(MatchEvents.SOCKET_RECONNECT_SUCCESS);
+    matchSocket.io.removeListener(MatchEvents.SOCKET_RECONNECT_FAILED);
   };
 
   const initListeners = () => {
+    initConnectionStatusListeners();
     switch (location.pathname) {
       case MatchPaths.HOME:
       case MatchPaths.TIMEOUT:
@@ -171,6 +182,38 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         return;
       default:
         return;
+    }
+  };
+
+  const initConnectionStatusListeners = () => {
+    let connectionLost = false;
+    if (!matchSocket.hasListeners(MatchEvents.SOCKET_DISCONNECT)) {
+      matchSocket.on(MatchEvents.SOCKET_DISCONNECT, (reason) => {
+        if (
+          reason !== MatchEvents.SOCKET_CLIENT_DISCONNECT &&
+          reason !== MatchEvents.SOCKET_SERVER_DISCONNECT
+        ) {
+          connectionLost = true;
+        }
+      });
+    }
+
+    if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_SUCCESS)) {
+      matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_SUCCESS, () => {
+        if (connectionLost) {
+          closeSocketConnection();
+          toast.error(MATCH_CONNECTION_ERROR);
+          appNavigate(MatchPaths.HOME);
+        }
+      });
+    }
+
+    if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_FAILED)) {
+      matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_FAILED, () => {
+        matchSocket.close();
+        toast.error(MATCH_CONNECTION_ERROR);
+        appNavigate(MatchPaths.HOME);
+      });
     }
   };
 
@@ -230,28 +273,6 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     });
   };
 
-  // TODO: disconnection / reconnection
-  // if (!matchSocket.hasListeners(MatchEvents.SOCKET_DISCONNECT)) {
-  //   matchSocket.on(MatchEvents.SOCKET_DISCONNECT, (reason) => {
-  //     if (reason !== MatchEvents.SOCKET_CLIENT_DISCONNECT) {
-  //       toast.error("Connection error! Reconnecting...");
-  //     }
-  //   });
-  // }
-
-  // if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_SUCCESS)) {
-  //   matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_SUCCESS, () => {
-  //     toast.success("Reconnected!");
-  //     initSocketListeners(); // TODO: check
-  //   });
-  // }
-
-  // if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_FAILED)) {
-  //   matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_FAILED, () => {
-  //     toast.error("Failed to reconnect! Please try again later.");
-  //   });
-  // }
-
   const findMatch = (
     complexities: string[],
     categories: string[],
@@ -262,6 +283,11 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       toast.error(MATCH_LOGIN_REQUIRED_MESSAGE);
       return;
     }
+
+    const requestTimeout = setTimeout(() => {
+      setLoading(false);
+      toast.error(MATCH_CONNECTION_ERROR);
+    }, requestTimeoutDuration);
 
     setLoading(true);
     openSocketConnection();
@@ -275,6 +301,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         timeout: timeout,
       },
       (requested: boolean) => {
+        clearTimeout(requestTimeout);
         setTimeout(() => setLoading(false), 500);
         if (requested) {
           setMatchCriteria({
@@ -285,7 +312,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
           });
           appNavigate(MatchPaths.MATCHING);
         } else {
-          matchSocket.removeAllListeners();
+          removeListeners();
         }
       }
     );
@@ -323,13 +350,18 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   };
 
   const rematch = () => {
-    setLoading(true);
-    setMatchPending(false);
-
     if (!matchCriteria) {
       toast.error(FAILED_MATCH_REQUEST_MESSAGE);
       return;
     }
+
+    const requestTimeout = setTimeout(() => {
+      setLoading(false);
+      toast.error(MATCH_CONNECTION_ERROR);
+    }, requestTimeoutDuration);
+
+    setLoading(true);
+    setMatchPending(false);
 
     const rematchRequest = {
       user: matchUser,
@@ -343,6 +375,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       matchId,
       rematchRequest,
       (requested: boolean) => {
+        clearTimeout(requestTimeout);
         setTimeout(() => setLoading(false), 500);
         if (requested) {
           appNavigate(MatchPaths.MATCHING);
@@ -381,6 +414,30 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     appNavigate(MatchPaths.HOME);
   };
 
+  const verifyMatchStatus = () => {
+    const requestTimeout = setTimeout(() => {
+      setLoading(false);
+      toast.error(MATCH_CONNECTION_ERROR);
+    }, requestTimeoutDuration);
+
+    setLoading(true);
+    matchSocket.emit(
+      MatchEvents.MATCH_STATUS_REQUEST,
+      matchUser?.id,
+      (match: { matchId: string; partner: MatchUser } | null) => {
+        clearTimeout(requestTimeout);
+        if (match) {
+          setMatchId(match.matchId);
+          setPartner(match.partner);
+        } else {
+          setMatchId(null);
+          setPartner(null);
+        }
+        setLoading(false);
+      }
+    );
+  };
+
   return (
     <MatchContext.Provider
       value={{
@@ -391,6 +448,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         retryMatch,
         matchingTimeout,
         matchOfferTimeout,
+        verifyMatchStatus,
         matchUser,
         matchCriteria,
         partner,

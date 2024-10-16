@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import AppMargin from "../../components/AppMargin";
 import { Button, Stack, Typography } from "@mui/material";
 import timeout from "../../assets/timeout.svg";
@@ -13,7 +13,11 @@ const Timeout: React.FC = () => {
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { retryMatch } = match;
+  const { retryMatch, matchCriteria } = match;
+
+  if (!matchCriteria) {
+    return <Navigate to="/home" replace />;
+  }
 
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>

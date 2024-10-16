@@ -44,7 +44,7 @@ const Matching: React.FC = () => {
   }, [timeLeft]);
 
   if (!matchCriteria) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/home" replace />;
   }
 
   return (

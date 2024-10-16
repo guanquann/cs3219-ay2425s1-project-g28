@@ -63,7 +63,7 @@ const Matched: React.FC = () => {
   }, [timeLeft]);
 
   if (!matchUser || !partner) {
-    return <Navigate to="/home" />;
+    return <Navigate to="/home" replace />;
   }
 
   if (loading) {

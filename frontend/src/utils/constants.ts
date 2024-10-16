@@ -89,6 +89,8 @@ export const MATCH_ENDED_MESSAGE = "Your partner has left the match.";
 export const MATCH_LOGIN_REQUIRED_MESSAGE =
   "Please login first to find a match.";
 export const MATCH_OFFER_TIMEOUT_MESSAGE = "Match offer timeout!";
+export const MATCH_CONNECTION_ERROR =
+  "Connection error! Please try again later.";
 
 /* Image paths */
 export const FIND_MATCH_FORM_PATH = "/find_match_form.png";

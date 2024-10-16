@@ -5,7 +5,10 @@ export const useAppNavigate = () => {
   const navigate = useNavigate();
 
   const appNavigate = (path: string) => {
-    navigate(path, { replace: true, state: { from: "app-navigation" } });
+    navigate(path, {
+      replace: location.pathname !== "/home",
+      state: { from: "app-navigation" },
+    });
   };
 
   return appNavigate;
@@ -15,7 +18,7 @@ const NoDirectAccessRoutes: React.FC = () => {
   const location = useLocation();
 
   if (location.state?.from !== "app-navigation") {
-    return <Navigate to="/home" />;
+    return <Navigate to="/home" replace />;
   }
 
   return <Outlet />;

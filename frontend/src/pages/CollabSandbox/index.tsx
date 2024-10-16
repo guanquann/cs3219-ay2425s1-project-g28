@@ -3,17 +3,32 @@ import { Button, Stack, Typography } from "@mui/material";
 import classes from "./index.module.css";
 import { useMatch } from "../../contexts/MatchContext";
 import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import Loader from "../../components/Loader";
+import ServerError from "../../components/ServerError";
 
 const CollabSandbox: React.FC = () => {
   const match = useMatch();
   if (!match) {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
-  const { stopMatch, partner } = match;
+  const { stopMatch, verifyMatchStatus, partner, loading } = match;
+
+  useEffect(() => {
+    verifyMatchStatus();
+  }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   if (!partner) {
-    return <Navigate to="/home" />;
+    return (
+      <ServerError
+        title="Oops, match ended..."
+        subtitle="Unfortunately, the match has ended due to a connection loss 😥"
+      />
+    );
   }
 
   return (
