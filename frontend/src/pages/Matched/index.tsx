@@ -9,7 +9,11 @@ import {
 } from "@mui/material";
 import classes from "./index.module.css";
 import { useMatch } from "../../contexts/MatchContext";
-import { USE_MATCH_ERROR_MESSAGE } from "../../utils/constants";
+import {
+  MATCH_OFFER_TIMEOUT_MESSAGE,
+  MATCH_UNSUCCESSFUL_MESSAGE,
+  USE_MATCH_ERROR_MESSAGE,
+} from "../../utils/constants";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Navigate } from "react-router-dom";
@@ -24,12 +28,12 @@ const Matched: React.FC = () => {
     throw new Error(USE_MATCH_ERROR_MESSAGE);
   }
   const {
+    matchOfferTimeout,
     acceptMatch,
     rematch,
-    stopMatch,
     matchUser,
-    matchId,
     partner,
+    matchPending,
     loading,
   } = match;
 
@@ -52,9 +56,9 @@ const Matched: React.FC = () => {
   useEffect(() => {
     if (timeLeft <= 0) {
       accepted
-        ? toast.error("Match unsuccessful! Your partner was not ready.")
-        : toast.error("Match offer timeout!");
-      stopMatch("/home", true);
+        ? toast.error(MATCH_UNSUCCESSFUL_MESSAGE)
+        : toast.error(MATCH_OFFER_TIMEOUT_MESSAGE);
+      matchOfferTimeout();
     }
   }, [timeLeft]);
 
@@ -106,7 +110,7 @@ const Matched: React.FC = () => {
             variant="contained"
             color="secondary"
             fullWidth
-            disabled={accepted}
+            disabled={matchPending && accepted}
             onClick={rematch}
           >
             Rematch
@@ -114,7 +118,7 @@ const Matched: React.FC = () => {
           <Button
             variant="contained"
             fullWidth
-            disabled={!matchId || accepted}
+            disabled={!matchPending || accepted}
             onClick={() => {
               acceptMatch();
               setAccepted(true);

@@ -138,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => stopMatch("/home")}
+              onClick={() => stopMatch()}
             >
               Stop matching
             </Button>

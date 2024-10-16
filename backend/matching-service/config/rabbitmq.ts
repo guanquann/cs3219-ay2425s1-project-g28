@@ -1,7 +1,7 @@
 import amqplib, { Connection } from "amqplib";
 import dotenv from "dotenv";
 import { matchUsers } from "../src/utils/mq_utils";
-import { MatchItem } from "../src/handlers/matchHandler";
+import { MatchRequestItem } from "../src/handlers/matchHandler";
 
 dotenv.config();
 
@@ -26,7 +26,9 @@ export const connectRabbitMq = async () => {
   }
 };
 
-export const sendRabbitMq = async (data: MatchItem): Promise<boolean> => {
+export const sendRabbitMq = async (
+  data: MatchRequestItem
+): Promise<boolean> => {
   try {
     const senderChannel = await mrConnection.createChannel();
     senderChannel.sendToQueue(queue, Buffer.from(JSON.stringify(data)));

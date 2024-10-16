@@ -1,8 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { matchSocket } from "../utils/matchSocket";
-import { minMatchTimeout, USE_AUTH_ERROR_MESSAGE } from "../utils/constants";
+import {
+  FAILED_MATCH_REQUEST_MESSAGE,
+  MATCH_ENDED_MESSAGE,
+  MATCH_LOGIN_REQUIRED_MESSAGE,
+  MATCH_REQUEST_EXISTS_MESSAGE,
+  MATCH_UNSUCCESSFUL_MESSAGE,
+  USE_AUTH_ERROR_MESSAGE,
+} from "../utils/constants";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
 import { useAppNavigate } from "../components/NoDirectAccessRoutes";
@@ -21,21 +28,37 @@ type MatchCriteria = {
 };
 
 enum MatchEvents {
+  // Send
   MATCH_REQUEST = "match_request",
-  MATCH_REQUEST_ERROR = "match_request_error",
-  MATCH_FOUND = "match_found",
-  MATCH_IN_PROGRESS = "match_in_progress",
-  MATCH_ACCEPTED = "match_accepted",
-  MATCH_NOT_ACCEPTED = "match_not_accepted",
+  CANCEL_MATCH_REQUEST = "cancel_match_request",
+  MATCH_ACCEPT_REQUEST = "match_accept_request",
+  MATCH_DECLINE_REQUEST = "match_decline_request",
   REMATCH_REQUEST = "rematch_request",
+  MATCH_END_REQUEST = "match_end_request",
+
+  USER_CONNECTED = "user_connected",
+  USER_DISCONNECTED = "user_disconnected",
+
+  // Receive
+  MATCH_FOUND = "match_found",
   MATCH_SUCCESSFUL = "match_successful",
+  MATCH_UNSUCCESSFUL = "match_unsuccessful",
   MATCH_ENDED = "match_ended",
-  MATCH_STOP_REQUEST = "match_stop_request",
+  MATCH_REQUEST_EXISTS = "match_request_exists",
+  MATCH_REQUEST_ERROR = "match_request_error",
 
   SOCKET_DISCONNECT = "disconnect",
   SOCKET_CLIENT_DISCONNECT = "io client disconnect",
   SOCKET_RECONNECT_SUCCESS = "reconnect",
   SOCKET_RECONNECT_FAILED = "reconnect_failed",
+}
+
+enum MatchPaths {
+  HOME = "/home",
+  TIMEOUT = "/matching/timeout",
+  MATCHING = "/matching",
+  MATCHED = "/matching/matched",
+  COLLAB = "/collaboration",
 }
 
 type MatchContextType = {
@@ -45,14 +68,16 @@ type MatchContextType = {
     languages: string[],
     timeout: number
   ) => void;
-  retryMatch: () => void;
+  stopMatch: () => void;
   acceptMatch: () => void;
   rematch: () => void;
-  stopMatch: (path: string, mutual?: boolean) => void;
+  retryMatch: () => void;
+  matchingTimeout: () => void;
+  matchOfferTimeout: () => void;
   matchUser: MatchUser | null;
-  matchCriteria: MatchCriteria;
-  matchId: string | null;
+  matchCriteria: MatchCriteria | null;
   partner: MatchUser | null;
+  matchPending: boolean;
   loading: boolean;
 };
 
@@ -77,92 +102,155 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       : null
   );
 
-  const [matchCriteria, setMatchCriteria] = useState<MatchCriteria>({
-    complexities: [],
-    categories: [],
-    languages: [],
-    timeout: minMatchTimeout,
-  });
+  const [matchCriteria, setMatchCriteria] = useState<MatchCriteria | null>(
+    null
+  );
   const [matchId, setMatchId] = useState<string | null>(null);
   const [partner, setPartner] = useState<MatchUser | null>(null);
   const [matchPending, setMatchPending] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const closeConnection = () => {
-    matchSocket.removeAllListeners();
-    matchSocket.disconnect();
+  useEffect(() => {
+    if (
+      !matchUser?.id ||
+      (location.pathname !== MatchPaths.MATCHING &&
+        location.pathname !== MatchPaths.MATCHED &&
+        location.pathname !== MatchPaths.COLLAB)
+    ) {
+      resetMatchStates();
+      return;
+    }
+
+    openSocketConnection();
+    matchSocket.emit(MatchEvents.USER_CONNECTED, matchUser?.id);
+
+    window.addEventListener("beforeunload", () => closeSocketConnection());
+
+    return () => {
+      closeSocketConnection();
+      window.removeEventListener("beforeunload", () => closeSocketConnection());
+    };
+  }, [matchUser?.id, location.pathname]);
+
+  const resetMatchStates = () => {
+    if (location.pathname !== MatchPaths.TIMEOUT) {
+      setMatchCriteria(null);
+    }
+    setMatchId(null);
+    setPartner(null);
+    setMatchPending(false);
+    setLoading(false);
   };
 
-  const openConnection = () => {
-    initSocketListeners();
+  const openSocketConnection = () => {
+    console.log("user request to connect");
     matchSocket.connect();
+    initListeners();
   };
 
-  const initSocketListeners = () => {
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_FOUND)) {
-      matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-        setMatchId(matchId);
-        matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
-        setMatchPending(true);
-        appNavigate("/matching/matched");
-      });
-    }
+  const closeSocketConnection = () => {
+    console.log("user request to disconnect");
+    matchSocket.emit(MatchEvents.USER_DISCONNECTED, matchUser?.id, matchId);
+    matchSocket.removeAllListeners();
+  };
 
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_IN_PROGRESS)) {
-      matchSocket.on(MatchEvents.MATCH_IN_PROGRESS, () => {
-        toast.error("You can only have 1 match at a time!");
-      });
-    }
-
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_SUCCESSFUL)) {
-      matchSocket.on(MatchEvents.MATCH_SUCCESSFUL, () => {
-        setMatchPending(false);
-        appNavigate("/collaboration");
-      });
-    }
-
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_NOT_ACCEPTED)) {
-      matchSocket.on(MatchEvents.MATCH_NOT_ACCEPTED, () => {
-        toast.error("Unfortunately, your partner did not accept the match.");
-        setMatchId(null);
-        setMatchPending(false);
-      });
-    }
-
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_ENDED)) {
-      matchSocket.on(MatchEvents.MATCH_ENDED, () => {
-        toast.error("Your partner has ended the match."); // TODO: stop match during matching
-        afterMatchCleanUp("/home");
-      });
-    }
-
-    if (!matchSocket.hasListeners(MatchEvents.MATCH_REQUEST_ERROR)) {
-      matchSocket.on(MatchEvents.MATCH_REQUEST_ERROR, () => {
-        toast.error("Failed to send match request! Please try again later.");
-      });
-    }
-
-    if (!matchSocket.hasListeners(MatchEvents.SOCKET_DISCONNECT)) {
-      matchSocket.on(MatchEvents.SOCKET_DISCONNECT, (reason) => {
-        if (reason !== MatchEvents.SOCKET_CLIENT_DISCONNECT) {
-          toast.error("Connection error! Reconnecting...");
-        }
-      });
-    }
-
-    if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_SUCCESS)) {
-      matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_SUCCESS, () => {
-        toast.success("Reconnected!");
-        initSocketListeners(); // TODO: check
-      });
-    }
-
-    if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_FAILED)) {
-      matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_FAILED, () => {
-        toast.error("Failed to reconnect! Please try again later.");
-      });
+  const initListeners = () => {
+    switch (location.pathname) {
+      case MatchPaths.HOME:
+      case MatchPaths.TIMEOUT:
+        initMatchRequestListeners();
+        return;
+      case MatchPaths.MATCHING:
+        initMatchingListeners();
+        return;
+      case MatchPaths.MATCHED:
+        initMatchedListeners();
+        return;
+      case MatchPaths.COLLAB:
+        initCollabListeners();
+        return;
+      default:
+        return;
     }
   };
+
+  const initMatchRequestListeners = () => {
+    matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
+      setMatchId(matchId);
+      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+      setMatchPending(true);
+      appNavigate(MatchPaths.MATCHED);
+    });
+
+    matchSocket.on(MatchEvents.MATCH_REQUEST_EXISTS, () => {
+      toast.error(MATCH_REQUEST_EXISTS_MESSAGE);
+    });
+
+    matchSocket.on(MatchEvents.MATCH_REQUEST_ERROR, () => {
+      toast.error(FAILED_MATCH_REQUEST_MESSAGE);
+    });
+  };
+
+  const initMatchingListeners = () => {
+    matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
+      setMatchId(matchId);
+      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+      setMatchPending(true);
+      appNavigate(MatchPaths.MATCHED);
+    });
+  };
+
+  const initMatchedListeners = () => {
+    matchSocket.on(MatchEvents.MATCH_SUCCESSFUL, () => {
+      setMatchPending(false);
+      appNavigate(MatchPaths.COLLAB);
+    });
+
+    matchSocket.on(MatchEvents.MATCH_UNSUCCESSFUL, () => {
+      toast.error(MATCH_UNSUCCESSFUL_MESSAGE);
+      setMatchPending(false);
+    });
+
+    matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
+      setMatchId(matchId);
+      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+      setMatchPending(true);
+      appNavigate(MatchPaths.MATCHED);
+    });
+
+    matchSocket.on(MatchEvents.MATCH_REQUEST_ERROR, () => {
+      toast.error(FAILED_MATCH_REQUEST_MESSAGE);
+    });
+  };
+
+  const initCollabListeners = () => {
+    matchSocket.on(MatchEvents.MATCH_ENDED, () => {
+      toast.error(MATCH_ENDED_MESSAGE);
+      appNavigate(MatchPaths.HOME);
+    });
+  };
+
+  // TODO: disconnection / reconnection
+  // if (!matchSocket.hasListeners(MatchEvents.SOCKET_DISCONNECT)) {
+  //   matchSocket.on(MatchEvents.SOCKET_DISCONNECT, (reason) => {
+  //     if (reason !== MatchEvents.SOCKET_CLIENT_DISCONNECT) {
+  //       toast.error("Connection error! Reconnecting...");
+  //     }
+  //   });
+  // }
+
+  // if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_SUCCESS)) {
+  //   matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_SUCCESS, () => {
+  //     toast.success("Reconnected!");
+  //     initSocketListeners(); // TODO: check
+  //   });
+  // }
+
+  // if (!matchSocket.io.hasListeners(MatchEvents.SOCKET_RECONNECT_FAILED)) {
+  //   matchSocket.io.on(MatchEvents.SOCKET_RECONNECT_FAILED, () => {
+  //     toast.error("Failed to reconnect! Please try again later.");
+  //   });
+  // }
 
   const findMatch = (
     complexities: string[],
@@ -170,8 +258,13 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     languages: string[],
     timeout: number
   ) => {
+    if (!matchUser) {
+      toast.error(MATCH_LOGIN_REQUIRED_MESSAGE);
+      return;
+    }
+
     setLoading(true);
-    openConnection();
+    openSocketConnection();
     matchSocket.emit(
       MatchEvents.MATCH_REQUEST,
       {
@@ -181,39 +274,62 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         languages: languages,
         timeout: timeout,
       },
-      (result: boolean) => {
+      (requested: boolean) => {
         setTimeout(() => setLoading(false), 500);
-        if (result) {
+        if (requested) {
           setMatchCriteria({
             complexities,
             categories,
             languages,
             timeout,
           });
-          appNavigate("/matching");
+          appNavigate(MatchPaths.MATCHING);
+        } else {
+          matchSocket.removeAllListeners();
         }
       }
     );
   };
 
-  const retryMatch = () => {
-    findMatch(
-      matchCriteria.complexities,
-      matchCriteria.categories,
-      matchCriteria.languages,
-      matchCriteria.timeout
-    );
+  const stopMatch = () => {
+    switch (location.pathname) {
+      case MatchPaths.TIMEOUT:
+        appNavigate(MatchPaths.HOME);
+        return;
+      case MatchPaths.MATCHING:
+        matchSocket.emit(MatchEvents.CANCEL_MATCH_REQUEST, matchUser?.id);
+        appNavigate(MatchPaths.HOME);
+        return;
+      case MatchPaths.MATCHED:
+        matchSocket.emit(
+          MatchEvents.MATCH_DECLINE_REQUEST,
+          matchUser?.id,
+          matchId,
+          false
+        );
+        appNavigate(MatchPaths.HOME);
+        return;
+      case MatchPaths.COLLAB:
+        matchSocket.emit(MatchEvents.MATCH_END_REQUEST, matchUser?.id, matchId);
+        appNavigate(MatchPaths.HOME);
+        return;
+      default:
+        return;
+    }
   };
 
   const acceptMatch = () => {
-    matchSocket.emit(MatchEvents.MATCH_ACCEPTED, matchId);
+    matchSocket.emit(MatchEvents.MATCH_ACCEPT_REQUEST, matchId);
   };
 
   const rematch = () => {
     setLoading(true);
-    setMatchId(null);
-    setPartner(null);
     setMatchPending(false);
+
+    if (!matchCriteria) {
+      toast.error(FAILED_MATCH_REQUEST_MESSAGE);
+      return;
+    }
 
     const rematchRequest = {
       user: matchUser,
@@ -226,52 +342,59 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       MatchEvents.REMATCH_REQUEST,
       matchId,
       rematchRequest,
-      (result: boolean) => {
+      (requested: boolean) => {
         setTimeout(() => setLoading(false), 500);
-        if (result) {
-          appNavigate("/matching");
+        if (requested) {
+          appNavigate(MatchPaths.MATCHING);
+          setPartner(null);
         }
       }
     );
   };
 
-  const stopMatch = (path: string, isMutual: boolean = false) => {
-    matchSocket.emit(
-      MatchEvents.MATCH_STOP_REQUEST,
-      matchUser?.id,
-      matchId,
-      matchPending,
-      isMutual,
-      () => afterMatchCleanUp(path)
+  const retryMatch = () => {
+    if (!matchCriteria) {
+      toast.error(FAILED_MATCH_REQUEST_MESSAGE);
+      return;
+    }
+
+    findMatch(
+      matchCriteria.complexities,
+      matchCriteria.categories,
+      matchCriteria.languages,
+      matchCriteria.timeout
     );
   };
 
-  const afterMatchCleanUp = (path: string) => {
-    closeConnection();
-    setMatchCriteria({
-      complexities: [],
-      categories: [],
-      languages: [],
-      timeout: minMatchTimeout,
-    });
-    setMatchId(null);
-    setPartner(null);
-    setMatchPending(false);
-    appNavigate(path);
+  const matchingTimeout = () => {
+    matchSocket.emit(MatchEvents.CANCEL_MATCH_REQUEST, matchUser?.id);
+    appNavigate(MatchPaths.TIMEOUT);
+  };
+
+  const matchOfferTimeout = () => {
+    matchSocket.emit(
+      MatchEvents.MATCH_DECLINE_REQUEST,
+      matchUser?.id,
+      matchId,
+      true
+    );
+    appNavigate(MatchPaths.HOME);
   };
 
   return (
     <MatchContext.Provider
       value={{
         findMatch,
-        retryMatch,
+        stopMatch,
         acceptMatch,
         rematch,
-        stopMatch,
+        retryMatch,
+        matchingTimeout,
+        matchOfferTimeout,
         matchUser,
         matchCriteria,
-        matchId,
         partner,
+        matchPending,
         loading,
       }}
     >

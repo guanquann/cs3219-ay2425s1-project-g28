@@ -1,15 +1,6 @@
-import { io } from "../../server";
 import { v4 as uuidv4 } from "uuid";
-import {
-  MATCH_FOUND,
-  MATCH_IN_PROGRESS,
-  MATCH_SUCCESSFUL,
-  MATCH_ENDED,
-  MATCH_REQUEST_ERROR,
-  MATCH_NOT_ACCEPTED,
-} from "../utils/constants";
-import { Socket } from "socket.io";
 import { sendRabbitMq } from "../../config/rabbitmq";
+import { sendMatchFound } from "./websocketHandler";
 
 interface MatchUser {
   id: string;
@@ -31,7 +22,7 @@ export interface MatchRequest {
   timeout: number;
 }
 
-export interface MatchItem {
+export interface MatchRequestItem {
   user: MatchUser;
   complexities: string[];
   categories: string[];
@@ -41,23 +32,12 @@ export interface MatchItem {
 }
 
 const matches = new Map<string, Match>();
-const userSockets = new Map<string, Socket>();
 
-export const createMatchItem = async (
-  socket: Socket,
-  matchRequest: MatchRequest,
-  isRematch?: boolean
+export const sendMatchRequest = async (
+  matchRequest: MatchRequest
 ): Promise<boolean> => {
   const { user, complexities, categories, languages, timeout } = matchRequest;
-
-  if (!isRematch && userSockets.has(user.id)) {
-    socket.emit(MATCH_IN_PROGRESS);
-    return false;
-  }
-
-  userSockets.set(user.id, socket);
-
-  const matchQueueItem: MatchItem = {
+  const matchItem: MatchRequestItem = {
     user: user,
     complexities: complexities,
     categories: categories,
@@ -66,98 +46,43 @@ export const createMatchItem = async (
     ttlInSecs: timeout,
   };
 
-  const result = await sendRabbitMq(matchQueueItem);
-  if (!result) {
-    socket.emit(MATCH_REQUEST_ERROR);
-  }
-  return result;
+  const sent = await sendRabbitMq(matchItem);
+  return sent;
 };
 
-export const createMatch = (matchItem1: MatchItem, matchItem2: MatchItem) => {
-  const uid1 = matchItem1.user.id;
-  const uid2 = matchItem2.user.id;
-
+export const createMatch = (
+  requestItem1: MatchRequestItem,
+  requestItem2: MatchRequestItem
+) => {
   const matchId = uuidv4();
   matches.set(matchId, {
-    uid1: uid1,
-    uid2: uid2,
+    uid1: requestItem1.user.id,
+    uid2: requestItem2.user.id,
     accepted: false,
   });
 
-  userSockets.get(uid1)?.join(matchId);
-  userSockets.get(uid2)?.join(matchId);
-  io.to(matchId).emit(MATCH_FOUND, {
-    matchId: matchId,
-    user1: matchItem1.user,
-    user2: matchItem2.user,
-  });
+  sendMatchFound(matchId, requestItem1, requestItem2);
 };
 
-export const handleMatchAcceptance = (matchId: string) => {
+export const handleMatchAccept = (matchId: string): boolean => {
   const match = matches.get(matchId);
   if (!match) {
-    return;
+    return false;
   }
 
-  if (match.accepted) {
-    io.to(matchId).emit(MATCH_SUCCESSFUL);
-  } else {
-    matches.set(matchId, { ...match, accepted: true });
-  }
+  const partnerAccepted = match.accepted;
+  matches.set(matchId, { ...match, accepted: true });
+  return partnerAccepted;
 };
 
-const handleMatchDecline = (socket: Socket, matchId: string) => {
-  if (matches.delete(matchId)) {
-    socket.to(matchId).emit(MATCH_NOT_ACCEPTED);
-  }
-};
+export const handleMatchDelete = (matchId: string): boolean =>
+  matches.delete(matchId);
 
-export const handleRematch = async (
-  socket: Socket,
-  matchId: string,
-  rematchRequest: MatchRequest
-): Promise<boolean> => {
-  handleMatchDecline(socket, matchId);
-  return await createMatchItem(socket, rematchRequest, true);
-};
-
-export const handleMatchStopRequest = (
-  socket: Socket,
-  uid: string | undefined,
-  matchId: string | null,
-  matchPending: boolean,
-  isMutual: boolean
-) => {
-  if (matchId) {
-    if (matchPending) {
-      handleMatchDecline(socket, matchId);
-      return;
-    }
-
-    const match = matches.get(matchId);
-    if (match) {
-      userSockets.delete(match.uid1);
-      userSockets.delete(match.uid2);
-      matches.delete(matchId);
-    }
-
-    if (!isMutual) {
-      socket.to(matchId).emit(MATCH_ENDED);
-    }
-  } else if (uid) {
-    userSockets.delete(uid);
-  }
-};
-
-export const handleUserDisconnect = (disconnectedSocket: Socket) => {
-  for (const [uid, socket] of userSockets) {
-    if (socket.id === disconnectedSocket.id) {
-      userSockets.delete(uid);
-      break;
+export const getMatchIdByUid = (uid: string): string | null => {
+  for (const [matchId, match] of matches) {
+    if (match.uid1 === uid || match.uid2 === uid) {
+      return matchId;
     }
   }
-};
-
-export const hasUserDisconnected = (uid: string) => {
-  return !userSockets.has(uid);
+  return null;
 };
