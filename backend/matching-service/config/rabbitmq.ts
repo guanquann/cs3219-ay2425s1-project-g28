@@ -14,7 +14,7 @@ export const connectRabbitMq = async () => {
     const consumerChannel = await mrConnection.createChannel();
     await consumerChannel.assertQueue(queue);
 
-    consumerChannel.consume(queue, async (msg) => {
+    consumerChannel.consume(queue, (msg) => {
       if (msg !== null) {
         matchUsers(msg.content.toString());
         consumerChannel.ack(msg);

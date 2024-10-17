@@ -12,13 +12,13 @@
 
 ## Running Matching Service Individually with Docker
 
-1. Set up and run RabbitMq locally on your computer with the command `docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management`. If you encounter connection errors, please wait for a few minutes as RabbitMq may take some time to start up.
+1. Set up and run RabbitMq locally on your computer with the command `docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:4.0-management`.
 
 2. Open Command Line/Terminal and navigate into the `matching-service` directory.
 
 3. Run the command: `npm install`. This will install all the necessary dependencies.
 
-4. Run the command `npm start` to start the Matching Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
+4. Run the command `npm start` to start the Matching Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes. If you encounter connection errors, please wait for a few minutes before running `npm start` again as RabbitMq may take some time to start up.
 
 ## After running
 
