@@ -14,7 +14,7 @@ import classes from "./index.module.css";
 import AppMargin from "../../components/AppMargin";
 import {
   complexityList,
-  // languageList,
+  languageList,
   maxMatchTimeout,
   minMatchTimeout,
   USE_MATCH_ERROR_MESSAGE,
@@ -31,7 +31,7 @@ import Loader from "../../components/Loader";
 const Home: React.FC = () => {
   const [complexities, setComplexities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [languages, _setLanguages] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>([]);
   const [timeout, setTimeout] = useState<number | undefined>(30);
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -181,7 +181,7 @@ const Home: React.FC = () => {
             </FormControl>
           </Grid2>
 
-          {/* <Grid2 size={2}>
+          <Grid2 size={2}>
             <Typography
               align="left"
               sx={{ fontWeight: "bold", paddingRight: 2 }}
@@ -219,7 +219,7 @@ const Home: React.FC = () => {
                 }
               />
             </FormControl>
-          </Grid2> */}
+          </Grid2>
 
           <Grid2 size={2}>
             <Typography
@@ -270,8 +270,8 @@ const Home: React.FC = () => {
             timeout < minMatchTimeout ||
             timeout > maxMatchTimeout ||
             complexities.length == 0 ||
-            categories.length == 0
-            // || languages.length == 0
+            categories.length == 0 ||
+            languages.length == 0
           }
           onClick={() =>
             findMatch(complexities, categories, languages, timeout!)

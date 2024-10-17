@@ -44,9 +44,9 @@ const isMatch = (req1: MatchRequestItem, req2: MatchRequestItem): boolean => {
   const hasCommonCategory = req1.categories.some((elem) =>
     req2.categories.includes(elem)
   );
-  // const hasCommonLanguage = req1.languages.some((elem) =>
-  //   req2.languages.includes(elem)
-  // );
+  const hasCommonLanguage = req1.languages.some((elem) =>
+    req2.languages.includes(elem)
+  );
 
-  return hasCommonComplexity && hasCommonCategory;
+  return hasCommonComplexity && hasCommonCategory && hasCommonLanguage;
 };
