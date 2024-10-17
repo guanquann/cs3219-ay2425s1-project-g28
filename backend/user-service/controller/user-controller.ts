@@ -11,6 +11,7 @@ import {
   findUserByUsernameOrEmail as _findUserByUsernameOrEmail,
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
+  updateUserVerification as _updateUserVerification,
 } from "../model/repository";
 import {
   validateEmail,
@@ -22,6 +23,10 @@ import {
 import { IUser } from "../model/user-model";
 import { upload } from "../config/multer";
 import { uploadFileToFirebase } from "../utils/utils";
+import redisClient from "../config/redis";
+import crypto from "crypto";
+import { sendMail } from "../utils/mailer";
+import { ACCOUNT_VERIFICATION_SUBJ } from "../utils/constants";
 
 export async function createUser(
   req: Request,
@@ -77,6 +82,14 @@ export async function createUser(
         email,
         hashedPassword
       );
+
+      const emailToken = crypto.randomBytes(16).toString("hex");
+      await redisClient.set(email, emailToken, { EX: 60 * 5 }); // expire in 5 minutes
+      const emailText = `Hello ${username},\n\n
+      Please click on the following link to verify your account:\n\nhttp://localhost:3001/api/users/verify-email/${email}/${emailToken}\n\n
+      If you did not request this, please ignore this email.`;
+      await sendMail(email, ACCOUNT_VERIFICATION_SUBJ, emailText);
+
       return res.status(201).json({
         message: `Created new user ${username} successfully`,
         data: formatUserResponse(createdUser),
@@ -93,6 +106,41 @@ export async function createUser(
       .json({ message: "Unknown error when creating new user!" });
   }
 }
+
+export const verifyUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email, token } = req.params;
+
+    const user = await _findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: `User ${email} not found` });
+    }
+
+    const expectedToken = await redisClient.get(email);
+
+    if (expectedToken !== token) {
+      return res
+        .status(400)
+        .json({ message: "Invalid token. Please request for a new one." });
+    }
+
+    const updatedUser = await _updateUserVerification(email);
+    if (!updatedUser) {
+      return res.status(404).json({ message: `User ${email} not verified.` });
+    }
+
+    return res
+      .status(200)
+      .json({ message: `User ${email} verified successfully.` });
+  } catch {
+    return res
+      .status(500)
+      .json({ message: "Unknown error when verifying user!" });
+  }
+};
 
 export const createImageLink = async (
   req: Request,
