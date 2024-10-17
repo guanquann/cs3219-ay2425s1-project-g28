@@ -265,14 +265,14 @@ const Home: React.FC = () => {
           color="primary"
           fullWidth
           sx={{ marginTop: 2 }}
-          // disabled={
-          //   !timeout ||
-          //   timeout < minMatchTimeout ||
-          //   timeout > maxMatchTimeout ||
-          //   complexities.length == 0 ||
-          //   categories.length == 0 ||
-          //   languages.length == 0
-          // }
+          disabled={
+            !timeout ||
+            timeout < minMatchTimeout ||
+            timeout > maxMatchTimeout ||
+            complexities.length == 0 ||
+            categories.length == 0 ||
+            languages.length == 0
+          }
           onClick={() =>
             findMatch(complexities, categories, languages, timeout!)
           }

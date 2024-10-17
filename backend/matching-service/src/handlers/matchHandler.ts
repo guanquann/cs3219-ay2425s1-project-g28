@@ -23,6 +23,7 @@ export interface MatchRequest {
 }
 
 export interface MatchRequestItem {
+  id: string;
   user: MatchUser;
   complexities: string[];
   categories: string[];
@@ -34,10 +35,13 @@ export interface MatchRequestItem {
 const matches = new Map<string, Match>();
 
 export const sendMatchRequest = async (
-  matchRequest: MatchRequest
+  matchRequest: MatchRequest,
+  requestId: string
 ): Promise<boolean> => {
   const { user, complexities, categories, languages, timeout } = matchRequest;
+
   const matchItem: MatchRequestItem = {
+    id: requestId,
     user: user,
     complexities: complexities,
     categories: categories,

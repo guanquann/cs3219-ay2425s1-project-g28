@@ -9,6 +9,7 @@ import {
   getMatchByUid,
 } from "./matchHandler";
 import { io } from "../../server";
+import { v4 as uuidv4 } from "uuid";
 
 enum MatchEvents {
   // Receive
@@ -38,6 +39,7 @@ interface UserConnection {
   socket: Socket;
   connectionTimeout?: NodeJS.Timeout;
   isDisconnecting: boolean;
+  requestId?: string;
 }
 
 const connectionDelay = 3000; // time window to allow for page navigation / refresh
@@ -47,7 +49,6 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
   socket.removeAllListeners();
 
   socket.on(MatchEvents.USER_CONNECTED, (uid: string) => {
-    console.log(`uid: ${uid} and socket id: ${socket.id}`);
     clearTimeout(userConnections.get(uid)?.connectionTimeout);
     if (userConnections.has(uid)) {
       const matchId = getMatchIdByUid(uid);
@@ -55,7 +56,11 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
         socket.join(matchId);
       }
     }
-    userConnections.set(uid, { socket: socket, isDisconnecting: false });
+    userConnections.set(uid, {
+      socket: socket,
+      isDisconnecting: false,
+      requestId: userConnections.get(uid)?.requestId,
+    });
   });
 
   socket.on(MatchEvents.USER_DISCONNECTED, (uid: string) => {
@@ -74,6 +79,7 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
       socket: socket,
       connectionTimeout: connectionTimeout,
       isDisconnecting: true,
+      requestId: userConnections.get(uid)?.requestId,
     });
   });
 
@@ -90,9 +96,15 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
         return;
       }
 
-      userConnections.set(uid, { socket: socket, isDisconnecting: false });
+      const requestId = uuidv4();
+      userConnections.set(uid, {
+        socket: socket,
+        connectionTimeout: userConnections.get(uid)?.connectionTimeout,
+        isDisconnecting: false,
+        requestId: requestId,
+      });
 
-      const sent = await sendMatchRequest(matchRequest);
+      const sent = await sendMatchRequest(matchRequest, requestId);
       if (!sent) {
         socket.emit(MatchEvents.MATCH_REQUEST_ERROR);
         userConnections.delete(uid);
@@ -136,7 +148,15 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
         socket.to(matchId).emit(MatchEvents.MATCH_UNSUCCESSFUL);
       }
 
-      const sent = await sendMatchRequest(rematchRequest);
+      const uid = rematchRequest.user.id;
+      const requestId = uuidv4();
+      userConnections.set(uid, {
+        socket: socket,
+        isDisconnecting: false,
+        requestId: requestId,
+      });
+
+      const sent = await sendMatchRequest(rematchRequest, requestId);
       if (!sent) {
         socket.emit(MatchEvents.MATCH_REQUEST_ERROR);
       }
@@ -173,6 +193,10 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
       }
     }
   });
+};
+
+export const isActiveRequest = (uid: string, requestId: string): boolean => {
+  return userConnections.get(uid)?.requestId === requestId;
 };
 
 export const sendMatchFound = (

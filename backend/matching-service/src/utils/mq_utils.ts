@@ -1,5 +1,5 @@
 import { createMatch, MatchRequestItem } from "../handlers/matchHandler";
-import { isUserConnected } from "../handlers/websocketHandler";
+import { isActiveRequest, isUserConnected } from "../handlers/websocketHandler";
 
 const matchingRequests = new Map<string, MatchRequestItem>();
 
@@ -10,12 +10,17 @@ export const matchUsers = (newRequest: string) => {
     if (
       isExpired(pendingRequest) ||
       !isUserConnected(uid) ||
+      !isActiveRequest(uid, pendingRequest.id) ||
       uid === newRequestUid
     ) {
       matchingRequests.delete(uid);
       continue;
     }
-    if (isExpired(newRequestJson) || !isUserConnected(uid)) {
+    if (
+      isExpired(newRequestJson) ||
+      !isUserConnected(newRequestUid) ||
+      !isActiveRequest(newRequestUid, newRequestJson.id)
+    ) {
       return;
     }
 
@@ -33,16 +38,15 @@ const isExpired = (data: MatchRequestItem): boolean => {
 };
 
 const isMatch = (req1: MatchRequestItem, req2: MatchRequestItem): boolean => {
-  const hasCommonCategory = req1.categories.some((elem) =>
-    req1.categories.includes(elem)
-  );
   const hasCommonComplexity = req1.complexities.some((elem) =>
     req2.complexities.includes(elem)
+  );
+  const hasCommonCategory = req1.categories.some((elem) =>
+    req2.categories.includes(elem)
   );
   const hasCommonLanguage = req1.languages.some((elem) =>
     req2.languages.includes(elem)
   );
 
-  // return hasCommonCategory && hasCommonComplexity && hasCommonLanguage;
-  return true;
+  return hasCommonComplexity && hasCommonCategory && hasCommonLanguage;
 };
