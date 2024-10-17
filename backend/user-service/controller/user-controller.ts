@@ -25,7 +25,7 @@ import { upload } from "../config/multer";
 import { uploadFileToFirebase } from "../utils/utils";
 import redisClient from "../config/redis";
 import crypto from "crypto";
-import { sendMail } from "../utils/mailer";
+import { sendAccVerificationMail } from "../utils/mailer";
 import { ACCOUNT_VERIFICATION_SUBJ } from "../utils/constants";
 
 export async function createUser(
@@ -85,10 +85,12 @@ export async function createUser(
 
       const emailToken = crypto.randomBytes(16).toString("hex");
       await redisClient.set(email, emailToken, { EX: 60 * 5 }); // expire in 5 minutes
-      const emailText = `Hello ${username},\n\n
-      Please click on the following link to verify your account:\n\nhttp://localhost:3001/api/users/verify-email/${email}/${emailToken}\n\n
-      If you did not request this, please ignore this email.`;
-      await sendMail(email, ACCOUNT_VERIFICATION_SUBJ, emailText);
+      await sendAccVerificationMail(
+        email,
+        ACCOUNT_VERIFICATION_SUBJ,
+        username,
+        `http://localhost:3001/api/users/verify-email/${email}/${emailToken}`
+      );
 
       return res.status(201).json({
         message: `Created new user ${username} successfully`,

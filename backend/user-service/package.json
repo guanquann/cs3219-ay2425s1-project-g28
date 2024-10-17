@@ -8,8 +8,8 @@
     "start": "tsx server.ts",
     "dev": "tsx watch server.ts",
     "lint": "eslint .",
-    "test": "cross-env NODE_ENV=test && jest",
-    "test:watch": "cross-env NODE_ENV=test && jest --watch"
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
+    "test:watch": "cross-env NODE_ENV=test jest --watch --detectOpenHandles"
   },
   "keywords": [],
   "author": "",
@@ -36,6 +36,7 @@
     "nodemon": "^3.1.4",
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
+    "ts-jest-mock-import-meta": "^1.2.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.1",
     "typescript": "^5.6.2",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^9.0.1",
+    "@types/nodemailer-express-handlebars": "^4.0.5",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -52,6 +54,7 @@
     "mongoose": "^8.5.4",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.15",
+    "nodemailer-express-handlebars": "^7.0.0",
     "redis": "^4.7.0",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",

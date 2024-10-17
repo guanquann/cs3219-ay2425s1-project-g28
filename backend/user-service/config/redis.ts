@@ -9,6 +9,6 @@ const client = createClient({ url: REDIS_URI });
 
 client.on("error", (err) => console.log(`Error: ${err}`));
 
-await client.connect();
+(async () => await client.connect())();
 
 export default client;
