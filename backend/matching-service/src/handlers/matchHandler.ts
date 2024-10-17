@@ -30,13 +30,15 @@ export interface MatchRequestItem {
   languages: string[];
   sentTimestamp: number;
   ttlInSecs: number;
+  rejectedPartnerId?: string;
 }
 
 const matches = new Map<string, Match>();
 
 export const sendMatchRequest = async (
   matchRequest: MatchRequest,
-  requestId: string
+  requestId: string,
+  rejectedPartnerId?: string
 ): Promise<boolean> => {
   const { user, complexities, categories, languages, timeout } = matchRequest;
 
@@ -48,6 +50,7 @@ export const sendMatchRequest = async (
     languages: languages,
     sentTimestamp: Date.now(),
     ttlInSecs: timeout,
+    rejectedPartnerId: rejectedPartnerId,
   };
 
   const sent = await sendRabbitMq(matchItem);

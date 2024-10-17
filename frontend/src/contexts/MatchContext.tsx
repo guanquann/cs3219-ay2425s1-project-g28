@@ -373,6 +373,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     matchSocket.emit(
       MatchEvents.REMATCH_REQUEST,
       matchId,
+      partner?.id,
       rematchRequest,
       (requested: boolean) => {
         clearTimeout(requestTimeout);

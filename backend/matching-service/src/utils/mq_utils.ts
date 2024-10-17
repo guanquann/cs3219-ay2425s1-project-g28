@@ -24,6 +24,13 @@ export const matchUsers = (newRequest: string) => {
       return;
     }
 
+    if (
+      uid === newRequestJson.rejectedPartnerId ||
+      newRequestUid === pendingRequest.rejectedPartnerId
+    ) {
+      continue;
+    }
+
     if (isMatch(newRequestJson, pendingRequest)) {
       matchingRequests.delete(uid);
       createMatch(pendingRequest, newRequestJson);

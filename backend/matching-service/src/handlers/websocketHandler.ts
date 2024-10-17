@@ -140,6 +140,7 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
     MatchEvents.REMATCH_REQUEST,
     async (
       matchId: string,
+      partnerId: string,
       rematchRequest: MatchRequest,
       callback: (result: boolean) => void
     ) => {
@@ -156,7 +157,7 @@ export const handleWebsocketMatchEvents = (socket: Socket) => {
         requestId: requestId,
       });
 
-      const sent = await sendMatchRequest(rematchRequest, requestId);
+      const sent = await sendMatchRequest(rematchRequest, requestId, partnerId);
       if (!sent) {
         socket.emit(MatchEvents.MATCH_REQUEST_ERROR);
       }
