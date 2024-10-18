@@ -8,8 +8,6 @@ import {
   passwordValidator,
   usernameValidator,
 } from "../../utils/validators";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import PasswordTextField from "../../components/PasswordTextField";
 import {
@@ -174,7 +172,7 @@ const SignUp: React.FC = () => {
                   textDecoration: "underline",
                 },
               }}
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
             >
               Log in
             </Typography>
@@ -191,7 +189,6 @@ const SignUp: React.FC = () => {
       >
         <SignUpSvg width="80%" height="80%" />
       </Box>
-      <ToastContainer position="bottom-right" />
     </Box>
   );
 };
