@@ -120,7 +120,7 @@ const LogIn: React.FC = () => {
                   textDecoration: "underline",
                 },
               }}
-              onClick={() => navigate("/forget-password")}
+              onClick={() => navigate("/auth/forget-password")}
             >
               Forget password
             </StyledTypography>
