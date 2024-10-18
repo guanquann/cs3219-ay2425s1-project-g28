@@ -6,18 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
 import { SUCCESS_LOG_OUT } from "../utils/constants";
-
-type User = {
-  id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  biography?: string;
-  profilePictureUrl?: string;
-  createdAt: string;
-  isAdmin: boolean;
-};
+import { User } from "../types/types";
 
 type AuthContextType = {
   signup: (
