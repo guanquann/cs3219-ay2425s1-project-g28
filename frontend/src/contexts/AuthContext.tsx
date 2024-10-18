@@ -5,7 +5,7 @@ import { userClient } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
-import { SUCCESS_LOG_OUT, SUCCESSFUL_SIGNUP } from "../utils/constants";
+import { SUCCESS_LOG_OUT } from "../utils/constants";
 
 type User = {
   id: string;
