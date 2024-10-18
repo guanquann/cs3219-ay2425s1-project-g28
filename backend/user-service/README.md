@@ -34,6 +34,14 @@
 
 4. A default admin account (`email: admin@gmail.com` and `password: Admin@123`) wil be created. If you wish to change the default credentials, update them in `.env`. Alternatively, you can also edit your credentials and user profile after you have created the default account.
 
+5. To view the contents stored in Redis,
+
+   1. Go to [http://localhost:5540](http://localhost:5540).
+
+   2. Click on "Add Redis Database".
+
+   3. Enter `host.internal.docker` as the Host.
+
 ## Running User Service without Docker
 
 1. Open Command Line/Terminal and navigate into the `user-service` directory.
