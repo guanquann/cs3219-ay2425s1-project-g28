@@ -83,17 +83,8 @@ export async function createUser(
         hashedPassword
       );
 
-      const emailToken = crypto.randomBytes(16).toString("hex");
-      await redisClient.set(email, emailToken, { EX: 60 * 5 }); // expire in 5 minutes
-      await sendAccVerificationMail(
-        email,
-        ACCOUNT_VERIFICATION_SUBJ,
-        username,
-        `http://localhost:3001/api/users/verify-email/${email}/${emailToken}`
-      );
-
       return res.status(201).json({
-        message: `Created new user ${username} successfully`,
+        message: `Created new user ${username} successfully.`,
         data: formatUserResponse(createdUser),
       });
     } else {
@@ -108,6 +99,38 @@ export async function createUser(
       .json({ message: "Unknown error when creating new user!" });
   }
 }
+
+export const sendVerificationMail = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email } = req.body;
+    const user = await _findUserByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ message: `User ${email} not found` });
+    }
+
+    const emailToken = crypto.randomBytes(16).toString("hex");
+    await redisClient.set(email, emailToken, { EX: 60 * 5 }); // expire in 5 minutes
+    await sendAccVerificationMail(
+      email,
+      ACCOUNT_VERIFICATION_SUBJ,
+      user.username,
+      `http://localhost:3001/api/users/verify-email/${email}/${emailToken}`
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Verification email sent. Please check your inbox." });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unknown error when sending verification email!",
+      error,
+    });
+  }
+};
 
 export const verifyUser = async (
   req: Request,
@@ -137,10 +160,10 @@ export const verifyUser = async (
     return res
       .status(200)
       .json({ message: `User ${email} verified successfully.` });
-  } catch {
+  } catch (error) {
     return res
       .status(500)
-      .json({ message: "Unknown error when verifying user!" });
+      .json({ message: "Unknown error when verifying user!", error });
   }
 };
 

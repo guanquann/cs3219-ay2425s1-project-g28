@@ -17,6 +17,12 @@ export async function handleLogin(
         return res.status(401).json({ message: "Wrong email and/or password" });
       }
 
+      if (!user.isVerified) {
+        return res.status(401).json({
+          message: "User not verified. Please check your email for the link",
+        });
+      }
+
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
         return res.status(401).json({ message: "Wrong email and/or password" });

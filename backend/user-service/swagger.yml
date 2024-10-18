@@ -71,6 +71,11 @@ components:
         password:
           type: string
           required: true
+    EmailVerification:
+      properties:
+        email:
+          type: string
+          required: true
     UserResponse:
       properties:
         message:
@@ -333,18 +338,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerErrorResponse"
-  /api/users/verify-email:
+  /api/users/send-verification-email:
+    post:
+      summary: Send verification email
+      tags:
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailVerification"
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  /api/users/verify-email/{email}/{token}:
     get:
       summary: Verify email address
       tags:
         - users
       parameters:
-        - in: query
+        - in: path
           name: email
           required: true
           schema:
             type: string
-        - in: query
+        - in: path
           name: token
           required: true
           schema:

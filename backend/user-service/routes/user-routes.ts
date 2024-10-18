@@ -6,6 +6,7 @@ import {
   deleteUser,
   getAllUsers,
   getUser,
+  sendVerificationMail,
   updateUser,
   updateUserPrivilege,
   verifyUser,
@@ -30,6 +31,8 @@ router.patch(
 router.post("/", createUser);
 
 router.post("/images", createImageLink);
+
+router.post("/send-verification-email", sendVerificationMail);
 
 router.get("/:id", getUser);
 
