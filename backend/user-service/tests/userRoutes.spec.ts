@@ -11,6 +11,8 @@ const USER_BASE_URL = "/api/users";
 
 faker.seed(0);
 
+const mockSendMail = jest.fn();
+
 jest.mock("../middleware/basic-access-control", () => ({
   verifyAccessToken: jest.fn((req, res, next) => {
     req.user = {
@@ -46,6 +48,12 @@ jest.mock("../middleware/basic-access-control", () => ({
         .json({ message: "Not authorized to access this resource" });
     }
   }),
+}));
+
+jest.mock("nodemailer", () => ({
+  createTransport: jest.fn(() => ({
+    sendMail: () => mockSendMail(),
+  })),
 }));
 
 const username = faker.internet.userName();
@@ -117,15 +125,13 @@ describe("User routes", () => {
   });
 
   it("Create a user with invalid username characters", async () => {
-    const res = await request
-      .post(USER_BASE_URL)
-      .send({
-        username: "!!!!!!!!!!!!!",
-        firstName,
-        lastName,
-        email,
-        password,
-      });
+    const res = await request.post(USER_BASE_URL).send({
+      username: "!!!!!!!!!!!!!",
+      firstName,
+      lastName,
+      email,
+      password,
+    });
 
     expect(res.status).toBe(400);
   });

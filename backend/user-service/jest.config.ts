@@ -3,10 +3,10 @@
  * https://jestjs.io/docs/configuration
  */
 
-// import type { Config } from "jest";
-import type { JestConfigWithTsJest } from "ts-jest";
+import type { Config } from "jest";
+// import type { JestConfigWithTsJest } from "ts-jest";
 
-const config: JestConfigWithTsJest = {
+const config: Config = {
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -53,7 +53,7 @@ const config: JestConfigWithTsJest = {
   // Make calling deprecated APIs throw helpful error messages
   // errorOnDeprecated: false,
 
-  extensionsToTreatAsEsm: [".ts"],
+  // extensionsToTreatAsEsm: [".ts"],
 
   // The default configuration for fake timers
   // fakeTimers: {
@@ -93,9 +93,9 @@ const config: JestConfigWithTsJest = {
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1",
-  },
+  // moduleNameMapper: {
+  //   "^(\\.{1,2}/.*)\\.js$": "$1",
+  // },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
@@ -151,7 +151,7 @@ const config: JestConfigWithTsJest = {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  // testEnvironment: "jest-environment-node",
+  // testEnvironment: "node",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -180,28 +180,38 @@ const config: JestConfigWithTsJest = {
   // testRunner: "jest-circus/runner",
 
   // A map from regular expressions to paths to transformers
-  transform: {
-    "^.+\\.tsx?$": [
-      "ts-jest",
-      {
-        diagnostics: {
-          ignoreCodes: [1343],
-        },
-        astTransformers: {
-          before: [
-            {
-              path: "node_modules/ts-jest-mock-import-meta", // or, alternatively, 'ts-jest-mock-import-meta' directly, without node_modules.
-            },
-          ],
-        },
-      },
-    ],
-  },
+  // transform: {
+  //   "^.+\\.tsx?$": [
+  //     "ts-jest",
+  //     {
+  //       diagnostics: {
+  //         ignoreCodes: [1343],
+  //       },
+  //       astTransformers: {
+  //         before: [
+  //           {
+  //             path: "node_modules/ts-jest-mock-import-meta", // or, alternatively, 'ts-jest-mock-import-meta' directly, without node_modules.
+  //           },
+  //         ],
+  //       },
+  //     },
+  //   ],
+  // },
+  // transform: {
+  //   "^.+\\.tsx?$": [
+  //     "ts-jest",
+  //     {
+  //       useESM: true,
+  //       astTransformers: { before: [{ path: "ts-jest-mock-import-meta" }] },
+  //       diagnostics: { ignoreCodes: [1343] },
+  //     },
+  //   ],
+  //   "node_modules/nodemailer-express-handlebars/.+\\.(j|t)sx?$": "ts-jest",
+  // },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
-  //   "/node_modules/",
-  //   "\\.pnp\\.[^\\/]+$"
+  //   "node_modules/?!(nodemailer-express-handlebars/.*)",
   // ],
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
