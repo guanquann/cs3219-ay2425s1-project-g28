@@ -9,9 +9,7 @@ export const ACCOUNT_VERIFICATION_TEMPLATE = `
   <body>
     <p>Hello {{username}}!</p>
     <p>
-      Thank you for signing up with us. Please verify your email address via
-      this
-      <span><a href={{verificationLink}}>link</a></span>.
+      Thank you for signing up with us. Please verify your email address using this token: <strong>{{token}}</strong>.
     </p>
     <p>If you did not sign up with us, please ignore this email.</p>
     <p>Regards,</p>

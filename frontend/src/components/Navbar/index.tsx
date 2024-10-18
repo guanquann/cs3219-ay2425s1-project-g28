@@ -124,11 +124,14 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 <>
                   <Button
                     variant="contained"
-                    onClick={() => navigate("/signup")}
+                    onClick={() => navigate("/auth/signup")}
                   >
                     Sign up
                   </Button>
-                  <Button variant="outlined" onClick={() => navigate("/login")}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => navigate("/auth/login")}
+                  >
                     Log in
                   </Button>
                 </>

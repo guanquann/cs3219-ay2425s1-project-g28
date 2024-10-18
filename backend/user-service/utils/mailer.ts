@@ -42,10 +42,10 @@ export const sendAccVerificationMail = async (
   to: string,
   subject: string,
   username: string,
-  verificationLink: string
+  token: string
 ) => {
   const template = Handlebars.compile(ACCOUNT_VERIFICATION_TEMPLATE);
-  const replacement = { username, verificationLink };
+  const replacement = { username, token };
   const html = template(replacement);
   const options = {
     from: USER,

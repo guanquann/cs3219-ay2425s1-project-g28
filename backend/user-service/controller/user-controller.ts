@@ -118,12 +118,13 @@ export const sendVerificationMail = async (
       email,
       ACCOUNT_VERIFICATION_SUBJ,
       user.username,
-      `http://localhost:3001/api/users/verify-email/${email}/${emailToken}`
+      emailToken
     );
 
-    return res
-      .status(200)
-      .json({ message: "Verification email sent. Please check your inbox." });
+    return res.status(200).json({
+      message: "Verification email sent. Please check your inbox.",
+      data: { email, id: user.id },
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Unknown error when sending verification email!",

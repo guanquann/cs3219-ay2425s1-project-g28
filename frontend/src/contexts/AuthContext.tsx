@@ -66,8 +66,9 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       })
       .then(() => userClient.post("users/send-verification-email", { email }))
       .then((res) => {
-        navigate("/login");
-        toast.success(res.data.message);
+        navigate(`/auth/verifyEmail/${res.data.data.id}`);
+        // navigate("/login");
+        // toast.success(res.data.message);
       })
       .catch((err) => {
         setUser(null);

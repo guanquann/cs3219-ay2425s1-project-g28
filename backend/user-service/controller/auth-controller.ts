@@ -19,7 +19,7 @@ export async function handleLogin(
 
       if (!user.isVerified) {
         return res.status(401).json({
-          message: "User not verified. Please check your email for the link",
+          message: "User not verified.",
         });
       }
 
