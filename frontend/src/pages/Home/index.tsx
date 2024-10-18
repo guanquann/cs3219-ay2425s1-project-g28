@@ -7,6 +7,8 @@ import {
   Grid2,
   TextField,
   Typography,
+  CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
 import { useEffect, useReducer, useState } from "react";
 
@@ -17,22 +19,27 @@ import {
   languageList,
   maxMatchTimeout,
   minMatchTimeout,
+  QUESTION_DOES_NOT_EXIST_ERROR,
   USE_MATCH_ERROR_MESSAGE,
 } from "../../utils/constants";
 import reducer, {
   getQuestionCategories,
+  getQuestionList,
   initialState as initialState,
 } from "../../reducers/questionReducer";
 import CustomChip from "../../components/CustomChip";
 import homepageImage from "/homepage_image.svg";
 import { useMatch } from "../../contexts/MatchContext";
 import Loader from "../../components/Loader";
+import { toast } from "react-toastify";
 
 const Home: React.FC = () => {
   const [complexities, setComplexities] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [languages, setLanguages] = useState<string[]>([]);
   const [timeout, setTimeout] = useState<number | undefined>(30);
+
+  const [isQueryingQnDB, setIsQueryingQnDB] = useState<boolean>(false);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -42,9 +49,22 @@ const Home: React.FC = () => {
   }
   const { findMatch, loading } = match;
 
+  const isSmallerThan1100px = useMediaQuery('(max-width:1100px)');
+
   useEffect(() => {
     getQuestionCategories(dispatch);
   }, []);
+
+  useEffect(() => {
+    if (isQueryingQnDB) {
+      if (state.questions.length > 0) {
+        findMatch(complexities, categories, languages, timeout!);
+      } else {
+        toast.error(QUESTION_DOES_NOT_EXIST_ERROR);
+      }
+    }
+    setIsQueryingQnDB(false);
+  }, [state.questions]);
 
   if (loading) {
     return <Loader />;
@@ -79,19 +99,21 @@ const Home: React.FC = () => {
         Specify your question preferences and sit back as we find you the best
         match.
       </Typography>
-      <Box
-        component="img"
-        src={homepageImage}
-        alt="Interview Practice Buddy"
-        sx={{
-          position: "absolute",
-          top: "35%",
-          left: "10%",
-          width: "128px",
-          height: "auto",
-          objectFit: "contain",
-        }}
-      />
+      {isSmallerThan1100px && (
+        <Box
+          component="img"
+          src={homepageImage}
+          alt="Interview Practice Buddy"
+          sx={{
+            position: "absolute",
+            top: "35%",
+            left: "10%",
+            width: "128px",
+            height: "auto",
+            objectFit: "contain",
+          }}
+        />
+      )}
       <Card
         sx={{
           padding: 4,
@@ -273,11 +295,12 @@ const Home: React.FC = () => {
             categories.length == 0 ||
             languages.length == 0
           }
-          onClick={() =>
-            findMatch(complexities, categories, languages, timeout!)
-          }
+          onClick={() => {
+            setIsQueryingQnDB(true);
+            getQuestionList(1, 10, "", complexities, categories, dispatch);
+          }}
         >
-          Find my match!
+          {isQueryingQnDB ? <CircularProgress /> : "Find my match!"}
         </Button>
       </Card>
     </AppMargin>
