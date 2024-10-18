@@ -29,6 +29,7 @@ type AuthContextType = {
   ) => void;
   login: (email: string, password: string) => void;
   logout: () => void;
+  resetPassword: (email: string) => void;
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
@@ -107,12 +108,20 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     toast.success(SUCCESS_LOG_OUT);
   };
 
+  const resetPassword = (email: string) => {
+    userClient.post("/users/reset-password", { email }).then(() => {
+      toast.success("Reset link sent to your email");
+    });
+  };
+
   if (loading) {
     return <Loader />;
   }
 
   return (
-    <AuthContext.Provider value={{ signup, login, logout, user, setUser, loading }}>
+    <AuthContext.Provider
+      value={{ signup, login, logout, user, setUser, resetPassword, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

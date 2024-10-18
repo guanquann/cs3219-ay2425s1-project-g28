@@ -1,42 +1,24 @@
-import {
-  Box,
-  Button,
-  Stack,
-  styled,
-  TextField,
-  Typography,
-  TypographyProps,
-} from "@mui/material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import LogInSvg from "../../assets/login.svg?react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { emailValidator } from "../../utils/validators";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
-import PasswordTextField from "../../components/PasswordTextField";
-import {
-  PASSWORD_REQUIRED_ERROR_MESSAGE,
-  USE_AUTH_ERROR_MESSAGE,
-} from "../../utils/constants";
+import { USE_AUTH_ERROR_MESSAGE } from "../../utils/constants";
 
-const StyledTypography = styled((props: TypographyProps) => {
-  return <Typography {...props} component={"span"} />;
-})({ fontSize: 14 });
-
-const LogIn: React.FC = () => {
-  const navigate = useNavigate();
+const ForgetPassword: React.FC = () => {
   const auth = useAuth();
   if (!auth) {
     throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
-  const { login } = auth;
+  const { resetPassword } = auth;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<{ email: string; password: string }>({ mode: "all" });
+  } = useForm<{ email: string }>({ mode: "all" });
 
   return (
     <Box
@@ -62,7 +44,7 @@ const LogIn: React.FC = () => {
             variant="h1"
             sx={{ color: "primary.main", textAlign: "center" }}
           >
-            PeerPrep
+            Reset Password
           </Typography>
           <Stack
             component="form"
@@ -72,9 +54,13 @@ const LogIn: React.FC = () => {
               marginTop: theme.spacing(2),
               marginBottom: theme.spacing(2),
             })}
-            onSubmit={handleSubmit((data) => login(data.email, data.password))}
+            onSubmit={handleSubmit((data) => resetPassword(data.email))}
             noValidate
           >
+            <Typography>
+              Enter your email address and we will send you a password reset
+              link.
+            </Typography>
             <TextField
               label="Email"
               required
@@ -88,60 +74,13 @@ const LogIn: React.FC = () => {
               error={!!errors.email}
               helperText={errors.email?.message}
             />
-            <PasswordTextField
-              label="Password"
-              required
-              fullWidth
-              margin="normal"
-              {...register("password", {
-                setValueAs: (value: string) => value.trim(),
-                required: PASSWORD_REQUIRED_ERROR_MESSAGE,
-              })}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-            />
             <Button
               type="submit"
               variant="contained"
               sx={(theme) => ({ margin: theme.spacing(2, 0) })}
             >
-              Log in
+              Send Reset Link
             </Button>
-          </Stack>
-          <Stack
-            direction="row"
-            spacing={0.5}
-            sx={{ justifyContent: "space-between" }}
-          >
-            <StyledTypography
-              role="button"
-              tabIndex={0}
-              sx={{
-                cursor: "pointer",
-                "&:hover": {
-                  textDecoration: "underline",
-                },
-              }}
-              onClick={() => navigate("/forget-password")}
-            >
-              Forget password
-            </StyledTypography>
-            <Box>
-              <StyledTypography>Don't have an account? &nbsp;</StyledTypography>
-              <StyledTypography
-                role="button"
-                tabIndex={0}
-                sx={{
-                  cursor: "pointer",
-                  "&:hover": {
-                    textDecoration: "underline",
-                  },
-                }}
-                onClick={() => navigate("/signup")}
-              >
-                Sign up
-              </StyledTypography>
-            </Box>
           </Stack>
         </Stack>
       </Box>
@@ -160,4 +99,4 @@ const LogIn: React.FC = () => {
   );
 };
 
-export default LogIn;
+export default ForgetPassword;
