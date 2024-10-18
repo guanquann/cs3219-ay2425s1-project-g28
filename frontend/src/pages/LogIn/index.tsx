@@ -134,7 +134,7 @@ const LogIn: React.FC = () => {
                     textDecoration: "underline",
                   },
                 }}
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/auth/signup")}
               >
                 Sign up
               </StyledTypography>
