@@ -17,8 +17,12 @@ import AppMargin from "../AppMargin";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
-import { USE_AUTH_ERROR_MESSAGE } from "../../utils/constants";
+import {
+  USE_AUTH_ERROR_MESSAGE,
+  USE_MATCH_ERROR_MESSAGE,
+} from "../../utils/constants";
 import { isMatchingPage } from "../../utils/url";
+import { useMatch } from "../../contexts/MatchContext";
 
 type NavbarItem = { label: string; link: string; needsLogin: boolean };
 
@@ -44,6 +48,12 @@ const Navbar: React.FC<NavbarProps> = (props) => {
   }
 
   const { logout, user } = auth;
+
+  const match = useMatch();
+  if (!match) {
+    throw new Error(USE_MATCH_ERROR_MESSAGE);
+  }
+  const { stopMatch } = match;
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) =>
     setAnchorEl(event.currentTarget);
@@ -114,11 +124,14 @@ const Navbar: React.FC<NavbarProps> = (props) => {
                 <>
                   <Button
                     variant="contained"
-                    onClick={() => navigate("/signup")}
+                    onClick={() => navigate("/auth/signup")}
                   >
                     Sign up
                   </Button>
-                  <Button variant="outlined" onClick={() => navigate("/login")}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => navigate("/auth/login")}
+                  >
                     Log in
                   </Button>
                 </>
@@ -128,7 +141,7 @@ const Navbar: React.FC<NavbarProps> = (props) => {
             <Button
               variant="outlined"
               color="error"
-              onClick={() => navigate("/home")}
+              onClick={() => stopMatch()}
             >
               Stop matching
             </Button>

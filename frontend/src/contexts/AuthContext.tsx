@@ -6,18 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Loader from "../components/Loader";
 import { SUCCESS_LOG_OUT } from "../utils/constants";
-
-type User = {
-  id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  biography?: string;
-  profilePictureUrl?: string;
-  createdAt: string;
-  isAdmin: boolean;
-};
+import { User } from "../types/types";
 
 type AuthContextType = {
   signup: (
@@ -76,7 +65,12 @@ const AuthProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         email: email,
         password: password,
       })
-      .then(() => login(email, password))
+      .then(() => userClient.post("users/send-verification-email", { email }))
+      .then((res) => {
+        navigate(`/auth/verifyEmail/${res.data.data.id}`);
+        // navigate("/login");
+        // toast.success(res.data.message);
+      })
       .catch((err) => {
         setUser(null);
         toast.error(err.response?.data.message || err.message);

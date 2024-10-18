@@ -71,6 +71,11 @@ components:
         password:
           type: string
           required: true
+    EmailVerification:
+      properties:
+        email:
+          type: string
+          required: true
     UserResponse:
       properties:
         message:
@@ -295,7 +300,7 @@ paths:
   /api/users/images:
     post:
       summary: Publish image to firebase storage
-      tags: 
+      tags:
         - users
       requestBody:
         content:
@@ -321,6 +326,78 @@ paths:
                   imageUrl:
                     type: string
                     description: image url
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  /api/users/send-verification-email:
+    post:
+      summary: Send verification email
+      tags:
+        - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmailVerification"
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerErrorResponse"
+  /api/users/verify-email/{email}/{token}:
+    get:
+      summary: Verify email address
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Message
         400:
           description: Bad Request
           content:

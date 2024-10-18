@@ -1,6 +1,6 @@
 # User Service Guide
 
-> If you have not set-up either a local or cloud MongoDB, as well as Firebase, visit [this](../README.md) before proceeding.
+> Please ensure that you have completed the backend set-up [here](../README.md) before proceeding.
 
 ## Setting-up User Service
 
@@ -8,19 +8,39 @@
 
 2. To connect to your cloud MongoDB instead of your local MongoDB, set the `NODE_ENV` to `production` instead of `development`.
 
-3. Update `MONGO_CLOUD_URI`, `MONGO_LOCAL_URI`, `FIREBASE_PROJECT_ID`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_STORAGE_BUCKET`, `JWT_SECRET`.
+3. Update the following variables in the `.env` file:
+
+   - `MONGO_CLOUD_URI`
+
+   - `MONGO_LOCAL_URI`
+
+   - `FIREBASE_PROJECT_ID`
+
+   - `FIREBASE_PRIVATE_KEY`
+
+   - `FIREBASE_CLIENT_EMAIL`
+
+   - `FIREBASE_STORAGE_BUCKET`
+
+   - `JWT_SECRET`
+
+   - `SERVICE`: Email service to use to send account verification links, e.g. `gmail`.
+
+   - `USER`: Email address that you will be using, e.g. `johndoe@gmail.com`.
+
+   - `PASS`: The app password. For gmail accounts, please refer to this [link](https://support.google.com/accounts/answer/185833?hl=en).
+
+   - `REDIS_URI`
 
 4. A default admin account (`email: admin@gmail.com` and `password: Admin@123`) wil be created. If you wish to change the default credentials, update them in `.env`. Alternatively, you can also edit your credentials and user profile after you have created the default account.
 
 ## Running User Service without Docker
 
-1. Follow the instructions [here](https://nodejs.org/en/download/package-manager) to set up Node v20.
+1. Open Command Line/Terminal and navigate into the `user-service` directory.
 
-2. Open Command Line/Terminal and navigate into the `user-service` directory.
+2. Run the command: `npm install`. This will install all the necessary dependencies.
 
-3. Run the command: `npm install`. This will install all the necessary dependencies.
-
-4. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
+3. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
 
 ## After running
 
