@@ -17,9 +17,12 @@ import Matching from "./pages/Matching";
 import Layout from "./components/Layout";
 import AuthProvider from "./contexts/AuthContext";
 import ProfileContextProvider from "./contexts/ProfileContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import MatchProvider from "./contexts/MatchContext";
 import CollabSandbox from "./pages/CollabSandbox";
 import NoDirectAccessRoutes from "./components/NoDirectAccessRoutes";
+import EmailVerification from "./pages/EmailVerification";
 
 function App() {
   return (
@@ -61,10 +64,14 @@ function App() {
             </Route>
             <Route path="*" element={<PageNotFound />} />
           </Route>
-          <Route path="signup" element={<SignUp />} />
-          <Route path="login" element={<LogIn />} />
+          <Route path="/auth">
+            <Route path="signup" element={<SignUp />} />
+            <Route path="login" element={<LogIn />} />
+            <Route path="verifyEmail/:userId" element={<EmailVerification />} />
+          </Route>
         </Routes>
       </MatchProvider>
+      <ToastContainer position="bottom-right" />
     </AuthProvider>
   );
 }

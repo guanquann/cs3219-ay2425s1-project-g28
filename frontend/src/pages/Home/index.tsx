@@ -86,7 +86,6 @@ const Home: React.FC = () => {
       >
         Start an interactive practice session today!
       </Typography>
-
       <Typography
         variant="subtitle1"
         textAlign={"center"}
