@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import {
   PASSWORD_REQUIRED_ERROR_MESSAGE,
   PASSWORD_MISMATCH_ERROR_MESSAGE,
+  TOKEN_REQUIRED_ERROR_MESSAGE,
 } from "../../utils/constants";
 
 const ForgetPassword: React.FC = () => {
@@ -21,6 +22,7 @@ const ForgetPassword: React.FC = () => {
 
   const [email, setEmail] = useState<string>("");
   const [hasSentEmail, setHasSentEmail] = useState<boolean>(false);
+  const [isLoading, setisLoading] = useState<boolean>(false);
 
   const {
     register: registerEmail,
@@ -38,6 +40,7 @@ const ForgetPassword: React.FC = () => {
   });
 
   const handleSendEmail = async (email: string) => {
+    setisLoading(true);
     userClient
       .post("/users/send-reset-password-email", { email })
       .then((res) => {
@@ -47,10 +50,14 @@ const ForgetPassword: React.FC = () => {
       })
       .catch((err) => {
         toast.error(err.response?.data.message || err.message);
+      })
+      .finally(() => {
+        setisLoading(false);
       });
   };
 
   const handleResetPassword = async (password: string, token: string) => {
+    setisLoading(true);
     userClient
       .post(`/users/reset-password`, { email, token, password })
       .then((res) => {
@@ -59,6 +66,9 @@ const ForgetPassword: React.FC = () => {
       })
       .catch((err) => {
         toast.error(err.response?.data.message || err.message);
+      })
+      .finally(() => {
+        setisLoading(false);
       });
   };
 
@@ -99,6 +109,7 @@ const ForgetPassword: React.FC = () => {
                 sx={(theme) => ({ marginTop: theme.spacing(1) })}
                 {...registerPassword("token", {
                   setValueAs: (value: string) => value.trim(),
+                  required: TOKEN_REQUIRED_ERROR_MESSAGE,
                 })}
                 error={!!errorsPassword.token}
                 helperText={errorsPassword.token?.message}
@@ -148,10 +159,16 @@ const ForgetPassword: React.FC = () => {
                   onClick={() => {
                     handleSendEmail(email);
                   }}
+                  disabled={isLoading}
                 >
                   Resend
                 </Button>
-                <Button fullWidth variant="contained" type="submit">
+                <Button
+                  fullWidth
+                  variant="contained"
+                  type="submit"
+                  disabled={isLoading}
+                >
                   Change Password
                 </Button>
               </Stack>
@@ -220,6 +237,7 @@ const ForgetPassword: React.FC = () => {
               type="submit"
               variant="contained"
               sx={(theme) => ({ margin: theme.spacing(2, 0) })}
+              disabled={isLoading}
             >
               Send Reset Link
             </Button>
