@@ -72,6 +72,7 @@ function App() {
               path="verifyEmail/:userId?"
               element={<EmailVerification />}
             />
+            <Route path="*" element={<Navigate to="/auth/login" />} />
           </Route>
         </Routes>
       </MatchProvider>
