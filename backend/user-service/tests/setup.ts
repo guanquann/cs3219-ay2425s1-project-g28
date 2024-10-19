@@ -3,7 +3,7 @@ import redisClient from "../config/redis";
 
 beforeAll(async () => {
   const mongoUri =
-    process.env.MONGO_URI_TEST || "mongodb://mongo:mongo@mongo:27017/";
+    process.env.MONGO_URI_TEST || "mongodb://mongo:mongo@test-mongo:27017/";
 
   await mongoose.connect(mongoUri, {});
   await redisClient.connect();

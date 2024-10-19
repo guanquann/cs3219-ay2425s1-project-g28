@@ -50,6 +50,9 @@ export const PASSWORD_SPECIAL_CHAR_ERROR_MESSAGE =
 export const PASSWORD_WEAK_ERROR_MESSAGE = "Password is weak";
 export const PASSWORD_MISMATCH_ERROR_MESSAGE = "Password does not match";
 
+/* Token Validation */
+export const TOKEN_REQUIRED_ERROR_MESSAGE = "Token is required";
+
 /* Toast Messages */
 // Authentication
 export const SUCCESS_LOG_OUT = "Logged out successfully!";

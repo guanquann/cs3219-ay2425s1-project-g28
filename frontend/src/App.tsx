@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 import NewQuestion from "./pages/NewQuestion";
 import QuestionDetail from "./pages/QuestionDetail";
@@ -10,6 +10,7 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
+import ForgetPassword from "./pages/ForgetPassword";
 import Matched from "./pages/Matched";
 import Timeout from "./pages/Timeout";
 import ProtectedRoutes from "./components/ProtectedRoutes";
@@ -64,10 +65,16 @@ function App() {
             </Route>
             <Route path="*" element={<PageNotFound />} />
           </Route>
-          <Route path="/auth">
+          <Route path="auth">
+            <Route index element={<Navigate to="/auth/login" />} />
             <Route path="signup" element={<SignUp />} />
             <Route path="login" element={<LogIn />} />
-            <Route path="verifyEmail/:userId" element={<EmailVerification />} />
+            <Route
+              path="verifyEmail/:userId?"
+              element={<EmailVerification />}
+            />
+            <Route path="forget-password" element={<ForgetPassword />} />
+            <Route path="*" element={<Navigate to="/auth/login" />} />
           </Route>
         </Routes>
       </MatchProvider>
