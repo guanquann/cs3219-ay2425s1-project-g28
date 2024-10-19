@@ -115,6 +115,21 @@ export async function updateUserVerification(
   );
 }
 
+export async function updateUserPassword(
+  email: string,
+  password: string
+): Promise<IUser | null> {
+  return UserModel.findOneAndUpdate(
+    { email },
+    {
+      $set: {
+        password,
+      },
+    },
+    { new: true } // return the updated user
+  );
+}
+
 export async function deleteUserById(userId: string): Promise<IUser | null> {
   return UserModel.findByIdAndDelete(userId);
 }

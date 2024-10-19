@@ -10,6 +10,7 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import LogIn from "./pages/LogIn";
+import ForgetPassword from "./pages/ForgetPassword";
 import Matched from "./pages/Matched";
 import Timeout from "./pages/Timeout";
 import ProtectedRoutes from "./components/ProtectedRoutes";
@@ -72,6 +73,7 @@ function App() {
               path="verifyEmail/:userId?"
               element={<EmailVerification />}
             />
+            <Route path="forget-password" element={<ForgetPassword />} />
             <Route path="*" element={<Navigate to="/auth/login" />} />
           </Route>
         </Routes>
