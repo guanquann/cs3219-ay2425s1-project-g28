@@ -105,7 +105,7 @@ const ForgetPassword: React.FC = () => {
               <TextField
                 fullWidth
                 margin="normal"
-                label="Token"
+                label="Token *"
                 sx={(theme) => ({ marginTop: theme.spacing(1) })}
                 {...registerPassword("token", {
                   setValueAs: (value: string) => value.trim(),

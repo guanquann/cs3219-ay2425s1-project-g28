@@ -119,7 +119,9 @@ export const sendVerificationMail = async (
     }
 
     const emailToken = crypto.randomBytes(16).toString("hex");
-    await redisClient.set(email, emailToken, { EX: 60 * 5 }); // expire in 5 minutes
+    await redisClient.set(`email_verification:${email}`, emailToken, {
+      EX: 60 * 5,
+    }); // expire in 5 minutes
     await sendMail(
       email,
       ACCOUNT_VERIFICATION_SUBJ,
@@ -152,7 +154,7 @@ export const verifyUser = async (
       return res.status(404).json({ message: `User ${email} not found` });
     }
 
-    const expectedToken = await redisClient.get(email);
+    const expectedToken = await redisClient.get(`email_verification:${email}`);
 
     if (expectedToken !== token) {
       return res
@@ -353,8 +355,16 @@ export const sendResetPasswordMail = async (
       return res.status(404).json({ message: `User not found` });
     }
 
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: "User is not verified. Please verify your account first.",
+      });
+    }
+
     const emailToken = crypto.randomBytes(16).toString("hex");
-    await redisClient.set(email, emailToken, { EX: 60 * 5 }); // expire in 5 minutes
+    await redisClient.set(`password_reset:${email}`, emailToken, {
+      EX: 60 * 5,
+    }); // expire in 5 minutes
     await sendMail(
       email,
       RESET_PASSWORD_SUBJ,
@@ -387,7 +397,7 @@ export const resetPassword = async (
       return res.status(404).json({ message: `User not found` });
     }
 
-    const expectedToken = await redisClient.get(email);
+    const expectedToken = await redisClient.get(`password_reset:${email}`);
 
     if (expectedToken !== token) {
       return res
@@ -407,9 +417,7 @@ export const resetPassword = async (
     const updatedUser = await _updateUserPassword(email, hashedPassword);
 
     if (!updatedUser) {
-      return res
-        .status(404)
-        .json({ message: `User's password not reset.` });
+      return res.status(404).json({ message: `User's password not reset.` });
     }
 
     return res

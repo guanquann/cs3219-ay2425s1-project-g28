@@ -18,7 +18,6 @@ import {
   verifyIsAdmin,
   verifyIsOwnerOrAdmin,
 } from "../middleware/basic-access-control";
-import { send } from "process";
 
 const router = express.Router();
 
