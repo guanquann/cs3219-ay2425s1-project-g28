@@ -49,7 +49,7 @@ const Home: React.FC = () => {
   }
   const { findMatch, loading } = match;
 
-  const isSmallerThan1100px = useMediaQuery('(max-width:1100px)');
+  const isSmallerThan1100px = useMediaQuery("(max-width:1100px)");
 
   useEffect(() => {
     getQuestionCategories(dispatch);
@@ -138,11 +138,9 @@ const Home: React.FC = () => {
               sx={{ backgroundColor: "white" }}
             >
               <Autocomplete
-                multiple
-                disableCloseOnSelect
                 options={complexityList}
                 onChange={(_, selectedOptions) => {
-                  setComplexities(selectedOptions);
+                  setComplexities(selectedOptions ? [selectedOptions] : []);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -178,11 +176,9 @@ const Home: React.FC = () => {
               sx={{ backgroundColor: "white" }}
             >
               <Autocomplete
-                multiple
-                disableCloseOnSelect
                 options={state.questionCategories}
                 onChange={(_, selectedOptions) => {
-                  setCategories(selectedOptions);
+                  setCategories(selectedOptions ? [selectedOptions] : []);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -218,11 +214,9 @@ const Home: React.FC = () => {
               sx={{ backgroundColor: "white" }}
             >
               <Autocomplete
-                multiple
-                disableCloseOnSelect
                 options={languageList}
                 onChange={(_, selectedOptions) => {
-                  setLanguages(selectedOptions);
+                  setLanguages(selectedOptions ? [selectedOptions] : []);
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
