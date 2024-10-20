@@ -100,16 +100,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   }
   const { user } = auth;
 
-  const [matchUser] = useState<MatchUser | null>(
-    user
-      ? {
-          id: user.id,
-          username: user.username,
-          profile: user.profilePictureUrl,
-        }
-      : null
-  );
-
+  const [matchUser, setMatchUser] = useState<MatchUser | null>(null);
   const [matchCriteria, setMatchCriteria] = useState<MatchCriteria | null>(
     null
   );
@@ -117,6 +108,18 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const [partner, setPartner] = useState<MatchUser | null>(null);
   const [matchPending, setMatchPending] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (user) {
+      setMatchUser({
+        id: user.id,
+        username: user.username,
+        profile: user.profilePictureUrl,
+      });
+    } else {
+      setMatchUser(null);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (
@@ -233,14 +236,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   const initMatchRequestListeners = () => {
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      setMatchId(matchId);
-      if (matchUser?.id === user1.id) {
-        setPartner(user2);
-      } else {
-        setPartner(user1);
-      }
-      setMatchPending(true);
-      appNavigate(MatchPaths.MATCHED);
+      handleMatchFound(matchId, user1, user2);
     });
 
     matchSocket.on(MatchEvents.MATCH_REQUEST_EXISTS, () => {
@@ -254,14 +250,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   const initMatchingListeners = () => {
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      setMatchId(matchId);
-      if (matchUser?.id === user1.id) {
-        setPartner(user2);
-      } else {
-        setPartner(user1);
-      }
-      setMatchPending(true);
-      appNavigate(MatchPaths.MATCHED);
+      handleMatchFound(matchId, user1, user2);
     });
   };
 
@@ -277,14 +266,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     });
 
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      setMatchId(matchId);
-      if (matchUser?.id === user1.id) {
-        setPartner(user2);
-      } else {
-        setPartner(user1);
-      }
-      setMatchPending(true);
-      appNavigate(MatchPaths.MATCHED);
+      handleMatchFound(matchId, user1, user2);
     });
 
     matchSocket.on(MatchEvents.MATCH_REQUEST_ERROR, () => {
@@ -297,6 +279,21 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       toast.error(MATCH_ENDED_MESSAGE);
       appNavigate(MatchPaths.HOME);
     });
+  };
+
+  const handleMatchFound = (
+    matchId: string,
+    user1: MatchUser,
+    user2: MatchUser
+  ) => {
+    setMatchId(matchId);
+    if (matchUser?.id === user1.id) {
+      setPartner(user2);
+    } else {
+      setPartner(user1);
+    }
+    setMatchPending(true);
+    appNavigate(MatchPaths.MATCHED);
   };
 
   const findMatch = (
