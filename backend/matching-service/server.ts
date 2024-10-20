@@ -2,7 +2,7 @@ import http from "http";
 import app, { allowedOrigins } from "./app.ts";
 import { handleWebsocketMatchEvents } from "./src/handlers/websocketHandler.ts";
 import { Server } from "socket.io";
-import { connectRabbitMq, connectToRabbitMq } from "./config/rabbitmq.ts";
+import { connectToRabbitMq } from "./config/rabbitmq.ts";
 
 const server = http.createServer(app);
 export const io = new Server(server, {
@@ -21,7 +21,6 @@ const PORT = process.env.SERVICE_PORT || 3002;
 
 if (process.env.NODE_ENV !== "test") {
   connectToRabbitMq()
-    // connectRabbitMq()
     .then(() => {
       console.log("RabbitMq connected!");
 

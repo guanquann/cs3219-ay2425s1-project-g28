@@ -51,7 +51,7 @@ export const sendToQueue = async (
   category: string,
   language: string,
   data: MatchRequestItem
-) => {
+): Promise<boolean> => {
   try {
     const queueName = `${complexity}_${category}_${language}`;
     const senderChannel = await mrConnection.createChannel();
