@@ -32,6 +32,7 @@ export const sendRabbitMq = async (
   try {
     const senderChannel = await mrConnection.createChannel();
     senderChannel.sendToQueue(queue, Buffer.from(JSON.stringify(data)));
+    console.log("Sent to queue:", JSON.stringify(data));
     return true;
   } catch (error) {
     console.log(error);
