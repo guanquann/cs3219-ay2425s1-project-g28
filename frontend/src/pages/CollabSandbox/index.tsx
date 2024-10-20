@@ -35,7 +35,7 @@ const CollabSandbox: React.FC = () => {
   return (
     <AppMargin classname={`${classes.fullheight} ${classes.center}`}>
       <Stack spacing={2} alignItems={"center"}>
-        <Typography variant="h1">Collaborative Sandbox</Typography>
+        <Typography variant="h1">Successfully matched!</Typography>
         <Typography variant="h3">Coming soon...</Typography>
         <Button variant="outlined" color="error" onClick={() => stopMatch()}>
           End Session
