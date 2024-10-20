@@ -257,21 +257,19 @@ export const readCategories = async (
     //   message: CATEGORIES_RETRIEVED_MESSAGE,
     //   categories: sortAlphabetically(uniqueCats),
     // });
-    res
-      .status(200)
-      .json({
-        message: CATEGORIES_RETRIEVED_MESSAGE,
-        categories: [
-          "Strings",
-          "Algorithms",
-          "Data Structures",
-          "Bit Manipulation",
-          "Recursion",
-          "Databases",
-          "Arrays",
-          "Brainteaser",
-        ],
-      });
+    res.status(200).json({
+      message: CATEGORIES_RETRIEVED_MESSAGE,
+      categories: sortAlphabetically([
+        "Strings",
+        "Algorithms",
+        "Data Structures",
+        "Bit Manipulation",
+        "Recursion",
+        "Databases",
+        "Arrays",
+        "Brainteaser",
+      ]),
+    });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
   }
