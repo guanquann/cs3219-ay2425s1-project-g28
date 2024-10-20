@@ -42,7 +42,7 @@
 
    3. Enter `host.internal.docker` as the Host.
 
-## Running User Service without Docker
+## Running User Service Individually
 
 1. Set up and run Redis using `docker compose run --rm --name redis -p 6379:6379 redis`.
 
