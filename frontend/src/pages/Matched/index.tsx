@@ -55,11 +55,14 @@ const Matched: React.FC = () => {
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      accepted
-        ? toast.error(MATCH_UNSUCCESSFUL_MESSAGE)
-        : toast.error(MATCH_OFFER_TIMEOUT_MESSAGE);
+      if (accepted) {
+        toast.error(MATCH_UNSUCCESSFUL_MESSAGE);
+      } else {
+        toast.error(MATCH_OFFER_TIMEOUT_MESSAGE);
+      }
       matchOfferTimeout();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
 
   if (!matchUser || !partner) {

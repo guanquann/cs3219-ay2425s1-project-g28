@@ -16,6 +16,7 @@ const CollabSandbox: React.FC = () => {
 
   useEffect(() => {
     verifyMatchStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
