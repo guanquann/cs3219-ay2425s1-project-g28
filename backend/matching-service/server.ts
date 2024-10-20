@@ -17,7 +17,7 @@ io.on("connection", (socket) => {
   handleWebsocketMatchEvents(socket);
 });
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.SERVICE_PORT || 3002;
 
 if (process.env.NODE_ENV !== "test") {
   connectToRabbitMq()
