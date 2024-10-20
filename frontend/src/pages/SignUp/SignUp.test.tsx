@@ -74,7 +74,7 @@ describe("Sign Up Components", () => {
     expect(logInButton).toBeInTheDocument();
 
     fireEvent.click(logInButton);
-    expect(mockUseNavigate).toHaveBeenCalledWith("/login");
+    expect(mockUseNavigate).toHaveBeenCalledWith("/auth/login");
   });
 });
 
