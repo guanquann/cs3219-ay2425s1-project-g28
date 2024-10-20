@@ -8,9 +8,13 @@
 
 2. To connect to your cloud MongoDB instead of your local MongoDB, set the `NODE_ENV` to `production` instead of `development`.
 
-3. Update `MONGO_CLOUD_URI`, `MONGO_LOCAL_URI`, `FIREBASE_PROJECT_ID`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_STORAGE_BUCKET`.
+3. Update `FIREBASE_PROJECT_ID`, `FIREBASE_PRIVATE_KEY`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_STORAGE_BUCKET`, `MONGO_CLOUD_URI` with the env variables obtained from following the instructions in the backend README. Then update `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` to change your MongoDB credentials if necessary.
+
+4. You can view the MongoDB collections locally using Mongo Express. To set up Mongo Express, update `ME_CONFIG_BASICAUTH_USERNAME` and `ME_CONFIG_BASICAUTH_PASSWORD`. The username and password will be the login credentials when you access Mongo Express at http://localhost:8081.
 
 ## Running Question Service without Docker
+
+> Make sure you have the cloud MongoDB URI in your .env file and set NODE_ENV to production already.
 
 1. Open Command Line/Terminal and navigate into the `question-service` directory.
 

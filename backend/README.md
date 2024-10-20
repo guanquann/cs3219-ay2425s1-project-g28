@@ -2,21 +2,11 @@
 
 > Before proceeding to each microservice for more instructions:
 
-1. Set-up either a local or cloud MongoDB.
+1. Set up cloud MongoDB if not using docker. We recommend this if you are just testing out each microservice separately to avoid needing to manually set up multiple instances of local MongoDB. Else, if you are using docker-compose.yml to run PeerPrep, check out the READMEs in the different backend microservices to set up the env for the local MongoDB instances.
 
-2. Set-up Firebase.
+2. Set up Firebase.
 
 3. Follow the instructions [here](https://nodejs.org/en/download/package-manager) to set up Node v20.
-
-## Setting-up local MongoDB (only if you are using Docker)
-
-1. In the `backend` directory, create a copy of the `.env.sample` file and name it `.env`.
-
-2. To set up credentials for the MongoDB database, update `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` of the `.env` file.
-
-3. Your local Mongo URI will be `mongodb://<MONGO_INITDB_ROOT_USERNAME>:<MONGO_INITDB_ROOT_PASSWORD>@mongo:27017/`. Take note of it as we will be using in the `.env` files in the various microservices later on.
-
-4. You can view the MongoDB collections locally using Mongo Express. To set up Mongo Express, update `ME_CONFIG_BASICAUTH_USERNAME` and `ME_CONFIG_BASICAUTH_PASSWORD`. The username and password will be the login credentials when you access Mongo Express at http://localhost:8081.
 
 ## Setting-up cloud MongoDB (in production)
 
@@ -96,6 +86,8 @@
 13. Your cloud Mongo URI will be the string you copied earlier. Take note of it as we will be using in the `.env` files in the various microservices later on.
 
 ## Setting-up Firebase
+
+> For ease of testing, you can set up just one firebase to use across all the microservices that need it.
 
 1. Go to https://console.firebase.google.com/u/0/.
 
