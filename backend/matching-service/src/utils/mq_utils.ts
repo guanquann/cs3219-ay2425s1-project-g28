@@ -1,5 +1,46 @@
+import { pendingRequestsPerQueue } from "../../config/rabbitmq";
 import { createMatch, MatchRequestItem } from "../handlers/matchHandler";
 import { isActiveRequest, isUserConnected } from "../handlers/websocketHandler";
+
+export const matchUsersInQueue = (queueName: string, newRequest: string) => {
+  const pendingRequests = pendingRequestsPerQueue.get(queueName)!;
+  const newRequestJson = JSON.parse(newRequest) as MatchRequestItem;
+  const newRequestUid = newRequestJson.user.id;
+
+  for (const [uid, pendingRequest] of pendingRequests) {
+    if (
+      isExpired(pendingRequest) ||
+      !isUserConnected(uid) ||
+      !isActiveRequest(uid, pendingRequest.id) ||
+      uid === newRequestUid
+    ) {
+      pendingRequests.delete(uid);
+      continue;
+    }
+
+    if (
+      isExpired(newRequestJson) ||
+      !isUserConnected(newRequestUid) ||
+      !isActiveRequest(newRequestUid, newRequestJson.id)
+    ) {
+      return;
+    }
+
+    if (
+      uid === newRequestJson.rejectedPartnerId ||
+      newRequestUid === pendingRequest.rejectedPartnerId
+    ) {
+      continue;
+    }
+
+    pendingRequests.delete(uid);
+    createMatch(pendingRequest, newRequestJson);
+    return;
+  }
+  pendingRequests.set(newRequestUid, newRequestJson);
+};
+
+// ----------------
 
 const matchingRequests = new Map<string, MatchRequestItem>();
 

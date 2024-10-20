@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { sendRabbitMq } from "../../config/rabbitmq";
+import { sendToQueue } from "../../config/rabbitmq";
 import { sendMatchFound } from "./websocketHandler";
 
 interface Match {
@@ -53,7 +53,7 @@ export const sendMatchRequest = async (
     rejectedPartnerId: rejectedPartnerId,
   };
 
-  const sent = await sendRabbitMq(matchItem);
+  const sent = await sendToQueue(matchItem);
   return sent;
 };
 
