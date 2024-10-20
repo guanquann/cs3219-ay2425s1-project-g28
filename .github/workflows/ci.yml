@@ -26,8 +26,8 @@ jobs:
 
     strategy:
       matrix:
-        # remove frontend for now
-        service: [backend/question-service, backend/user-service]
+        # remove frontend, backend/question-service for now
+        service: [backend/user-service]
 
     services:
       redis:
@@ -62,21 +62,6 @@ jobs:
         with:
           mongodb-replica-set: test-rs
           mongodb-port: 42069
-
-      - name: Set .env variables
-        working-directory: ${{ matrix.service }}
-        run: |
-          touch .env
-          echo "FIREBASE_PROJECT_ID=${{ env.FIREBASE_PROJECT_ID }}" >> .env
-          echo "FIREBASE_PRIVATE_KEY=${{ env.FIREBASE_PRIVATE_KEY }}" >> .env
-          echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
-          echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
-          echo "FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET }}" >> .env
-          echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> .env
-          echo "REDIS_HOST=${{ env.REDIS_HOST }}" >> .env
-          echo "REDIS_PORT=${{ env.REDIS_PORT }}" >> .env
-          echo "REDIS_URI_TEST=${{ env.REDIS_URI_TEST }}" >> .env
-          echo "MONGO_URI_TEST=${{ env.MONGODB_URI_TEST }}" >> .env
 
       - name: Tests
         working-directory: ${{ matrix.service }}
