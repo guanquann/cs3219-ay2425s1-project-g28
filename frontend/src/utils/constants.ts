@@ -96,6 +96,17 @@ export const MATCH_LOGIN_REQUIRED_MESSAGE =
 export const MATCH_OFFER_TIMEOUT_MESSAGE = "Match offer timeout!";
 export const MATCH_CONNECTION_ERROR =
   "Connection error! Please try again later.";
+export const QUESTION_DOES_NOT_EXIST_ERROR =
+  "There are no questions with the specified complexity and category. Please try another combination.";
+
+/* Alerts & Dialog Boxes */
+// Questions
+export const ABORT_CREATE_OR_EDIT_QUESTION_CONFIRMATION_MESSAGE =
+  "Are you sure you want to leave this page? All process will be lost.";
+
+// Match
+export const ABORT_MATCH_PROCESS_CONFIRMATION_MESSAGE =
+  "Are you sure you want to leave the matching process?";
 
 /* Image paths */
 export const FIND_MATCH_FORM_PATH = "/find_match_form.png";

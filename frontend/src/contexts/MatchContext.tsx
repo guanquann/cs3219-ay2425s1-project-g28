@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { matchSocket } from "../utils/matchSocket";
 import {
+  ABORT_MATCH_PROCESS_CONFIRMATION_MESSAGE,
   FAILED_MATCH_REQUEST_MESSAGE,
   MATCH_CONNECTION_ERROR,
   MATCH_ENDED_MESSAGE,
@@ -131,11 +132,22 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     openSocketConnection();
     matchSocket.emit(MatchEvents.USER_CONNECTED, matchUser?.id);
 
-    window.addEventListener("beforeunload", () => closeSocketConnection());
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = ABORT_MATCH_PROCESS_CONFIRMATION_MESSAGE; // for legacy support, does not actually display message
+    };
+
+    const handleUnload = () => {
+      closeSocketConnection();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("unload", handleUnload);
 
     return () => {
       closeSocketConnection();
-      window.removeEventListener("beforeunload", () => closeSocketConnection());
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("unload", handleUnload);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchUser?.id, location.pathname]);
