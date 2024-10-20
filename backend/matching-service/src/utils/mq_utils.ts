@@ -34,6 +34,11 @@ export const matchUsers = (newRequest: string) => {
     if (isMatch(newRequestJson, pendingRequest)) {
       matchingRequests.delete(uid);
       createMatch(pendingRequest, newRequestJson);
+      console.log(
+        "Matched users:",
+        JSON.stringify(newRequestJson),
+        JSON.stringify(pendingRequest)
+      );
       return;
     }
   }
