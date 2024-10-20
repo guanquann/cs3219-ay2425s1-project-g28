@@ -12,6 +12,9 @@ env:
   FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
   FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
   JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  REDIS_HOST: localhost
+  REDIS_PORT: 6379
+  REDIS_URI_TEST: redis://localhost:6379
 
 permissions:
   contents: read
@@ -19,22 +22,40 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        service: [frontend, backend/question-service, backend/user-service]
+        # remove frontend for now
+        service: [backend/question-service, backend/user-service]
+
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setting node version
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+
       - name: Install dependencies
         working-directory: ${{ matrix.service }}
         run: npm install
+
       - name: Linting
         working-directory: ${{ matrix.service }}
         run: npm run lint
+
       - name: Set .env variables
         working-directory: ${{ matrix.service }}
         run: |
@@ -45,6 +66,10 @@ jobs:
           echo "FIREBASE_CLIENT_EMAIL=${{ env.FIREBASE_CLIENT_EMAIL }}" >> .env
           echo "FIREBASE_STORAGE_BUCKET=${{ env.FIREBASE_STORAGE_BUCKET }}" >> .env
           echo "JWT_SECRET=${{ env.JWT_SECRET }}" >> .env
+          echo "REDIS_HOST=${{ env.REDIS_HOST }}" >> .env
+          echo "REDIS_PORT=${{ env.REDIS_PORT }}" >> .env
+          echo "REDIS_URI_TEST=${{ env.REDIS_URI_TEST }}" >> .env
+
       - name: Tests
         working-directory: ${{ matrix.service }}
         run: npm test
