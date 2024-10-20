@@ -69,8 +69,11 @@ services:
     restart: always
     networks:
       - peerprep-network
-    env_file:
-      - ./backend/.env
+    # env_file:
+    #   - ./backend/.env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=mongo
 
   test-redis:
     image: redis:8.0-M01
