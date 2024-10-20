@@ -1,6 +1,6 @@
 /* Dropdowns */
 export const complexityList: string[] = ["Easy", "Medium", "Hard"];
-export const languageList = ["Python", "Java"];
+export const languageList = ["Python", "Java", "C"];
 
 /* Context Provider Errors */
 export const USE_AUTH_ERROR_MESSAGE =

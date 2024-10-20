@@ -25,9 +25,6 @@ export interface MatchRequest {
 export interface MatchRequestItem {
   id: string;
   user: MatchUser;
-  complexities: string[];
-  categories: string[];
-  languages: string[];
   sentTimestamp: number;
   ttlInSecs: number;
   rejectedPartnerId?: string;
@@ -45,15 +42,17 @@ export const sendMatchRequest = async (
   const matchItem: MatchRequestItem = {
     id: requestId,
     user: user,
-    complexities: complexities,
-    categories: categories,
-    languages: languages,
     sentTimestamp: Date.now(),
     ttlInSecs: timeout,
     rejectedPartnerId: rejectedPartnerId,
   };
 
-  const sent = await sendToQueue(matchItem);
+  const sent = await sendToQueue(
+    complexities[0],
+    categories[0],
+    languages[0],
+    matchItem
+  );
   return sent;
 };
 
