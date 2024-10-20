@@ -28,7 +28,6 @@ jobs:
         working-directory: frontend
         run: npm run lint
       - name: Frontend tests
-        working-directory: frontend
         run: docker compose -f docker-compose-test.yml run --rm test-frontend
   backend-ci:
     runs-on: ubuntu-latest
