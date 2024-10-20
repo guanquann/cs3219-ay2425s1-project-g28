@@ -98,7 +98,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
   const { user } = auth;
-  console.log(user);
+
   const [matchUser] = useState<MatchUser | null>(
     user
       ? {
