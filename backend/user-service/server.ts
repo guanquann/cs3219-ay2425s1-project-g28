@@ -3,10 +3,11 @@ import index from "./app.ts";
 import dotenv from "dotenv";
 import { connectToDB } from "./model/repository";
 import { seedAdminAccount } from "./scripts/seed.ts";
+import { connectRedis } from "./config/redis.ts";
 
 dotenv.config();
 
-const port = process.env.PORT || 3001;
+const port = process.env.SERVICE_PORT || 3001;
 
 const server = http.createServer(index);
 
@@ -23,4 +24,6 @@ if (process.env.NODE_ENV !== "test") {
       console.error("Failed to connect to DB");
       console.error(err);
     });
+
+  await connectRedis();
 }

@@ -11,6 +11,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { toast } from "react-toastify";
 
 import {
+  ABORT_CREATE_OR_EDIT_QUESTION_CONFIRMATION_MESSAGE,
   complexityList,
   FAILED_QUESTION_UPDATE,
   FILL_ALL_FIELDS,
@@ -61,11 +62,7 @@ const QuestionEdit = () => {
   }, [state.selectedQuestion]);
 
   const handleBack = () => {
-    if (
-      !confirm(
-        "Are you sure you want to leave this page? All process will be lost."
-      )
-    ) {
+    if (!confirm(ABORT_CREATE_OR_EDIT_QUESTION_CONFIRMATION_MESSAGE)) {
       return;
     }
     navigate("/questions");

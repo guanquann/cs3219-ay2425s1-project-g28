@@ -1,17 +1,13 @@
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
-
-let mongo: MongoMemoryServer;
+import redisClient from "../config/redis";
 
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
-  const mongoUri = mongo.getUri();
-
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
-  }
+  const mongoUri =
+    process.env.MONGO_URI_TEST || "mongodb://mongo:mongo@test-mongo:27017/";
 
   await mongoose.connect(mongoUri, {});
+  await redisClient.connect();
+  redisClient.on("error", (err) => console.log(`Error: ${err}`));
 });
 
 afterEach(async () => {
@@ -24,9 +20,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  if (mongo) {
-    await mongo.stop();
-  }
-
   await mongoose.connection.close();
+  await redisClient.disconnect();
 });

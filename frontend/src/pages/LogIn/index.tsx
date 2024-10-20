@@ -1,16 +1,26 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Stack,
+  styled,
+  TextField,
+  Typography,
+  TypographyProps,
+} from "@mui/material";
 import LogInSvg from "../../assets/login.svg?react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { emailValidator } from "../../utils/validators";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import PasswordTextField from "../../components/PasswordTextField";
 import {
   PASSWORD_REQUIRED_ERROR_MESSAGE,
   USE_AUTH_ERROR_MESSAGE,
 } from "../../utils/constants";
+
+const StyledTypography = styled((props: TypographyProps) => {
+  return <Typography {...props} component={"span"} />;
+})({ fontSize: 14 });
 
 const LogIn: React.FC = () => {
   const navigate = useNavigate();
@@ -99,26 +109,37 @@ const LogIn: React.FC = () => {
           <Stack
             direction="row"
             spacing={0.5}
-            sx={{ justifyContent: "flex-end" }}
+            sx={{ justifyContent: "space-between" }}
           >
-            <Typography component="span" sx={{ fontSize: 14 }}>
-              Don't have an account?
-            </Typography>
-            <Typography
-              component="span"
+            <StyledTypography
               role="button"
               tabIndex={0}
               sx={{
-                fontSize: 14,
                 cursor: "pointer",
                 "&:hover": {
                   textDecoration: "underline",
                 },
               }}
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/auth/forget-password")}
             >
-              Sign up
-            </Typography>
+              Forget password
+            </StyledTypography>
+            <Box>
+              <StyledTypography>Don't have an account? &nbsp;</StyledTypography>
+              <StyledTypography
+                role="button"
+                tabIndex={0}
+                sx={{
+                  cursor: "pointer",
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                }}
+                onClick={() => navigate("/auth/signup")}
+              >
+                Sign up
+              </StyledTypography>
+            </Box>
           </Stack>
         </Stack>
       </Box>
@@ -132,7 +153,6 @@ const LogIn: React.FC = () => {
       >
         <LogInSvg width="80%" height="80%" />
       </Box>
-      <ToastContainer position="bottom-right" />
     </Box>
   );
 };

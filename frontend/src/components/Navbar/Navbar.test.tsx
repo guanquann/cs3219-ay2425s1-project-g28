@@ -1,8 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import axios from "axios";
 import { faker } from "@faker-js/faker";
-import * as hooks from "../../contexts/AuthContext";
+import * as authHooks from "../../contexts/AuthContext";
+import * as matchHooks from "../../contexts/MatchContext";
 import Navbar from ".";
 import { MemoryRouter } from "react-router-dom";
 
@@ -16,6 +16,24 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockUseNavigate(),
 }));
+
+beforeEach(() => {
+  jest.spyOn(matchHooks, "useMatch").mockImplementation(() => ({
+    findMatch: jest.fn(),
+    stopMatch: () => mockUseNavigate("/home"),
+    acceptMatch: jest.fn(),
+    rematch: jest.fn(),
+    retryMatch: jest.fn(),
+    matchingTimeout: jest.fn(),
+    matchOfferTimeout: jest.fn(),
+    verifyMatchStatus: jest.fn(),
+    matchUser: null,
+    matchCriteria: null,
+    partner: null,
+    matchPending: false,
+    loading: false,
+  }));
+});
 
 describe("Navigation routes", () => {
   it("Question route is present", () => {
@@ -42,10 +60,11 @@ describe("Navigation routes", () => {
         },
       },
     });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      setUser: jest.fn(),
       loading: false,
       user: {
         id: "1",
@@ -71,11 +90,12 @@ describe("Navigation routes", () => {
 describe("Unauthenticated user", () => {
   it("Sign up button is rendered", () => {
     mockedAxios.get.mockResolvedValue({ data: { data: null } });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
       loading: false,
+      setUser: jest.fn(),
       user: null,
     }));
     render(
@@ -88,10 +108,11 @@ describe("Unauthenticated user", () => {
 
   it("Login button is rendered", () => {
     mockedAxios.get.mockResolvedValue({ data: { data: null } });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      setUser: jest.fn(),
       loading: false,
       user: null,
     }));
@@ -129,10 +150,11 @@ describe("Authenticated user", () => {
         },
       },
     });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      setUser: jest.fn(),
       loading: false,
       user: {
         id: "1",
@@ -178,10 +200,11 @@ describe("Authenticated user", () => {
         },
       },
     });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      setUser: jest.fn(),
       loading: false,
       user: {
         id: "1",
@@ -231,10 +254,11 @@ describe("Authenticated user", () => {
         },
       },
     });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      setUser: jest.fn(),
       loading: false,
       user: {
         id: "1",
@@ -282,11 +306,12 @@ describe("Authenticated user", () => {
         },
       },
     });
-    jest.spyOn(hooks, "useAuth").mockImplementation(() => ({
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
       loading: false,
+      setUser: jest.fn(),
       user: {
         id: "1",
         username,
@@ -309,5 +334,61 @@ describe("Authenticated user", () => {
     expect(
       screen.getByRole("menuitem", { name: "Logout" })
     ).toBeInTheDocument();
+  });
+
+  it("Stop matching button is rendered", () => {
+    const username = faker.internet.userName();
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const email = faker.internet.email();
+    const biography = faker.person.bio();
+    const profilePictureUrl = "";
+    const createdAt = "";
+    const isAdmin = false;
+    mockedAxios.get.mockResolvedValue({
+      data: {
+        data: {
+          id: "1",
+          username,
+          firstName,
+          lastName,
+          email,
+          biography,
+          profilePictureUrl,
+          createdAt,
+          isAdmin,
+        },
+      },
+    });
+    jest.spyOn(authHooks, "useAuth").mockImplementation(() => ({
+      signup: jest.fn(),
+      login: jest.fn(),
+      logout: jest.fn(),
+      loading: false,
+      setUser: jest.fn(),
+      user: {
+        id: "1",
+        username,
+        firstName,
+        lastName,
+        email,
+        profilePictureUrl,
+        biography,
+        createdAt,
+        isAdmin,
+      },
+    }));
+    render(
+      <MemoryRouter initialEntries={["/matching"]}>
+        <Navbar />
+      </MemoryRouter>
+    );
+    const stopMatchingButton = screen.getByRole("button", {
+      name: "Stop matching",
+    });
+    expect(stopMatchingButton).toBeInTheDocument();
+
+    fireEvent.click(stopMatchingButton);
+    expect(mockUseNavigate).toHaveBeenCalledWith("/home");
   });
 });

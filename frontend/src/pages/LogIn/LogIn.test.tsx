@@ -27,6 +27,8 @@ describe("Log In Components", () => {
       signup: jest.fn(),
       login: jest.fn(),
       logout: jest.fn(),
+      setUser: jest.fn(),
+      loading: false,
       user: null,
     }));
   });
@@ -57,7 +59,7 @@ describe("Log In Components", () => {
     expect(signUpButton).toBeInTheDocument();
 
     fireEvent.click(signUpButton);
-    expect(mockUseNavigate).toHaveBeenCalledWith("/signup");
+    expect(mockUseNavigate).toHaveBeenCalledWith("/auth/signup");
   });
 });
 
@@ -76,6 +78,8 @@ describe("Log In Events", () => {
         });
       },
       logout: jest.fn(),
+      setUser: jest.fn(),
+      loading: false,
       user: null,
     }));
   });

@@ -1,11 +1,8 @@
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
-
-let mongo: MongoMemoryServer;
 
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
-  const mongoUri = mongo.getUri();
+  const mongoUri =
+    process.env.MONGO_URI_TEST || "mongodb://mongo:mongo@test-mongo:27017/";
 
   if (mongoose.connection.readyState !== 0) {
     await mongoose.disconnect();
@@ -24,9 +21,5 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  if (mongo) {
-    await mongo.stop();
-  }
-
   await mongoose.connection.close();
 });

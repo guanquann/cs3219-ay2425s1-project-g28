@@ -11,6 +11,8 @@ import {
   findUserByUsernameOrEmail as _findUserByUsernameOrEmail,
   updateUserById as _updateUserById,
   updateUserPrivilegeById as _updateUserPrivilegeById,
+  updateUserVerification as _updateUserVerification,
+  updateUserPassword as _updateUserPassword,
 } from "../model/repository";
 import {
   validateEmail,
@@ -22,6 +24,15 @@ import {
 import { IUser } from "../model/user-model";
 import { upload } from "../config/multer";
 import { uploadFileToFirebase } from "../utils/utils";
+import redisClient from "../config/redis";
+import crypto from "crypto";
+import { sendMail } from "../utils/mailer";
+import {
+  ACCOUNT_VERIFICATION_SUBJ,
+  ACCOUNT_VERIFICATION_TEMPLATE,
+  RESET_PASSWORD_SUBJ,
+  RESET_PASSWORD_TEMPLATE,
+} from "../utils/constants";
 
 export async function createUser(
   req: Request,
@@ -77,8 +88,9 @@ export async function createUser(
         email,
         hashedPassword
       );
+
       return res.status(201).json({
-        message: `Created new user ${username} successfully`,
+        message: `Created new user ${username} successfully.`,
         data: formatUserResponse(createdUser),
       });
     } else {
@@ -93,6 +105,75 @@ export async function createUser(
       .json({ message: "Unknown error when creating new user!" });
   }
 }
+
+export const sendVerificationMail = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email } = req.body;
+    const user = await _findUserByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ message: `User ${email} not found` });
+    }
+
+    const emailToken = crypto.randomBytes(16).toString("hex");
+    await redisClient.set(`email_verification:${email}`, emailToken, {
+      EX: 60 * 5,
+    }); // expire in 5 minutes
+    await sendMail(
+      email,
+      ACCOUNT_VERIFICATION_SUBJ,
+      user.username,
+      ACCOUNT_VERIFICATION_TEMPLATE,
+      emailToken
+    );
+
+    return res.status(200).json({
+      message: "Verification email sent. Please check your inbox.",
+      data: { email, id: user.id },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unknown error when sending verification email!",
+      error,
+    });
+  }
+};
+
+export const verifyUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email, token } = req.params;
+
+    const user = await _findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: `User ${email} not found` });
+    }
+
+    const expectedToken = await redisClient.get(`email_verification:${email}`);
+
+    if (expectedToken !== token) {
+      return res
+        .status(400)
+        .json({ message: "Invalid token. Please request for a new one." });
+    }
+
+    const updatedUser = await _updateUserVerification(email);
+    if (!updatedUser) {
+      return res.status(404).json({ message: `User not verified.` });
+    }
+
+    return res.status(200).json({ message: `User verified successfully.` });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Unknown error when verifying user!", error });
+  }
+};
 
 export const createImageLink = async (
   req: Request,
@@ -259,6 +340,93 @@ export async function updateUser(
       .json({ message: "Unknown error when updating user!" });
   }
 }
+
+export const sendResetPasswordMail = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email } = req.body;
+    const user = await _findUserByEmail(email);
+
+    if (!user) {
+      return res.status(404).json({ message: `User not found` });
+    }
+
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: "User is not verified. Please verify your account first.",
+      });
+    }
+
+    const emailToken = crypto.randomBytes(16).toString("hex");
+    await redisClient.set(`password_reset:${email}`, emailToken, {
+      EX: 60 * 5,
+    }); // expire in 5 minutes
+    await sendMail(
+      email,
+      RESET_PASSWORD_SUBJ,
+      user.username,
+      RESET_PASSWORD_TEMPLATE,
+      emailToken
+    );
+
+    return res.status(200).json({
+      message: "Reset password email sent. Please check your inbox.",
+      data: { email, id: user.id },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unknown error when sending reset password email!",
+      error,
+    });
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { email, token, password } = req.body;
+
+    const user = await _findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ message: `User not found` });
+    }
+
+    const expectedToken = await redisClient.get(`password_reset:${email}`);
+
+    if (expectedToken !== token) {
+      return res
+        .status(400)
+        .json({ message: "Invalid token. Please request for a new one." });
+    }
+
+    const { isValid: isValidPassword, message: passwordMessage } =
+      validatePassword(password);
+    if (!isValidPassword) {
+      return res.status(400).json({ message: passwordMessage });
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(password, salt);
+
+    const updatedUser = await _updateUserPassword(email, hashedPassword);
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: `User's password not reset.` });
+    }
+
+    return res
+      .status(200)
+      .json({ message: `User's password successfully reset.` });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Unknown error when resetting user password!", error });
+  }
+};
 
 export async function updateUserPrivilege(
   req: Request,

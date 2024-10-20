@@ -1,40 +1,74 @@
 import {
-  // Autocomplete,
-  // Button,
-  // Card,
-  // FormControl,
-  // Grid2,
-  // TextField,
+  Autocomplete,
+  Box,
+  Button,
+  Card,
+  FormControl,
+  Grid2,
+  TextField,
   Typography,
+  CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
-// import { useEffect, useReducer, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import classes from "./index.module.css";
 import AppMargin from "../../components/AppMargin";
-// import {
-//   complexityList,
-//   languageList,
-//   maxMatchTimeout,
-//   minMatchTimeout,
-// } from "../../utils/constants";
-// import reducer, {
-//   getQuestionCategories,
-//   initialState,
-// } from "../../reducers/questionReducer";
-// import CustomChip from "../../components/CustomChip";
-// import homepageImage from "/homepage_image.svg";
+import {
+  complexityList,
+  languageList,
+  maxMatchTimeout,
+  minMatchTimeout,
+  QUESTION_DOES_NOT_EXIST_ERROR,
+  USE_MATCH_ERROR_MESSAGE,
+} from "../../utils/constants";
+import reducer, {
+  getQuestionCategories,
+  getQuestionList,
+  initialState as initialState,
+} from "../../reducers/questionReducer";
+import CustomChip from "../../components/CustomChip";
+import homepageImage from "/homepage_image.svg";
+import { useMatch } from "../../contexts/MatchContext";
+import Loader from "../../components/Loader";
+import { toast } from "react-toastify";
 
 const Home: React.FC = () => {
-  // const [complexity, setComplexity] = useState<string[]>([]);
-  // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  // const [language, setLanguage] = useState<string[]>([]);
-  // const [timeout, setTimeout] = useState<number>(30);
+  const [complexity, setComplexity] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [language, setLanguage] = useState<string>("");
+  const [timeout, setTimeout] = useState<number | undefined>(30);
 
-  // const [state, dispatch] = useReducer(reducer, initialState);
+  const [isQueryingQnDB, setIsQueryingQnDB] = useState<boolean>(false);
 
-  // useEffect(() => {
-  //   getQuestionCategories(dispatch);
-  // }, []);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const match = useMatch();
+  if (!match) {
+    throw new Error(USE_MATCH_ERROR_MESSAGE);
+  }
+  const { findMatch, loading } = match;
+
+  const isSmallerThan1100px = useMediaQuery("(max-width:1100px)");
+
+  useEffect(() => {
+    getQuestionCategories(dispatch);
+  }, []);
+
+  useEffect(() => {
+    if (isQueryingQnDB) {
+      if (state.questions.length > 0) {
+        findMatch(complexity, category, language, timeout!);
+      } else {
+        toast.error(QUESTION_DOES_NOT_EXIST_ERROR);
+      }
+    }
+    setIsQueryingQnDB(false);
+  }, [state.questions]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <AppMargin
@@ -52,7 +86,6 @@ const Home: React.FC = () => {
       >
         Start an interactive practice session today!
       </Typography>
-
       <Typography
         variant="subtitle1"
         textAlign={"center"}
@@ -65,20 +98,22 @@ const Home: React.FC = () => {
         Specify your question preferences and sit back as we find you the best
         match.
       </Typography>
-      {/* <Box
-        component="img"
-        src={homepageImage}
-        alt="Interview Practice Buddy"
-        sx={{
-          position: "absolute",
-          top: "35%",
-          left: "10%",
-          width: "128px",
-          height: "auto",
-          objectFit: "contain",
-        }}
-      /> */}
-      {/* <Card
+      {isSmallerThan1100px && (
+        <Box
+          component="img"
+          src={homepageImage}
+          alt="Interview Practice Buddy"
+          sx={{
+            position: "absolute",
+            top: "35%",
+            left: "10%",
+            width: "128px",
+            height: "auto",
+            objectFit: "contain",
+          }}
+        />
+      )}
+      <Card
         sx={{
           padding: 4,
           width: "100%",
@@ -103,11 +138,9 @@ const Home: React.FC = () => {
               sx={{ backgroundColor: "white" }}
             >
               <Autocomplete
-                multiple
-                disableCloseOnSelect
                 options={complexityList}
-                onChange={(_, selectedOptions) => {
-                  setComplexity(selectedOptions);
+                onChange={(_, selectedOption) => {
+                  setComplexity(selectedOption || "");
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -143,11 +176,9 @@ const Home: React.FC = () => {
               sx={{ backgroundColor: "white" }}
             >
               <Autocomplete
-                multiple
-                disableCloseOnSelect
                 options={state.questionCategories}
-                onChange={(_, selectedOptions) => {
-                  setSelectedCategories(selectedOptions);
+                onChange={(_, selectedOption) => {
+                  setCategory(selectedOption || "");
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -183,11 +214,9 @@ const Home: React.FC = () => {
               sx={{ backgroundColor: "white" }}
             >
               <Autocomplete
-                multiple
-                disableCloseOnSelect
                 options={languageList}
-                onChange={(_, selectedOptions) => {
-                  setLanguage(selectedOptions);
+                onChange={(_, selectedOption) => {
+                  setLanguage(selectedOption || "");
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -221,17 +250,16 @@ const Home: React.FC = () => {
               required
               fullWidth
               type="number"
-              value={timeout}
+              onKeyDown={(event) => event.key === "e" && event.preventDefault()}
+              value={timeout !== undefined ? timeout : ""}
               onChange={(event) => {
-                const value = parseInt(event.target.value, 10);
-                setTimeout(value);
-              }}
-              InputProps={{
-                inputProps: { min: minMatchTimeout, max: maxMatchTimeout },
+                const value = event.target.value;
+                const newTimeout = value ? parseInt(value, 10) : undefined;
+                setTimeout(newTimeout);
               }}
               helperText={`Set a timeout between ${minMatchTimeout} to ${maxMatchTimeout} seconds`}
               error={
-                isNaN(timeout) ||
+                !timeout ||
                 timeout < minMatchTimeout ||
                 timeout > maxMatchTimeout
               }
@@ -253,22 +281,21 @@ const Home: React.FC = () => {
           fullWidth
           sx={{ marginTop: 2 }}
           disabled={
-            isNaN(timeout) ||
+            !timeout ||
             timeout < minMatchTimeout ||
             timeout > maxMatchTimeout ||
-            complexity.length == 0 ||
-            selectedCategories.length == 0 ||
-            language.length == 0
+            !complexity ||
+            !category ||
+            !language
           }
           onClick={() => {
-            alert(
-              `${complexity}, ${selectedCategories}, ${language}, ${timeout}`
-            );
+            setIsQueryingQnDB(true);
+            getQuestionList(1, 1, "", [complexity], [category], dispatch);
           }}
         >
-          Find my match!
+          {isQueryingQnDB ? <CircularProgress /> : "Find my match!"}
         </Button>
-      </Card> */}
+      </Card>
     </AppMargin>
   );
 };

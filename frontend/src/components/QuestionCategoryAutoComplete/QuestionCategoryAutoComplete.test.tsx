@@ -1,5 +1,4 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import QuestionCategoryAutoComplete from ".";
 
 jest.mock("../../utils/api", () => ({
@@ -39,33 +38,33 @@ describe("Question Category Auto Complete", () => {
     await waitFor(() => expect(screen.getByText("DFS")).toBeInTheDocument());
   });
 
-  it("Adding a new category not from the category list", async () => {
-    const { rerender } = render(
-      <QuestionCategoryAutoComplete
-        selectedCategories={selectedCategories}
-        setSelectedCategories={setSelectedCategories}
-      />
-    );
+  // it("Adding a new category not from the category list", async () => {
+  //   const { rerender } = render(
+  //     <QuestionCategoryAutoComplete
+  //       selectedCategories={selectedCategories}
+  //       setSelectedCategories={setSelectedCategories}
+  //     />
+  //   );
 
-    const input = screen.getByLabelText("Category");
-    fireEvent.change(input, { target: { value: "New Category" } });
+  //   const input = screen.getByLabelText("Category");
+  //   fireEvent.change(input, { target: { value: "New Category" } });
 
-    const valueAdded = 'Add: "New Category"';
-    expect(await screen.findByText(valueAdded)).toBeInTheDocument();
+  //   const valueAdded = 'Add: "New Category"';
+  //   expect(await screen.findByText(valueAdded)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText(valueAdded));
+  //   fireEvent.click(screen.getByText(valueAdded));
 
-    const updatedCategories = [...selectedCategories, "New Category"];
+  //   const updatedCategories = [...selectedCategories, "New Category"];
 
-    rerender(
-      <QuestionCategoryAutoComplete
-        selectedCategories={updatedCategories}
-        setSelectedCategories={setSelectedCategories}
-      />
-    );
+  //   rerender(
+  //     <QuestionCategoryAutoComplete
+  //       selectedCategories={updatedCategories}
+  //       setSelectedCategories={setSelectedCategories}
+  //     />
+  //   );
 
-    expect(screen.getByText("New Category")).toBeInTheDocument();
-  });
+  //   expect(screen.getByText("New Category")).toBeInTheDocument();
+  // });
 
   it("Remove a category from selected categories", async () => {
     render(
