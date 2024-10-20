@@ -13,7 +13,7 @@ import {
 } from "../utils/constants";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
-import { useAppNavigate } from "../components/NoDirectAccessRoutes";
+import useAppNavigate from "../components/UseAppNavigate";
 
 type MatchUser = {
   id: string;
