@@ -265,9 +265,9 @@ export const readCategories = async (
         "Data Structures",
         "Bit Manipulation",
         "Recursion",
-        "Databases",
+        "Dynamic Programming",
         "Arrays",
-        "Brainteaser",
+        "Tree",
       ]),
     });
   } catch (error) {
