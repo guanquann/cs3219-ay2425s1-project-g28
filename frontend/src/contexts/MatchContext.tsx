@@ -15,6 +15,8 @@ import {
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
 import useAppNavigate from "../components/UseAppNavigate";
+import { UNSAFE_NavigationContext } from "react-router-dom";
+import { Action, type History, type Transition } from "history";
 
 type MatchUser = {
   id: string;
@@ -109,6 +111,8 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const [matchPending, setMatchPending] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const navigator = useContext(UNSAFE_NavigationContext).navigator as History;
+
   useEffect(() => {
     if (user) {
       setMatchUser({
@@ -134,6 +138,16 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     openSocketConnection();
     matchSocket.emit(MatchEvents.USER_CONNECTED, matchUser?.id);
+
+    const unblock = navigator.block((transition: Transition) => {
+      if (
+        transition.action === Action.Replace ||
+        confirm(ABORT_MATCH_PROCESS_CONFIRMATION_MESSAGE)
+      ) {
+        unblock();
+        appNavigate(transition.location.pathname);
+      }
+    });
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault();
