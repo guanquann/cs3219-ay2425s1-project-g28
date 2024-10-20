@@ -21,7 +21,7 @@ import {
   USE_AUTH_ERROR_MESSAGE,
   USE_MATCH_ERROR_MESSAGE,
 } from "../../utils/constants";
-import { isMatchingPage } from "../../utils/url";
+import { isMatchingPage, isCollabPage } from "../../utils/url";
 import { useMatch } from "../../contexts/MatchContext";
 
 type NavbarItem = { label: string; link: string; needsLogin: boolean };
@@ -82,7 +82,9 @@ const Navbar: React.FC<NavbarProps> = (props) => {
           >
             PeerPrep
           </Typography>
-          {!isMatchingPage(path) ? (
+          {isCollabPage(path) ? (
+            <></>
+          ) : !isMatchingPage(path) ? (
             <Stack direction={"row"} alignItems={"center"} spacing={2}>
               {navbarItems
                 .filter((item) => !item.needsLogin || (item.needsLogin && user))
