@@ -8,7 +8,7 @@ services:
     ports:
       - 3001:3001
     depends_on:
-      - mongo
+      - user-service-mongo
       - redis
     networks:
       - peerprep-network
@@ -26,7 +26,7 @@ services:
     ports:
       - 3000:3000
     depends_on:
-      - mongo
+      - question-service-mongo
       - user-service
     networks:
       - peerprep-network
@@ -72,7 +72,7 @@ services:
       - /frontend/node_modules
     restart: on-failure
 
-  mongo:
+  question-service-mongo:
     image: mongo
     restart: always
     ports:
@@ -80,11 +80,11 @@ services:
     networks:
       - peerprep-network
     volumes:
-      - mongo-data:/data/db
+      - question-service-mongo-data:/data/db
     env_file:
-      - ./backend/.env
+      - ./backend/question-service/.env
 
-  mongo-express:
+  question-service-mongo-express:
     image: mongo-express
     restart: always
     ports:
@@ -92,8 +92,31 @@ services:
     networks:
       - peerprep-network
     depends_on:
-      - mongo
-    env_file: ./backend/.env
+      - question-service-mongo
+    env_file: ./backend/question-service/.env
+
+  user-service-mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27018:27017
+    networks:
+      - peerprep-network
+    volumes:
+      - user-service-mongo-data:/data/db
+    env_file:
+      - ./backend/user-service/.env
+
+  user-service-mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8082:8081
+    networks:
+      - peerprep-network
+    depends_on:
+      - user-service-mongo
+    env_file: ./backend/user-service/.env
 
   rabbitmq:
     image: rabbitmq:4.0-management
@@ -142,7 +165,8 @@ services:
         restart: true
 
 volumes:
-  mongo-data:
+  question-service-mongo-data:
+  user-service-mongo-data:
   redis-data:
   redis-insight-data:
 

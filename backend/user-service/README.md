@@ -12,8 +12,6 @@
 
    - `MONGO_CLOUD_URI`
 
-   - `MONGO_LOCAL_URI`
-
    - `FIREBASE_PROJECT_ID`
 
    - `FIREBASE_PRIVATE_KEY`
@@ -32,9 +30,13 @@
 
    - `REDIS_URI`
 
-4. A default admin account (`email: admin@gmail.com` and `password: Admin@123`) wil be created. If you wish to change the default credentials, update them in `.env`. Alternatively, you can also edit your credentials and user profile after you have created the default account.
+   You can also update `MONGO_INITDB_ROOT_USERNAME`, `MONGO_INITDB_ROOT_PASSWORD` to change your MongoDB credentials if necessary.
 
-5. To view the contents stored in Redis,
+4. You can view the MongoDB collections locally using Mongo Express. To set up Mongo Express, update `ME_CONFIG_BASICAUTH_USERNAME` and `ME_CONFIG_BASICAUTH_PASSWORD`. The username and password will be the login credentials when you access Mongo Express at http://localhost:8082.
+
+5. A default admin account (`email: admin@gmail.com` and `password: Admin@123`) wil be created. If you wish to change the default credentials, update them in `.env`. Alternatively, you can also edit your credentials and user profile after you have created the default account.
+
+6. To view the contents stored in Redis,
 
    1. Go to [http://localhost:5540](http://localhost:5540).
 
@@ -43,6 +45,8 @@
    3. Enter `host.internal.docker` as the Host.
 
 ## Running User Service without Docker
+
+> Make sure you have the cloud MongoDB URI in your .env file and set NODE_ENV to production already.
 
 1. Open Command Line/Terminal and navigate into the `user-service` directory.
 
