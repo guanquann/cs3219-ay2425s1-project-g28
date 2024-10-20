@@ -53,6 +53,24 @@ services:
     restart: on-failure
     command: ["npm", "test"]
 
+  test-matching-service:
+    image: peerprep/matching-service
+    build: ./backend/matching-service
+    # env_file: ./backend/matching-service/.env
+    environment:
+      - NODE_ENV=test
+      - PORT=3002
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=password
+      - RABBITMQ_ADDR=amqp://admin:password@rabbitmq:5672
+    networks:
+      - peerprep-network
+    volumes:
+      - ./backend/matching-service:/matching-service
+      - /matching-service/node_modules
+    restart: on-failure
+    command: ["npm", "test"]
+
   test-frontend:
     image: peerprep/frontend
     build: ./frontend
