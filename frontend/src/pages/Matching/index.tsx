@@ -35,12 +35,14 @@ const Matching: React.FC = () => {
     });
 
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (timeLeft <= 0) {
       matchingTimeout();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft]);
 
   if (!matchCriteria) {

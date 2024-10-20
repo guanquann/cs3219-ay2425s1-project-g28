@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { matchSocket } from "../utils/matchSocket";
 import {
+  ABORT_MATCH_PROCESS_CONFIRMATION_MESSAGE,
   FAILED_MATCH_REQUEST_MESSAGE,
   MATCH_CONNECTION_ERROR,
   MATCH_ENDED_MESSAGE,
@@ -13,7 +14,7 @@ import {
 } from "../utils/constants";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
-import { useAppNavigate } from "../components/NoDirectAccessRoutes";
+import useAppNavigate from "../components/UseAppNavigate";
 
 type MatchUser = {
   id: string;
@@ -98,16 +99,8 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
   const { user } = auth;
-  const [matchUser, _setMatchUser] = useState<MatchUser | null>(
-    user
-      ? {
-          id: user.id,
-          username: user.username,
-          profile: user.profilePictureUrl,
-        }
-      : null
-  );
 
+  const [matchUser, setMatchUser] = useState<MatchUser | null>(null);
   const [matchCriteria, setMatchCriteria] = useState<MatchCriteria | null>(
     null
   );
@@ -115,6 +108,18 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const [partner, setPartner] = useState<MatchUser | null>(null);
   const [matchPending, setMatchPending] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (user) {
+      setMatchUser({
+        id: user.id,
+        username: user.username,
+        profile: user.profilePictureUrl,
+      });
+    } else {
+      setMatchUser(null);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (
@@ -130,12 +135,24 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     openSocketConnection();
     matchSocket.emit(MatchEvents.USER_CONNECTED, matchUser?.id);
 
-    window.addEventListener("beforeunload", () => closeSocketConnection());
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = ABORT_MATCH_PROCESS_CONFIRMATION_MESSAGE; // for legacy support, does not actually display message
+    };
+
+    const handleUnload = () => {
+      closeSocketConnection();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("unload", handleUnload);
 
     return () => {
       closeSocketConnection();
-      window.removeEventListener("beforeunload", () => closeSocketConnection());
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("unload", handleUnload);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchUser?.id, location.pathname]);
 
   const resetMatchStates = () => {
@@ -219,10 +236,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   const initMatchRequestListeners = () => {
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      setMatchId(matchId);
-      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
-      setMatchPending(true);
-      appNavigate(MatchPaths.MATCHED);
+      handleMatchFound(matchId, user1, user2);
     });
 
     matchSocket.on(MatchEvents.MATCH_REQUEST_EXISTS, () => {
@@ -236,10 +250,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
   const initMatchingListeners = () => {
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      setMatchId(matchId);
-      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
-      setMatchPending(true);
-      appNavigate(MatchPaths.MATCHED);
+      handleMatchFound(matchId, user1, user2);
     });
   };
 
@@ -255,10 +266,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     });
 
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
-      setMatchId(matchId);
-      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
-      setMatchPending(true);
-      appNavigate(MatchPaths.MATCHED);
+      handleMatchFound(matchId, user1, user2);
     });
 
     matchSocket.on(MatchEvents.MATCH_REQUEST_ERROR, () => {
@@ -271,6 +279,21 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       toast.error(MATCH_ENDED_MESSAGE);
       appNavigate(MatchPaths.HOME);
     });
+  };
+
+  const handleMatchFound = (
+    matchId: string,
+    user1: MatchUser,
+    user2: MatchUser
+  ) => {
+    setMatchId(matchId);
+    if (matchUser?.id === user1.id) {
+      setPartner(user2);
+    } else {
+      setPartner(user1);
+    }
+    setMatchPending(true);
+    appNavigate(MatchPaths.MATCHED);
   };
 
   const findMatch = (

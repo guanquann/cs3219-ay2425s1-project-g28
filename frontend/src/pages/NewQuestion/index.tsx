@@ -15,6 +15,7 @@ import reducer, {
 import { toast } from "react-toastify";
 
 import {
+  ABORT_CREATE_OR_EDIT_QUESTION_CONFIRMATION_MESSAGE,
   complexityList,
   FAILED_QUESTION_CREATE,
   FILL_ALL_FIELDS,
@@ -47,11 +48,7 @@ const NewQuestion = () => {
       selectedComplexity ||
       selectedCategories.length > 0
     ) {
-      if (
-        !confirm(
-          "Are you sure you want to leave this page? All process will be lost."
-        )
-      ) {
+      if (!confirm(ABORT_CREATE_OR_EDIT_QUESTION_CONFIRMATION_MESSAGE)) {
         return;
       }
     }

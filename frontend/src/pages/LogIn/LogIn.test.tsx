@@ -59,7 +59,7 @@ describe("Log In Components", () => {
     expect(signUpButton).toBeInTheDocument();
 
     fireEvent.click(signUpButton);
-    expect(mockUseNavigate).toHaveBeenCalledWith("/signup");
+    expect(mockUseNavigate).toHaveBeenCalledWith("/auth/signup");
   });
 });
 
