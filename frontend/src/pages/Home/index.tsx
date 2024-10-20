@@ -296,7 +296,7 @@ const Home: React.FC = () => {
           }
           onClick={() => {
             setIsQueryingQnDB(true);
-            getQuestionList(1, 10, "", complexities, categories, dispatch);
+            getQuestionList(1, 1, "", complexities, categories, dispatch);
           }}
         >
           {isQueryingQnDB ? <CircularProgress /> : "Find my match!"}
