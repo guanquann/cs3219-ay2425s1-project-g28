@@ -251,11 +251,24 @@ export const readCategories = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const uniqueCats = await Question.distinct("category");
+    // const uniqueCats = await Question.distinct("category");
 
+    // res.status(200).json({
+    //   message: CATEGORIES_RETRIEVED_MESSAGE,
+    //   categories: sortAlphabetically(uniqueCats),
+    // });
     res.status(200).json({
       message: CATEGORIES_RETRIEVED_MESSAGE,
-      categories: sortAlphabetically(uniqueCats),
+      categories: sortAlphabetically([
+        "Strings",
+        "Algorithms",
+        "Data Structures",
+        "Bit Manipulation",
+        "Recursion",
+        "Dynamic Programming",
+        "Arrays",
+        "Tree",
+      ]),
     });
   } catch (error) {
     res.status(500).json({ message: SERVER_ERROR_MESSAGE, error });
