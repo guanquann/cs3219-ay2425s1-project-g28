@@ -42,13 +42,21 @@
 
    3. Enter `host.internal.docker` as the Host.
 
-## Running User Service without Docker
+## Running User Service Individually
 
-1. Open Command Line/Terminal and navigate into the `user-service` directory.
+1. Set up and run Redis using `docker compose run --rm --name redis -p 6379:6379 redis`.
 
-2. Run the command: `npm install`. This will install all the necessary dependencies.
+2. Open Command Line/Terminal and navigate into the `user-service` directory.
 
-3. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
+3. Run the command: `npm install`. This will install all the necessary dependencies.
+
+4. Run the command `npm start` to start the User Service in production mode, or use `npm run dev` for development mode, which includes features like automatic server restart when you make code changes.
+
+## Running User Service Individually with Docker
+
+1. Open the command line/terminal.
+
+2. Run the command `docker compose run user-service` to start up the user service and its dependencies.
 
 ## After running
 
