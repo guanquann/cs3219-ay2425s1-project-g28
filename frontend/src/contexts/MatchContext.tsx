@@ -13,7 +13,7 @@ import {
 } from "../utils/constants";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
-import { useAppNavigate } from "../components/NoDirectAccessRoutes";
+import useAppNavigate from "../components/UseAppNavigate";
 
 type MatchUser = {
   id: string;
@@ -98,7 +98,8 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     throw new Error(USE_AUTH_ERROR_MESSAGE);
   }
   const { user } = auth;
-  const [matchUser, _setMatchUser] = useState<MatchUser | null>(
+
+  const [matchUser] = useState<MatchUser | null>(
     user
       ? {
           id: user.id,
@@ -136,6 +137,7 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       closeSocketConnection();
       window.removeEventListener("beforeunload", () => closeSocketConnection());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [matchUser?.id, location.pathname]);
 
   const resetMatchStates = () => {
@@ -220,7 +222,11 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const initMatchRequestListeners = () => {
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
       setMatchId(matchId);
-      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+      if (matchUser?.id === user1.id) {
+        setPartner(user2);
+      } else {
+        setPartner(user1);
+      }
       setMatchPending(true);
       appNavigate(MatchPaths.MATCHED);
     });
@@ -237,7 +243,11 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   const initMatchingListeners = () => {
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
       setMatchId(matchId);
-      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+      if (matchUser?.id === user1.id) {
+        setPartner(user2);
+      } else {
+        setPartner(user1);
+      }
       setMatchPending(true);
       appNavigate(MatchPaths.MATCHED);
     });
@@ -256,7 +266,11 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     matchSocket.on(MatchEvents.MATCH_FOUND, ({ matchId, user1, user2 }) => {
       setMatchId(matchId);
-      matchUser?.id === user1.id ? setPartner(user2) : setPartner(user1);
+      if (matchUser?.id === user1.id) {
+        setPartner(user2);
+      } else {
+        setPartner(user1);
+      }
       setMatchPending(true);
       appNavigate(MatchPaths.MATCHED);
     });
