@@ -16,9 +16,9 @@ export interface MatchUser {
 
 export interface MatchRequest {
   user: MatchUser;
-  complexities: string[];
-  categories: string[];
-  languages: string[];
+  complexity: string;
+  category: string;
+  language: string;
   timeout: number;
 }
 
@@ -37,7 +37,7 @@ export const sendMatchRequest = async (
   requestId: string,
   rejectedPartnerId?: string
 ): Promise<boolean> => {
-  const { user, complexities, categories, languages, timeout } = matchRequest;
+  const { user, complexity, category, language, timeout } = matchRequest;
 
   const matchItem: MatchRequestItem = {
     id: requestId,
@@ -47,12 +47,7 @@ export const sendMatchRequest = async (
     rejectedPartnerId: rejectedPartnerId,
   };
 
-  const sent = await sendToQueue(
-    complexities[0],
-    categories[0],
-    languages[0],
-    matchItem
-  );
+  const sent = await sendToQueue(complexity, category, language, matchItem);
   return sent;
 };
 

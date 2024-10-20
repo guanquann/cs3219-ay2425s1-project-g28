@@ -23,9 +23,9 @@ type MatchUser = {
 };
 
 type MatchCriteria = {
-  complexities: string[];
-  categories: string[];
-  languages: string[];
+  complexity: string;
+  category: string;
+  language: string;
   timeout: number;
 };
 
@@ -67,9 +67,9 @@ enum MatchPaths {
 
 type MatchContextType = {
   findMatch: (
-    complexities: string[],
-    categories: string[],
-    languages: string[],
+    complexity: string,
+    category: string,
+    language: string,
     timeout: number
   ) => void;
   stopMatch: () => void;
@@ -297,9 +297,9 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
   };
 
   const findMatch = (
-    complexities: string[],
-    categories: string[],
-    languages: string[],
+    complexity: string,
+    category: string,
+    language: string,
     timeout: number
   ) => {
     if (!matchUser) {
@@ -318,9 +318,9 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
       MatchEvents.MATCH_REQUEST,
       {
         user: matchUser,
-        complexities: complexities,
-        categories: categories,
-        languages: languages,
+        complexity: complexity,
+        category: category,
+        language: language,
         timeout: timeout,
       },
       (requested: boolean) => {
@@ -328,9 +328,9 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
         setTimeout(() => setLoading(false), 500);
         if (requested) {
           setMatchCriteria({
-            complexities,
-            categories,
-            languages,
+            complexity: complexity,
+            category: category,
+            language: language,
             timeout,
           });
           appNavigate(MatchPaths.MATCHING);
@@ -388,9 +388,9 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
 
     const rematchRequest = {
       user: matchUser,
-      complexities: matchCriteria.complexities,
-      categories: matchCriteria.categories,
-      languages: matchCriteria.languages,
+      complexities: matchCriteria.complexity,
+      categories: matchCriteria.category,
+      languages: matchCriteria.language,
       timeout: matchCriteria.timeout,
     };
     matchSocket.emit(
@@ -416,9 +416,9 @@ const MatchProvider: React.FC<{ children?: React.ReactNode }> = (props) => {
     }
 
     findMatch(
-      matchCriteria.complexities,
-      matchCriteria.categories,
-      matchCriteria.languages,
+      matchCriteria.complexity,
+      matchCriteria.category,
+      matchCriteria.language,
       matchCriteria.timeout
     );
   };
