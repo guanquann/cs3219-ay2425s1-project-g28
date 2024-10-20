@@ -27,13 +27,13 @@ jobs:
       - name: Linting
         working-directory: frontend
         run: npm run lint
-      - name: Frontend tests
+      - name: Test
         run: docker compose -f docker-compose-test.yml run --rm test-frontend
   backend-ci:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [question-service, user-service]
+        service: [question-service, user-service, matching-service]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
       - name: Linting
         working-directory: backend/${{ matrix.service }}
         run: npm run lint
-      - name: Backend tests
+      - name: Test
         env:
           FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
           FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
