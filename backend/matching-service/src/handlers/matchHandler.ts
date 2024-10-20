@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { sendRabbitMq } from "../../config/rabbitmq";
+import { sendToQueue } from "../../config/rabbitmq";
 import { sendMatchFound } from "./websocketHandler";
 
 interface Match {
@@ -16,18 +16,15 @@ export interface MatchUser {
 
 export interface MatchRequest {
   user: MatchUser;
-  complexities: string[];
-  categories: string[];
-  languages: string[];
+  complexity: string;
+  category: string;
+  language: string;
   timeout: number;
 }
 
 export interface MatchRequestItem {
   id: string;
   user: MatchUser;
-  complexities: string[];
-  categories: string[];
-  languages: string[];
   sentTimestamp: number;
   ttlInSecs: number;
   rejectedPartnerId?: string;
@@ -40,20 +37,17 @@ export const sendMatchRequest = async (
   requestId: string,
   rejectedPartnerId?: string
 ): Promise<boolean> => {
-  const { user, complexities, categories, languages, timeout } = matchRequest;
+  const { user, complexity, category, language, timeout } = matchRequest;
 
   const matchItem: MatchRequestItem = {
     id: requestId,
     user: user,
-    complexities: complexities,
-    categories: categories,
-    languages: languages,
     sentTimestamp: Date.now(),
     ttlInSecs: timeout,
     rejectedPartnerId: rejectedPartnerId,
   };
 
-  const sent = await sendRabbitMq(matchItem);
+  const sent = await sendToQueue(complexity, category, language, matchItem);
   return sent;
 };
 

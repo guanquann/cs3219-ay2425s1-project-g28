@@ -34,9 +34,9 @@ import Loader from "../../components/Loader";
 import { toast } from "react-toastify";
 
 const Home: React.FC = () => {
-  const [complexities, setComplexities] = useState<string[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
+  const [complexity, setComplexity] = useState<string>("");
+  const [category, setCategory] = useState<string>("");
+  const [language, setLanguage] = useState<string>("");
   const [timeout, setTimeout] = useState<number | undefined>(30);
 
   const [isQueryingQnDB, setIsQueryingQnDB] = useState<boolean>(false);
@@ -58,7 +58,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     if (isQueryingQnDB) {
       if (state.questions.length > 0) {
-        findMatch(complexities, categories, languages, timeout!);
+        findMatch(complexity, category, language, timeout!);
       } else {
         toast.error(QUESTION_DOES_NOT_EXIST_ERROR);
       }
@@ -139,8 +139,8 @@ const Home: React.FC = () => {
             >
               <Autocomplete
                 options={complexityList}
-                onChange={(_, selectedOptions) => {
-                  setComplexities(selectedOptions ? [selectedOptions] : []);
+                onChange={(_, selectedOption) => {
+                  setComplexity(selectedOption || "");
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -177,8 +177,8 @@ const Home: React.FC = () => {
             >
               <Autocomplete
                 options={state.questionCategories}
-                onChange={(_, selectedOptions) => {
-                  setCategories(selectedOptions ? [selectedOptions] : []);
+                onChange={(_, selectedOption) => {
+                  setCategory(selectedOption || "");
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -215,8 +215,8 @@ const Home: React.FC = () => {
             >
               <Autocomplete
                 options={languageList}
-                onChange={(_, selectedOptions) => {
-                  setLanguages(selectedOptions ? [selectedOptions] : []);
+                onChange={(_, selectedOption) => {
+                  setLanguage(selectedOption || "");
                 }}
                 renderInput={(params) => <TextField {...params} />}
                 renderTags={(tagValue, getTagProps) =>
@@ -284,13 +284,13 @@ const Home: React.FC = () => {
             !timeout ||
             timeout < minMatchTimeout ||
             timeout > maxMatchTimeout ||
-            complexities.length == 0 ||
-            categories.length == 0 ||
-            languages.length == 0
+            !complexity ||
+            !category ||
+            !language
           }
           onClick={() => {
             setIsQueryingQnDB(true);
-            getQuestionList(1, 1, "", complexities, categories, dispatch);
+            getQuestionList(1, 1, "", [complexity], [category], dispatch);
           }}
         >
           {isQueryingQnDB ? <CircularProgress /> : "Find my match!"}
