@@ -15,6 +15,7 @@ env:
   REDIS_HOST: localhost
   REDIS_PORT: 6379
   REDIS_URI_TEST: redis://localhost:6379
+  MONGO_URI_TEST: mongodb://localhost:42069/testdb
 
 permissions:
   contents: read
@@ -56,6 +57,12 @@ jobs:
         working-directory: ${{ matrix.service }}
         run: npm run lint
 
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-replica-set: test-rs
+          mongodb-port: 42069
+
       - name: Set .env variables
         working-directory: ${{ matrix.service }}
         run: |
@@ -69,6 +76,7 @@ jobs:
           echo "REDIS_HOST=${{ env.REDIS_HOST }}" >> .env
           echo "REDIS_PORT=${{ env.REDIS_PORT }}" >> .env
           echo "REDIS_URI_TEST=${{ env.REDIS_URI_TEST }}" >> .env
+          echo "MONGO_URI_TEST=${{ env.MONGODB_URI_TEST }}" >> .env
 
       - name: Tests
         working-directory: ${{ matrix.service }}
